@@ -75,3 +75,13 @@
 对原生 Harbor 示例，查看其 Job、Trial、verifier 和 Agent 日志。对 Harness 公开会话路径，按[结果报告](../chips/HARBOR_RESULTS.md)核验冻结候选、独立评分和归档。离线重放按示例检查 candidate、task、checker、engine 与配置身份，不能仅凭退出码判断成功。
 
 最后用自己选择的 Agent 与模型运行任务，并检查工具调用和最终提交是否来自这次尝试。需要训练数据时，按 [ATIF 数据说明](../../circuit_harness/data/README.md)检查轨迹完整性、筛选条件与实际支持范围。参考候选验收和模型解题成绩分开报告。
+
+服务器部署也按此顺序验收。先确认镜像架构、离线依赖和容器资源限制，
+再运行参考候选与合法的性能负例，最后运行有预算限制的 Agent Trial。
+已有的[服务器 SKY130 对照](../../examples/analogbench/README.md#linux-服务器上的性能对照)
+展示了参考 7/7、性能负例 4/7，以及 CPU controller 缺失时如何保留基础设施失败。
+公开会话路径先执行[静态与环境预检](../chips/HARBOR_DEPLOYMENT.md)；
+预检通过仍不代表模型鉴权或商业终评许可证已验收。
+另见 [EVAS 与独立 Spectre 的服务器实验](../../examples/evas-va07/README.md#服务器公开会话实验)。
+该实验分别保留了超时的模型 Trial、事后恢复的独立评分和成功的参考候选控制，
+没有把后续恢复结果改写为原 Trial 的成功。

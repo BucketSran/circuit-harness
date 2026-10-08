@@ -168,6 +168,32 @@ B 的 Harbor Nop Agent 保持空 subcircuit starter，仿真前合法性检查�
 本例适配修复该路径并拒绝合法候选缺少 checker 报告的情况。
 准备边界回归涵盖源码漂移、stock job、密钥引用、缺 checker 和缺执行报告。A 的回归经生成配置与真实 Harbor Verifier 工厂，
 模拟 checker exit=2 但只有 trap 零分的独立 verifier 环境，确认返回基础设施错误。
+
+### Linux 服务器上的性能对照
+
+同日使用 Harness `4409953` 的 `execution.analog_design_bench.run_case`，
+在 Linux x86_64、rootless Podman 和原固定镜像内的 ngspice-46 上重跑 B。
+原任务树、合法性检查器、评分代码和阈值均未修改。
+
+| 候选 | 合法性检查 | 原评分 | 解释 |
+| --- | --- | --- | --- |
+| 上游参考解 | 通过 | 7/7 | 最坏工况增益 41.42 dB，七项均通过 |
+| 参考解四个 signal-core 器件的 L 从 1.0 µm 改为 0.7 µm | 通过 | 4/7 | 最坏工况增益 39.18 dB，低于 40 dB；UGB、相位裕度、功耗、噪声通过 |
+
+第二行保留拓扑、宽度、器件型号和偏置镜像。原检查器因 PVT 检查失败，
+将 CMRR、PSRR 标为 `blocked`；4/7 不表示另三项都完成测量且不达标。
+这是合法、可仿真的性能负例，与空 starter 在仿真前被拒绝的 0/7 不同。
+寻找此对照共运行三个预先限定的长度设置：0.6 µm 为 0/7，0.8 µm 为 7/7，
+0.7 µm 为 4/7。这些是操作者设计的控制实验，不是模型解题成绩。
+
+该服务器未委派 CPU controller。默认四 CPU 配额的运行返回容器错误，分数为 `null`；
+随后显式使用既有 `podman_no_cpu_limit=True`，成功执行上述对照。
+复现实验需记录这一资源条件，不能声称具有 CPU 硬配额。
+运行使用离线导入的固定 linux/amd64 镜像，保留归档摘要与实际 Podman image ID。
+镜像在线拉取未完成，不作为成功步骤。
+
+这里验证的是 Harness 的直接执行入口。上文的新准备 CLI 和 Harbor Analog 流程
+在本机 Docker 验证；本节不把服务器直接执行记录扩展为服务器 Harbor 或 Agent 验收。
 外部原题回归需设置 `ANALOG_EXAMPLE_SOURCES`，默认不下载第三方数据：
 
 ```bash
