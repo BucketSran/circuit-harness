@@ -6,6 +6,8 @@ from pathlib import Path
 
 import pytest
 
+pytest.importorskip("harbor")
+
 from circuit_harness.execution.analog_design_bench import TASKS
 from circuit_harness.harbor.analog_example import prepare
 
