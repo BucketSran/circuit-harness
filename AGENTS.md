@@ -40,8 +40,11 @@ Planning/review skills use the [issue tracker](docs/agents/issue-tracker.md) and
 
 ## Ownership and compatibility
 
+- `circuit_harness/benchmarks/`: benchmark-specific preparation, replay and operator CLIs.
 - `circuit_harness/execution/`: simulators, public sessions, transport and evidence.
-- `circuit_harness/harbor/`: Harbor plugins, Agent/Model configuration and independent verification.
+- `circuit_harness/harbor/`: Harbor environment/verifier plugins, Agent/Model configuration and independent verification.
+- `examples/analogbench/`, `examples/evas-va07/`: complete benchmark recipes and their runtime assets.
+- `docs/guides/integration.md`: developer integration guide.
 - `circuit_harness/data/`: ATIF preparation and external-trainer dataset interfaces.
 - `circuit_harness/reporting/`: offline saved-episode reports.
 - `circuit_harness/cli.py`, `public_mcp.py`, `task_authoring.py`: operator and public protocol entries.
