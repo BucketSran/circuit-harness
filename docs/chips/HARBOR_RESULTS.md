@@ -98,7 +98,7 @@ Spectre 分数来自 `verifier/transport/*/archive`，通过现有 `verify_archi
 | 批次 `score_count` / `score_mean` | `score_denominator` / `mean_score` | 均只使用有效独立分数 |
 | 用量和费用 | `usage` | 采用原生保存值，缺失保持未知 |
 
-旧 `chips_experiment`、`chips_evaluate` 入口及其记录格式保持原状；它们不读取新 schema。
+旧版本记录不改写；`chips_experiment`、`chips_evaluate` 启动器已退役，见[迁移说明](MIGRATION.md)。
 
 ## 验证范围
 
