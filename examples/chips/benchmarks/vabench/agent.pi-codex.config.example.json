@@ -1,0 +1,21 @@
+{
+  "transport": "ssh",
+  "host": "lab-host",
+  "python": "/usr/local/bin/python3.12",
+  "bundle": "/private/harness/chips-agent.pyz",
+  "session": "/private/scratch/session-001",
+  "task_id": "v4-001",
+  "job_root": "/private/scratch/jobs",
+  "job_id": "pi-codex-001",
+  "archive_root": "/private/persistent/archives",
+  "policy_kind": "remote_model",
+  "pi_cli": "/absolute/path/to/pi",
+  "provider_kind": "openai_codex",
+  "pi_auth_dir": "/private/pi-codex-auth",
+  "model": "gpt-5.6-luna",
+  "thinking": "medium",
+  "episode_timeout_s": 600,
+  "max_model_calls": 12,
+  "max_request_bytes": 64000,
+  "max_output_tokens": 4096
+}

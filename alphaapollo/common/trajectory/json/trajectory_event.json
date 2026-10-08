@@ -1,0 +1,263 @@
+{
+  "$defs": {
+    "ArtifactRef": {
+      "additionalProperties": false,
+      "description": "One durable occurrence of content-addressed artifact data.",
+      "properties": {
+        "contamination_flags": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Contamination Flags",
+          "type": "array"
+        },
+        "created_by": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Created By"
+        },
+        "hash": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Hash"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "location": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Location"
+        },
+        "provenance": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ProvenanceRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Type"
+        },
+        "version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Version"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "title": "ArtifactRef",
+      "type": "object"
+    },
+    "ProvenanceRef": {
+      "additionalProperties": false,
+      "properties": {
+        "hash": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Hash"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "location": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Location"
+        },
+        "version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Version"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "title": "ProvenanceRef",
+      "type": "object"
+    },
+    "TrajectoryEventType": {
+      "enum": [
+        "ProblemUnderstood",
+        "ProblemDecomposed",
+        "HypothesisCreated",
+        "EvidenceAdded",
+        "ClaimVerified",
+        "ToolCalled",
+        "ToolFailed",
+        "BranchForked",
+        "BranchPruned",
+        "VerifierPassed",
+        "VerifierFailed",
+        "AssumptionChanged",
+        "SkillApplied",
+        "ArtifactGenerated",
+        "HumanIntervened",
+        "SolutionPackaged"
+      ],
+      "title": "TrajectoryEventType",
+      "type": "string"
+    }
+  },
+  "additionalProperties": true,
+  "description": "Append-only audit envelope compatible with historical v3 records.",
+  "properties": {
+    "artifact_refs": {
+      "items": {
+        "$ref": "#/$defs/ArtifactRef"
+      },
+      "title": "Artifact Refs",
+      "type": "array"
+    },
+    "branch_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Branch Id"
+    },
+    "event_id": {
+      "title": "Event Id",
+      "type": "string"
+    },
+    "payload": {
+      "additionalProperties": true,
+      "title": "Payload",
+      "type": "object"
+    },
+    "provenance": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ProvenanceRef"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "schema_version": {
+      "default": "1.1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "sequence": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Sequence"
+    },
+    "session_id": {
+      "title": "Session Id",
+      "type": "string"
+    },
+    "timestamp": {
+      "format": "date-time",
+      "title": "Timestamp",
+      "type": "string"
+    },
+    "trajectory_schema_version": {
+      "anyOf": [
+        {
+          "minimum": 1,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Trajectory Schema Version"
+    },
+    "type": {
+      "$ref": "#/$defs/TrajectoryEventType"
+    }
+  },
+  "required": [
+    "type",
+    "event_id",
+    "session_id",
+    "timestamp"
+  ],
+  "title": "TrajectoryEvent",
+  "type": "object"
+}

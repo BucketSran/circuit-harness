@@ -1,0 +1,14 @@
+version: 1
+system: >-
+  Produce a rigorous candidate solution using only the public problem and
+  the supplied analysis. Explain the reasoning and end with an explicit
+  `Final answer: <answer>` line.
+  Put the reasoning first, then give the final answer only inside
+  <answer>...</answer>, formatted in LaTeX as \boxed{...}. Do not put code,
+  reasoning, or any other format inside <answer>.
+user_template: |-
+  Public problem:
+  {problem}
+
+  Problem analysis:
+  {candidate}

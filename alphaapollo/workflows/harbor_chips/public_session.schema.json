@@ -1,0 +1,169 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "task": {
+      "additionalProperties": true,
+      "title": "Task",
+      "type": "object"
+    },
+    "materials": {
+      "format": "path",
+      "title": "Materials",
+      "type": "string"
+    },
+    "checkout": {
+      "anyOf": [
+        {
+          "format": "path",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Checkout"
+    },
+    "kernel": {
+      "anyOf": [
+        {
+          "format": "path",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Kernel"
+    },
+    "public_backend": {
+      "default": "docker",
+      "enum": [
+        "docker",
+        "podman",
+        "native_codex_sandbox",
+        "remote_spectre"
+      ],
+      "title": "Public Backend",
+      "type": "string"
+    },
+    "public_cpu_limit": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0,
+          "maximum": 1,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": 1,
+      "title": "Public Cpu Limit"
+    },
+    "public_remote": {
+      "anyOf": [
+        {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Public Remote"
+    },
+    "public_task_package": {
+      "anyOf": [
+        {
+          "format": "path",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Public Task Package"
+    },
+    "public_codex": {
+      "anyOf": [
+        {
+          "format": "path",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Public Codex"
+    },
+    "public_python": {
+      "anyOf": [
+        {
+          "format": "path",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Public Python"
+    },
+    "image": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Image"
+    },
+    "max_actions": {
+      "default": 24,
+      "minimum": 1,
+      "title": "Max Actions",
+      "type": "integer"
+    },
+    "max_simulations": {
+      "default": 4,
+      "minimum": 1,
+      "title": "Max Simulations",
+      "type": "integer"
+    },
+    "simulation_timeout_s": {
+      "default": 120,
+      "exclusiveMinimum": 0,
+      "title": "Simulation Timeout S",
+      "type": "number"
+    },
+    "max_output_bytes": {
+      "default": 16777216,
+      "minimum": 1,
+      "title": "Max Output Bytes",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "task",
+    "materials",
+    "image"
+  ],
+  "title": "PublicSessionConfig",
+  "type": "object"
+}

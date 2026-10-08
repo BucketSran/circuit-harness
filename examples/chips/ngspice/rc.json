@@ -1,0 +1,5 @@
+{
+  "resistance_ohm": 1000,
+  "capacitance_f": 1e-9,
+  "voltage_v": 1
+}

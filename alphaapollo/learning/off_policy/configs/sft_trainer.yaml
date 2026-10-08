@@ -1,0 +1,67 @@
+# AlphaApollo SFT config — shared offline training overlay
+#
+# Inherits verl's sft_trainer_engine base config via hydra.searchpath on the installed
+# third_party/verl package, then overlays AlphaApollo-specific values.
+# All keys are verl-0.9 sft_trainer_engine schema — NOT verl-0.3 fsdp_sft_trainer keys.
+#
+# V-gate rules:
+#   - Use data.messages_key (NOT data.prompt_key / data.response_key — those are 0.3 keys)
+#   - Use data.micro_batch_size_per_gpu (NOT data.micro_batch_size)
+#   - Use model.path (NOT model.partial_pretrain)
+#   - data.custom_cls is null → uses default MultiTurnSFTDataset
+#
+# GPU-free resolve gate (D-06):
+#   python -m alphaapollo.learning.off_policy.main_off_policy --cfg job
+
+# Put verl's installed config package on Hydra's search path so `- sft_trainer_engine`
+# below resolves to third_party/verl/verl/trainer/config/sft_trainer_engine.yaml
+# (and its nested model/engine/optim/profiler group defaults).
+hydra:
+  searchpath:
+    - pkg://verl.trainer.config
+
+defaults:
+  - sft_trainer_engine
+  - _self_
+
+# ---------------------------------------------------------------------------
+# Data — verl-0.9 sft_trainer_engine keys
+# ---------------------------------------------------------------------------
+data:
+  # Parametrized — bound at launch via AA_SFT_TRAIN_FILES / AA_SFT_VAL_FILES env vars.
+  # Fallback is a placeholder path; real paths are always provided at launch time.
+  train_files: ${oc.env:AA_SFT_TRAIN_FILES,/data/train.parquet}
+  val_files: ${oc.env:AA_SFT_VAL_FILES,null}
+
+  # verl-0.9 MultiTurnSFTDataset key — reads list-of-{role,content} from parquet
+  messages_key: messages
+
+  # verl-0.9 batch size keys (NOT data.micro_batch_size which is the 0.3 key)
+  train_batch_size: 256
+  micro_batch_size_per_gpu: 4
+
+  max_length: 2048
+  truncation: right
+
+  # Use default MultiTurnSFTDataset (custom_cls.path null → no override needed)
+  # custom_cls.path: null is already set in sft_trainer_engine base
+
+# ---------------------------------------------------------------------------
+# Model — verl-0.9 uses model.path (NOT model.partial_pretrain)
+# ---------------------------------------------------------------------------
+model:
+  path: Qwen/Qwen2.5-3B-Instruct
+
+# ---------------------------------------------------------------------------
+# Trainer — experiment tracking
+# ---------------------------------------------------------------------------
+trainer:
+  project_name: aa-sft
+  experiment_name: offline_sft
+  total_epochs: 1
+  # console only — no W&B secrets in committed config
+  logger: ["console"]
+  default_hdfs_dir: null
+  # Disable checkpoint I/O during smoke/testing
+  save_freq: -1
+  test_freq: -1

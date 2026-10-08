@@ -1,0 +1,85 @@
+name: Feature proposal
+description: Propose a feature, refactor, or scoped engineering task
+title: "[Proposal] "
+labels:
+  - enhancement
+body:
+  - type: dropdown
+    id: area
+    attributes:
+      label: Primary area
+      options:
+        - common
+        - schema
+        - reasoning
+        - learning
+        - evolving
+        - workflows
+        - docs / examples / config
+        - installation / CI
+        - cross-cutting
+    validations:
+      required: true
+
+  - type: textarea
+    id: related-work
+    attributes:
+      label: Related issues and pull requests
+      description: Link similar proposals or implementations found during your search, or state that none were found and include the search terms.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem and motivation
+      description: Explain the user or engineering problem. Focus on why the current behavior is insufficient.
+    validations:
+      required: true
+
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Desired outcome
+      description: Describe the observable result without prescribing unnecessary implementation details.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed approach
+      description: Outline the intended design, affected components, and important compatibility constraints.
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance criteria
+      description: List concrete, verifiable conditions for considering the work complete.
+      placeholder: |
+        - [ ] ...
+        - [ ] ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: non-goals
+    attributes:
+      label: Non-goals
+      description: State what this proposal intentionally does not cover.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives, risks, and additional context
+      description: Record alternatives considered, migration risks, examples, or related issues.
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Submission checks
+      options:
+        - label: I searched existing issues and documented related work above.
+          required: true

@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "task_id": "RC-001",
+  "shell": "/bin/csh",
+  "setup_scripts": [
+    "/path/to/cadence.csh",
+    "/path/to/second-setup.csh"
+  ],
+  "spectre": "/path/to/spectre",
+  "run_root": "/private/scratch/chips-spectre-jobs",
+  "archive_root": "/private/persistent/chips-spectre-archives",
+  "timeout_s": 60,
+  "license_queue_s": 5
+}

@@ -1,0 +1,38 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "executable": {
+      "format": "path",
+      "title": "Executable",
+      "type": "string"
+    },
+    "root": {
+      "format": "path",
+      "title": "Root",
+      "type": "string"
+    },
+    "runroot": {
+      "format": "path",
+      "title": "Runroot",
+      "type": "string"
+    },
+    "control_dir": {
+      "format": "path",
+      "title": "Control Dir",
+      "type": "string"
+    },
+    "ignore_chown_errors": {
+      "default": false,
+      "title": "Ignore Chown Errors",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "executable",
+    "root",
+    "runroot",
+    "control_dir"
+  ],
+  "title": "PodmanRuntimeConfig",
+  "type": "object"
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Review Pull Request"
+  short_description: "Review Harness requirements and compatibility"
+  default_prompt: "Use $review-pr to review this Harness change with shared code-review and project contract checks."

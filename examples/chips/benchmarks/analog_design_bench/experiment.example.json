@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "benchmark": "analog_design_bench",
+  "task_id": "rlc-rf-bandpass-100mhz",
+  "run_id": "analog-new-run-001",
+  "agent": "pi",
+  "operator_config": "/private/config/analog-operator.json",
+  "output": "/private/runs/chips/analog-new-run-001",
+  "final_output": "/private/scratch/analog-final-new-run-001",
+  "archive_root": "/private/persistent/analog-archives",
+  "key_file": "/private/secrets/glm.key"
+}

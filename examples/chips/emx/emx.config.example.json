@@ -1,0 +1,13 @@
+{
+  "ssh_host": "lab-emx",
+  "remote_root": "/path/to/your/private/chips-runs",
+  "converter": ["/absolute/path/to/.venv/bin/python", "/absolute/path/to/examples/chips/emx/json_to_gds.py", "{input_json}", "{output_gds}"],
+  "emx_command": ["/absolute/path/to/lab-emx-wrapper", "{gds}", "{job_dir}"],
+  "remote_input_files": ["/absolute/path/to/process-file"],
+  "outputs": ["result.s2p"],
+  "remote_python": "python3",
+  "timeout_s": 1800,
+  "command_timeout_s": 30,
+  "max_attempts": 3,
+  "max_output_bytes": 268435456
+}

@@ -1,0 +1,437 @@
+{
+  "$defs": {
+    "ArrayArtifact": {
+      "additionalProperties": false,
+      "description": "A safe array artifact; no pickle or executable object graph.",
+      "properties": {
+        "artifact": {
+          "$ref": "#/$defs/ArtifactRef"
+        },
+        "byte_order": {
+          "default": "little",
+          "enum": [
+            "little",
+            "big"
+          ],
+          "title": "Byte Order",
+          "type": "string"
+        },
+        "dtype": {
+          "title": "Dtype",
+          "type": "string"
+        },
+        "encoding": {
+          "enum": [
+            "numpy-npy",
+            "torch-raw",
+            "json-array"
+          ],
+          "title": "Encoding",
+          "type": "string"
+        },
+        "shape": {
+          "items": {
+            "type": "integer"
+          },
+          "title": "Shape",
+          "type": "array"
+        }
+      },
+      "required": [
+        "artifact",
+        "encoding",
+        "dtype",
+        "shape"
+      ],
+      "title": "ArrayArtifact",
+      "type": "object"
+    },
+    "ArtifactRef": {
+      "additionalProperties": false,
+      "description": "One durable occurrence of content-addressed artifact data.",
+      "properties": {
+        "contamination_flags": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Contamination Flags",
+          "type": "array"
+        },
+        "created_by": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Created By"
+        },
+        "hash": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Hash"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "location": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Location"
+        },
+        "provenance": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ProvenanceRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Type"
+        },
+        "version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Version"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "title": "ArtifactRef",
+      "type": "object"
+    },
+    "CaptureDisposition": {
+      "additionalProperties": false,
+      "properties": {
+        "detail": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Detail"
+        },
+        "field": {
+          "title": "Field",
+          "type": "string"
+        },
+        "reason_code": {
+          "title": "Reason Code",
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/$defs/CaptureStatus"
+        }
+      },
+      "required": [
+        "field",
+        "status",
+        "reason_code"
+      ],
+      "title": "CaptureDisposition",
+      "type": "object"
+    },
+    "CaptureStatus": {
+      "enum": [
+        "captured",
+        "unavailable",
+        "omitted",
+        "rejected"
+      ],
+      "title": "CaptureStatus",
+      "type": "string"
+    },
+    "ProvenanceRef": {
+      "additionalProperties": false,
+      "properties": {
+        "hash": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Hash"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "location": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Location"
+        },
+        "version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Version"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "title": "ProvenanceRef",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Validated backend-neutral record restored into a Learning container.",
+  "properties": {
+    "backend_metadata": {
+      "additionalProperties": true,
+      "title": "Backend Metadata",
+      "type": "object"
+    },
+    "batch_size": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Batch Size"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "dispositions": {
+      "items": {
+        "$ref": "#/$defs/CaptureDisposition"
+      },
+      "title": "Dispositions",
+      "type": "array"
+    },
+    "hash_algorithm": {
+      "const": "sha256",
+      "default": "sha256",
+      "title": "Hash Algorithm",
+      "type": "string"
+    },
+    "input_batch_size": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Input Batch Size"
+    },
+    "input_manifest_ref": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ArtifactRef"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "input_meta_info": {
+      "additionalProperties": true,
+      "title": "Input Meta Info",
+      "type": "object"
+    },
+    "input_non_tensor_batch": {
+      "additionalProperties": {
+        "$ref": "#/$defs/ArrayArtifact"
+      },
+      "title": "Input Non Tensor Batch",
+      "type": "object"
+    },
+    "input_tensor_batch": {
+      "additionalProperties": {
+        "$ref": "#/$defs/ArrayArtifact"
+      },
+      "title": "Input Tensor Batch",
+      "type": "object"
+    },
+    "meta_info": {
+      "additionalProperties": true,
+      "title": "Meta Info",
+      "type": "object"
+    },
+    "model": {
+      "title": "Model",
+      "type": "string"
+    },
+    "non_tensor_batch": {
+      "additionalProperties": {
+        "$ref": "#/$defs/ArrayArtifact"
+      },
+      "title": "Non Tensor Batch",
+      "type": "object"
+    },
+    "output_manifest_ref": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ArtifactRef"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "output_to_input": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ArrayArtifact"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "raw_backend": {
+      "additionalProperties": true,
+      "title": "Raw Backend",
+      "type": "object"
+    },
+    "record_id": {
+      "title": "Record Id",
+      "type": "string"
+    },
+    "request": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Request"
+    },
+    "request_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Request Id"
+    },
+    "response": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Response"
+    },
+    "schema_version": {
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "session_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Session Id"
+    },
+    "tensor_batch": {
+      "additionalProperties": {
+        "$ref": "#/$defs/ArrayArtifact"
+      },
+      "title": "Tensor Batch",
+      "type": "object"
+    }
+  },
+  "required": [
+    "record_id",
+    "created_at",
+    "model"
+  ],
+  "title": "InferenceCaptureRecord",
+  "type": "object"
+}

@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "tasks": [
+    {
+      "task_path": "/operator/tasks/task-a",
+      "task_id": "controlled-task-a",
+      "task_version": "fixture-v1",
+      "support": "supported",
+      "session_config": "/operator/private/task-a/public-session.json",
+      "final_config": "/operator/private/task-a/final-evaluation.json"
+    },
+    {
+      "task_path": "/operator/tasks/task-b",
+      "task_id": "controlled-task-b",
+      "task_version": "fixture-v1",
+      "support": "supported",
+      "session_config": "/operator/private/task-b/public-session.json",
+      "final_config": "/operator/private/task-b/final-evaluation.json"
+    }
+  ]
+}

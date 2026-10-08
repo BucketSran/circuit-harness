@@ -1,0 +1,27 @@
+type: default
+options:
+  # Interaction budget for one role-step episode. Each solver role opens its own
+  # Environment and its own bridge, so these are per-role, not per-problem.
+  #
+  # `max_steps` mirrors the runtime's `max_turns`: the Environment terminates the
+  # session at `max_steps`, the runtime stops generating at `max_turns`, and a
+  # mismatch just means the lower of the two is the real ceiling. Both are 8.
+  #
+  # `max_tool_calls` is what actually bound the old configuration. Measured on
+  # three AIME 2026 problems with `max_steps: 4` / `max_tool_calls: 2`: every
+  # role-step that reached for bash spent both calls, one was refused with
+  # `tool_budget_exhausted`, and only a single step ever reached the turn
+  # ceiling. Raising `max_turns` alone changed nothing because the tool budget
+  # ran out first.
+  #
+  # The ceiling on all of this is the server's context window; the arithmetic
+  # that ties these numbers to it, and the per-stream observation cap that makes
+  # it hold, live at `MAX_OBSERVATION_STREAM_BYTES` in
+  # `alphaapollo/common/environment/default/projection.py`, and are pinned by
+  # `tests/common/environment/test_budget_context_bound.py`.
+  max_steps: 8
+  max_tool_calls: 6
+  tool_timeout_s: 30
+  execution_mode: isolated
+  feedback_mode: differentiated
+  enable_python_code: false

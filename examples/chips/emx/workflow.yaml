@@ -1,0 +1,19 @@
+version: 1
+name: chips_emx_smoke
+roles:
+  - id: engineer
+    target: solver
+    tools: [emx_simulate]
+    system_prompt: |
+      Run the operator-configured EMX pipeline exactly once for the supplied layout JSON.
+      Use emx_simulate. If a run is unknown, report its run_id; do not submit a new job.
+      Report execution status and artifact paths. Never claim circuit quality or design
+      correctness from an EMX exit code. Do not change the configured server or commands.
+steps:
+  - id: simulate
+    kind: agent
+    role: engineer
+    input_template: "Run the EMX harness for this layout JSON: {problem}"
+    output: true
+entry_step: simulate
+transitions: []

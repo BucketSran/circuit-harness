@@ -1,0 +1,168 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "alphaapollo"
+version = "3.1.0.dev0"
+description = "Circuit Harness experiment platform built on AlphaApollo"
+license = {file = "LICENSE"}
+readme = {file = "README.md", content-type = "text/markdown"}
+authors = [{name = "AlphaApollo maintainers"}]
+requires-python = ">=3.10"
+dependencies = [
+    "hydra-core>=1.3",
+    "numpy>=1.24",
+    "omegaconf>=2.3",
+    "pydantic>=2.7,<3",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+chips = ["gdstk==1.0.0"]
+# Harbor plugins are optional and require their pinned Python 3.12+ runtime.
+harbor = ["harbor==0.23.0; python_version >= '3.12'"]
+# The Workflow YAML entry point is part of the base package; ``api`` only adds
+# the optional live OpenAI-compatible transport.
+api = ["openai>=1.0"]
+# Only the MCP tool bridge needs this: the server process that hands
+# AlphaApollo's own tools to an external coding agent, and any MCP client work
+# built on the same official SDK. Nothing on the native path imports it.
+# The upper bound is load-bearing: mcp 2.0 rewrote the low-level server and
+# dropped the decorator API and mcp.shared.memory that the bridge is built on.
+mcp = ["mcp>=1.27,<2"]
+test = [
+    "pytest>=7.0",
+    "pyarrow>=15,<26",
+    "pyyaml>=6.0",
+    "hydra-core>=1.3",
+    "omegaconf>=2.3",
+    "requests>=2.31",
+    "mcp>=1.27,<2",
+]
+dev = [
+    "openai>=1.0",
+    "pytest>=7.0",
+    "pyarrow>=15,<26",
+    "ruff==0.15.6",
+    "pyyaml>=6.0",
+    "hydra-core>=1.3",
+    "omegaconf>=2.3",
+    "requests>=2.31",
+    "mcp>=1.27,<2",
+]
+learning = [
+    "torch>=2.1",
+    "tensordict>=0.10,<=0.10.0",
+    "datasets>=2.16,<6",
+    "hydra-core>=1.3",
+    "omegaconf>=2.3",
+    "ray>=2.10",
+    "transformers>=4.51",
+    "pillow>=10",
+    "requests>=2.31",
+    "openai>=1.23.6",
+    "pyyaml>=6.0",
+]
+environments = ["omegaconf>=2.3", "requests>=2.31"]
+# Optional deterministic persistent reasoning memory. The adapter always uses
+# infer=False and accepts a caller-owned Memory.from_config document, so model
+# and vector-store choices do not leak into the base runtime.
+memory = [
+    "mem0ai>=2.0.11,<2.1",
+    "chromadb>=1.5.9,<2",
+    "sentence-transformers>=5.6,<6",
+]
+# Dataset preparation is optional for runtime-only installations.
+#
+# Both upper bounds are the next major after the one the suite is run against,
+# measured in this workspace: datasets 5.0.1 and pyarrow 25.0.1. An open range
+# would promise every future major, and neither project keeps a stable API
+# across one -- ``datasets`` 3.0 changed script-dataset loading and ``pyarrow``
+# bumps its major yearly. Raise a bound only after running ``pytest -q`` against
+# the new major and updating the version recorded here.
+data = ["datasets>=2.16,<6", "pyarrow>=15,<26"]
+# LIBERO is deliberately NOT an extra, and `prepare_libero` therefore never
+# requires one to be installed: it imports the benchmark API only when a row is
+# normalized, and accepts a `checkout_path` instead. Measured against upstream
+# rather than assumed:
+#   * https://github.com/Lifelong-Robot-Learning/LIBERO declares
+#     `install_requires=[]` while `libero/libero/benchmark/__init__.py` imports
+#     `torch`, so a pip install of it produces a package that cannot import.
+#   * That `setup.py` uses `find_packages()` with no `MANIFEST.in`, and
+#     `bddl_files/`, `init_files/`, and `assets/` hold no `__init__.py`, so the
+#     BDDL and initial-state files this preparer reads ship only in a checkout.
+#   * The `libero` project on PyPI (0.1.1) is a separate repackaging by
+#     huggingface/lerobot-libero, not the upstream `robotics/UPSTREAM.md`
+#     documents, and pins `robosuite==1.4.0` and `robomimic==0.2.0`.
+# Clone the official repository and pass `--checkout-path`; see
+# `alphaapollo/data_preprocess/robotics/UPSTREAM.md`.
+# LIBERO-Pro is also deliberately NOT an extra. `prepare_liberopro` imports
+# `rpent-liberopro==0.1.1` only while validating or generating rows; that
+# distribution declares the complete robosuite/MuJoCo environment stack, which
+# metadata-only and runtime-only AlphaApollo installations must not inherit.
+# Optional structured-output validation shared by external Agent runtimes.
+json-schema = ["jsonschema>=4.20,<5"]
+# Backward-compatible narrow extra for callers that only need local Parquet I/O.
+# Bound must stay identical to the ``data`` extra: one version everywhere.
+data-parquet = ["pyarrow>=15,<26"]
+# No `robocasa` extra: the snapshot generator's one new third-party import
+# is `robocasa` itself, which is a source install (see
+# alphaapollo/data_preprocess/robotics/UPSTREAM.md) that brings its own
+# robosuite/mujoco/numpy pins. An extra naming those transitive packages
+# would read as "this installs the generator's runtime" while installing
+# something that still cannot run it. Preparation needs none of it.
+# The real-model robotics MCP services in examples/robotics/services/. Nothing
+# in the library imports them; the deterministic fixture services need only
+# the "mcp" extra. RLinf is not published on PyPI, so ``pi05_vla_server.py``
+# additionally needs a local ``rlinf`` checkout on PYTHONPATH, and
+# ``sam3_hf_server.py`` needs a transformers release that ships SAM3.
+robotics-services = [
+    "mcp>=1.27,<2",
+    "torch>=2.1",
+    "transformers>=5.0,<6",
+    "imageio>=2.31",
+    "omegaconf>=2.3",
+    "numpy>=1.24",
+]
+
+[project.urls]
+Homepage = "https://github.com/BucketSran/circuit-harness"
+
+[tool.setuptools]
+include-package-data = true
+license-files = ["LICENSE", "Notice.txt", "third_party/pi/LICENSE", "third_party/robocasa/LICENSE"]
+
+[tool.setuptools.package-data]
+"alphaapollo.configs" = ["*.yaml", "*/*.yaml", "*/*/*.yaml"]
+"alphaapollo.common.artifacts" = ["json/*.json"]
+"alphaapollo.common.execution.tools" = ["json/*.json"]
+"alphaapollo.common.trajectory" = ["json/*.json"]
+"alphaapollo.common.prompts" = ["README.md"]
+"alphaapollo.common.prompts.resources.roles" = ["*.yaml"]
+"alphaapollo.common.prompts.resources.environments" = ["*.yaml"]
+"alphaapollo.data_preprocess.robotics.snapshots" = ["*.jsonl", "*.json"]
+"alphaapollo.learning.adapters" = ["json/*.json"]
+"alphaapollo.data_preprocess" = ["json/*.json"]
+# The pi tool bridge is a TypeScript extension pi loads with -e, not source.
+"alphaapollo.reasoning.runtime.external.bridge" = ["*.ts"]
+"alphaapollo.learning.on_policy" = [
+    "configs/*.yaml",
+    "algorithms/*/configs/*.yaml",
+]
+"alphaapollo.learning.off_policy" = ["configs/*.yaml"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["alphaapollo*"]
+
+[tool.pytest.ini_options]
+addopts = "--strict-markers"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+isort = {known-first-party = ["alphaapollo"]}
+select = ["E", "F", "B", "I", "UP"]

@@ -1,0 +1,397 @@
+{
+  "$defs": {
+    "AttemptRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "plan_id": {
+          "title": "Plan Id",
+          "type": "string"
+        },
+        "attempt": {
+          "title": "Attempt",
+          "type": "integer"
+        },
+        "task": {
+          "additionalProperties": true,
+          "title": "Task",
+          "type": "object"
+        },
+        "conditions": {
+          "additionalProperties": true,
+          "title": "Conditions",
+          "type": "object"
+        },
+        "trial_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Trial Id"
+        },
+        "trial_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Trial Name"
+        },
+        "task_checksum": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Task Checksum"
+        },
+        "status": {
+          "enum": [
+            "not_run",
+            "missing",
+            "running",
+            "failed",
+            "unevaluable",
+            "graded",
+            "invalid"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "started": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": false,
+          "title": "Started"
+        },
+        "agent_exception": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Agent Exception"
+        },
+        "agent_info": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Agent Info"
+        },
+        "collection_source": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Collection Source"
+        },
+        "termination_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Termination Reason"
+        },
+        "candidate_sha256": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Candidate Sha256"
+        },
+        "evaluation": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Evaluation"
+        },
+        "actual_conditions": {
+          "additionalProperties": true,
+          "title": "Actual Conditions",
+          "type": "object"
+        },
+        "score": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Score"
+        },
+        "usage": {
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "title": "Usage",
+          "type": "object"
+        },
+        "timings": {
+          "additionalProperties": true,
+          "title": "Timings",
+          "type": "object"
+        },
+        "sources": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Sources",
+          "type": "object"
+        },
+        "errors": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Errors",
+          "type": "array"
+        }
+      },
+      "required": [
+        "plan_id",
+        "attempt",
+        "task",
+        "conditions",
+        "status"
+      ],
+      "title": "AttemptRecord",
+      "type": "object"
+    },
+    "GroupSummary": {
+      "additionalProperties": false,
+      "properties": {
+        "plan_id": {
+          "title": "Plan Id",
+          "type": "string"
+        },
+        "task": {
+          "additionalProperties": true,
+          "title": "Task",
+          "type": "object"
+        },
+        "conditions": {
+          "additionalProperties": true,
+          "title": "Conditions",
+          "type": "object"
+        },
+        "planned": {
+          "title": "Planned",
+          "type": "integer"
+        },
+        "started": {
+          "title": "Started",
+          "type": "integer"
+        },
+        "started_unknown": {
+          "title": "Started Unknown",
+          "type": "integer"
+        },
+        "metric_valid": {
+          "title": "Metric Valid",
+          "type": "integer"
+        },
+        "missing": {
+          "title": "Missing",
+          "type": "integer"
+        },
+        "coverage": {
+          "title": "Coverage",
+          "type": "number"
+        },
+        "score_denominator": {
+          "title": "Score Denominator",
+          "type": "integer"
+        },
+        "mean_score": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Mean Score"
+        },
+        "statuses": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Statuses",
+          "type": "object"
+        },
+        "observed_conditions": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Observed Conditions"
+        }
+      },
+      "required": [
+        "plan_id",
+        "task",
+        "conditions",
+        "planned",
+        "started",
+        "started_unknown",
+        "metric_valid",
+        "missing",
+        "coverage",
+        "score_denominator",
+        "mean_score",
+        "statuses"
+      ],
+      "title": "GroupSummary",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "harbor_version": {
+      "const": "0.23.0",
+      "default": "0.23.0",
+      "title": "Harbor Version",
+      "type": "string"
+    },
+    "job_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Job Id"
+    },
+    "source_config_sha256": {
+      "title": "Source Config Sha256",
+      "type": "string"
+    },
+    "source_result_sha256": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Source Result Sha256"
+    },
+    "denominator": {
+      "const": "planned task \u00d7 agent \u00d7 n_attempts; score mean uses metric_valid only",
+      "default": "planned task \u00d7 agent \u00d7 n_attempts; score mean uses metric_valid only",
+      "title": "Denominator",
+      "type": "string"
+    },
+    "records": {
+      "items": {
+        "$ref": "#/$defs/AttemptRecord"
+      },
+      "title": "Records",
+      "type": "array"
+    },
+    "groups": {
+      "items": {
+        "$ref": "#/$defs/GroupSummary"
+      },
+      "title": "Groups",
+      "type": "array"
+    },
+    "errors": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Errors",
+      "type": "array"
+    }
+  },
+  "required": [
+    "source_config_sha256",
+    "records",
+    "groups"
+  ],
+  "title": "ExperimentReport",
+  "type": "object"
+}

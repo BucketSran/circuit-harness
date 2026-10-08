@@ -1,0 +1,14 @@
+// Constructed linear behavioral fixture, not a transistor or PDK model.
+`include "constants.vams"
+`include "disciplines.vams"
+
+module gain_fixture(vip, vin, out, vdd, vss);
+  inout vip, vin, out, vdd, vss;
+  electrical vip, vin, out, vdd, vss;
+  parameter real gain0 = 1000 from (0:inf);
+  parameter real pole_hz = 100 from (0:inf);
+  analog begin
+    V(out, vss) <+ V(vdd, vss)/2
+      + laplace_nd(gain0*V(vip, vin), {1}, {1, 1/(2*`M_PI*pole_hz)});
+  end
+endmodule

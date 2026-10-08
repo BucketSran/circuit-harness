@@ -1,0 +1,27 @@
+# Complete native AgentRuntime component. Backend and sampling are owned here
+# because they are implementation details of the runtime, not standalone apps.
+type: alphaapollo
+options:
+  backend:
+    type: openai_compatible
+    options:
+      base_url: http://127.0.0.1:8000/v1
+      api_key: EMPTY
+      max_retries: 3
+      timeout: 300
+      return_token_ids: false
+      # 1 is sequential compatibility mode; values >1 enable bounded client concurrency.
+      max_concurrency: 1
+  model: served-model
+  tools: []
+  sampling:
+    temperature: 0.6
+    max_tokens: 4096
+    top_p: 1.0
+    seed: null
+    tool_choice: null
+    provider_options: {}
+  max_turns: 6
+  # Optional request-only window over image-bearing messages. null keeps all
+  # historical images without changing the stored trajectory.
+  image_history_messages: null

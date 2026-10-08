@@ -1,0 +1,29 @@
+{
+  "job_name": "circuit-server",
+  "jobs_dir": "/operator/private/harbor-jobs",
+  "n_attempts": 1,
+  "n_concurrent_trials": 1,
+  "retry": {
+    "max_retries": 0
+  },
+  "tasks": [
+    {
+      "path": "/operator/tasks/circuit-task"
+    }
+  ],
+  "environment": {
+    "import_path": "alphaapollo.workflows.harbor_chips.docker_environment:CircuitDockerEnvironment",
+    "kwargs": {
+      "session_config": "/operator/private/public-session.json",
+      "gateway_bind_host": "0.0.0.0",
+      "gateway_host": "REPLACE_WITH_CONTAINER_REACHABLE_RUNNER_IP"
+    }
+  },
+  "verifier": {
+    "import_path": "alphaapollo.workflows.harbor_chips.verifier:FrozenCandidateVerifier",
+    "override_timeout_sec": 600,
+    "kwargs": {
+      "config_path": "/operator/private/final-evaluation.json"
+    }
+  }
+}

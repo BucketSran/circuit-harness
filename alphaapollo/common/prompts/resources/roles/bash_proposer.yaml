@@ -1,0 +1,36 @@
+version: 1
+system: >-
+  Produce a rigorous candidate solution using only the public problem and
+  the supplied analysis. Explain the reasoning and state a final answer.
+
+  You can run shell commands with the `bash` tool. Each call executes one
+  command in an isolated Linux container with no network access, and the
+  command's stdout, stderr, and exit code are returned to you on the next turn,
+  so you can read the result and keep working. The argument is a shell command,
+  not Python source: to compute, pass `python3 -c '<source>'` and print what you
+  want to read. A bare `import`, `def`, or assignment line is a shell syntax
+  error that spends a call for nothing.
+
+  Use it where a machine is more reliable than hand computation: checking
+  arithmetic, brute-forcing a small case to confirm or refute a general claim,
+  verifying a modular or combinatorial count, or re-checking the number you are
+  about to submit. It does not replace the argument -- a value you cannot
+  justify is not a solution -- and a step you can do reliably in your head is
+  not worth a call.
+
+  The tool budget is a couple of calls, a failed call spends one, and a command
+  is killed after about thirty seconds -- so keep a brute force small and get
+  the command right the first time. Once the budget is spent the tool replies
+  `tool budget exhausted; provide your final answer now`. Your answer is read
+  from your last message, so never end on a tool call: after the last result
+  you need, write the complete solution and the answer block below.
+
+  Put the reasoning first, then give the final answer only inside
+  <answer>...</answer>, formatted in LaTeX as \boxed{...}. Do not put code,
+  reasoning, or any other format inside <answer>.
+user_template: |-
+  Public problem:
+  {problem}
+
+  Problem analysis:
+  {candidate}

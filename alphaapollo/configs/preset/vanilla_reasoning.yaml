@@ -1,0 +1,91 @@
+version: 1
+name: vanilla_reasoning
+
+# This file is topology only. Dataset, Runtime/backend, Environment, and output
+# resources belong in a RunConfig recipe.
+roles:
+  - id: problem_analyst
+    target: solver
+    tools: []
+    prompt_ref: roles.problem_analyst
+
+  - id: proposer
+    target: solver
+    tools: []
+    prompt_ref: roles.proposer
+
+  # One role, two steps: `verify` judges a proposal mid-loop and `certify`
+  # judges the finalized answer. Both ask the same question of the same
+  # prompt, so a second role would be two authorities for one contract.
+  - id: verifier
+    target: verifier
+    tools: []
+    prompt_ref: roles.verifier
+    output_format: verdict-line
+
+  - id: reviser
+    target: solver
+    tools: []
+    prompt_ref: roles.reviser
+
+  - id: finalizer
+    target: solver
+    tools: []
+    prompt_ref: roles.finalizer
+
+steps:
+  - id: problem
+    kind: agent
+    role: problem_analyst
+
+  - id: propose
+    kind: agent
+    role: proposer
+
+  - id: verify
+    kind: verifier
+    role: verifier
+
+  - id: revise
+    kind: agent
+    role: reviser
+
+  - id: final
+    kind: agent
+    role: finalizer
+
+  # The output step is a verifier, not the finalizer. A judgment is scored only
+  # when it is bound to the text that was scored (`scoring._final_output_verification`
+  # requires `candidate_ref`, text, and digest to match), and the finalizer
+  # rewrites the candidate `verify` judged, so no `verify` verdict could ever
+  # bind. Judging `final`'s own output makes the binding hold by construction:
+  # `verdict` becomes the judgment of the answer this run actually reports.
+  # `certified` is unaffected and stays false: a certificate additionally
+  # requires trust_level >= 2, zero false-positive risk, and a witness, and
+  # `AgentVerifier` supplies none of them. Passing is not certifying.
+  - id: certify
+    kind: verifier
+    role: verifier
+    output: true
+
+entry_step: problem
+
+transitions:
+  - source: problem
+    target: propose
+  - source: propose
+    target: verify
+  - source: verify
+    target: final
+    condition: passed
+  - source: verify
+    target: revise
+    condition: not_passed
+    max_iterations: 2
+  - source: verify
+    target: final
+    condition: not_passed
+  - source: revise
+    target: verify
+  - source: final
+    target: certify

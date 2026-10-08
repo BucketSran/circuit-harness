@@ -1,0 +1,14 @@
+# Generic prepared-dataset projection. A runnable task must provide the path and
+# may replace the field mapping when its records do not use these defaults.
+path: ???
+format: jsonl
+split: null
+input_key: problem
+id_key: id
+metadata_keys: []
+# One concrete private split file; private prepared rows carry no split column.
+task_payload_path: null
+# null inherits the public dataset format; set this for a mixed-format sidecar.
+task_payload_format: null
+task_payload_key: env_payload
+task_payload_envelope: direct

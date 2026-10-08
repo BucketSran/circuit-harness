@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "agents": {
+    "claude-code": {"name": "claude-code"},
+    "codex": {"name": "codex", "kwargs": {"reasoning_effort": "medium"}},
+    "pi": {"name": "pi", "kwargs": {"thinking": "medium"}},
+    "mini-swe-agent": {"name": "mini-swe-agent", "kwargs": {"max_tokens": 8192}}
+  },
+  "models": {
+    "claude": {
+      "connections": [
+        {"protocol": "anthropic-messages", "model": "claude-fixture",
+         "base_url": "https://claude-gateway.example.invalid", "key_env": "CLAUDE_GATEWAY_KEY"}
+      ]
+    },
+    "glm": {
+      "connections": [
+        {"protocol": "anthropic-messages", "model": "glm-fixture",
+         "base_url": "https://glm-gateway.example.invalid/anthropic", "key_env": "GLM_GATEWAY_KEY"},
+        {"protocol": "openai-chat-completions", "model": "glm-fixture",
+         "base_url": "https://glm-gateway.example.invalid/v1", "key_env": "GLM_GATEWAY_KEY"},
+        {"protocol": "openai-responses", "model": "glm-fixture",
+         "base_url": "https://glm-gateway.example.invalid/v1", "key_env": "GLM_GATEWAY_KEY"}
+      ]
+    },
+    "deepseek": {
+      "connections": [
+        {"protocol": "openai-chat-completions", "model": "deepseek-fixture",
+         "base_url": "https://deepseek-gateway.example.invalid/v1", "key_env": "DEEPSEEK_GATEWAY_KEY"}
+      ]
+    },
+    "gpt": {
+      "connections": [
+        {"protocol": "openai-responses", "model": "gpt-fixture",
+         "base_url": "https://gpt-gateway.example.invalid/v1", "key_env": "GPT_GATEWAY_KEY"}
+      ]
+    }
+  }
+}

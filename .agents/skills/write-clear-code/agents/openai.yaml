@@ -1,0 +1,4 @@
+interface:
+  display_name: "Write Clear Code"
+  short_description: "Preserve Harness ownership and execution contracts"
+  default_prompt: "Use $write-clear-code to check this change's module ownership, public compatibility and execution lifecycle."

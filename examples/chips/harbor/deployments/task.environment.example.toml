@@ -1,0 +1,5 @@
+# Use an already-present local image ID with Python 3, sh and root access.
+# Put this [environment] table in the exported task.toml.
+[environment]
+docker_image = "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+network_mode = "public"

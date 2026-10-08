@@ -1,0 +1,28 @@
+version: 1
+workflow: workflow.yaml
+dataset:
+  path: tasks.jsonl
+  format: jsonl
+  input_key: question
+  id_key: task_id
+runtimes:
+  solver:
+    type: external
+    options:
+      agent: codex
+      model: gpt-6-astra
+      concurrency: 1
+      keep_workspaces: true
+      reuse_workspace: true
+      workspace_root: runs/chips/agent-workspaces
+      session:
+        timeout_s: 2100
+        sandbox: workspace-write
+        config_overrides:
+          - mcp_servers.alphaapollo.tool_timeout_sec=1900
+environment:
+  type: none
+verifiers: {}
+output:
+  directory: runs/chips/workflow
+  format: jsonl

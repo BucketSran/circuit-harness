@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "task": {
+    "task_id": "REPLACE_WITH_TASK_ID",
+    "task_version": "REPLACE_WITH_TASK_VERSION",
+    "public_files": ["instruction.md"],
+    "candidate_files": ["dut.va"],
+    "feedback_fields": ["diagnostics"],
+    "manifest": {
+      "models": ["dut.va"],
+      "instances": [],
+      "transient": {"sources": {}, "output_times": [0.0], "stop": 1.0, "max_step": 0.1},
+      "tolerances": {"vabstol": 1e-8, "reltol": 0}
+    }
+  },
+  "materials": "/operator/private/public-materials",
+  "checkout": "/operator/private/evas-checkout",
+  "kernel": "/operator/private/evas-linux-kernel",
+  "public_backend": "docker",
+  "image": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "max_actions": 24,
+  "max_simulations": 4,
+  "simulation_timeout_s": 120,
+  "max_output_bytes": 16777216
+}

@@ -1,0 +1,366 @@
+{
+  "$defs": {
+    "OpensourceEvaluationConfig": {
+      "additionalProperties": false,
+      "description": "The benchmark-declared replay settings; no commercial resource access.",
+      "properties": {
+        "schema_version": {
+          "const": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "image": {
+          "pattern": "^(?:[A-Za-z0-9][A-Za-z0-9._:/-]*@)?sha256:[a-f0-9]{64}$",
+          "title": "Image",
+          "type": "string"
+        },
+        "task_package_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Task Package Sha256",
+          "type": "string"
+        },
+        "solver_options": {
+          "additionalProperties": true,
+          "title": "Solver Options",
+          "type": "object"
+        },
+        "unsupported": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Unsupported",
+          "type": "array"
+        },
+        "timeout_s": {
+          "exclusiveMinimum": 0,
+          "maximum": 300,
+          "title": "Timeout S",
+          "type": "number"
+        },
+        "max_output_bytes": {
+          "maximum": 16777216,
+          "minimum": 1,
+          "title": "Max Output Bytes",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "schema_version",
+        "image",
+        "task_package_sha256",
+        "solver_options",
+        "unsupported",
+        "timeout_s",
+        "max_output_bytes"
+      ],
+      "title": "OpensourceEvaluationConfig",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "else": {
+        "not": {
+          "required": [
+            "final_opensource"
+          ]
+        },
+        "properties": {
+          "final_remote": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "final_remote"
+        ]
+      },
+      "if": {
+        "properties": {
+          "final_backend": {
+            "const": "benchmark_opensource"
+          }
+        },
+        "required": [
+          "final_backend"
+        ]
+      },
+      "then": {
+        "not": {
+          "required": [
+            "final_remote"
+          ]
+        },
+        "properties": {
+          "final_opensource": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "final_opensource"
+        ]
+      }
+    }
+  ],
+  "description": "Compatible operator configuration for the optional native Codex path.",
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "task": {
+      "additionalProperties": true,
+      "title": "Task",
+      "type": "object"
+    },
+    "materials": {
+      "format": "path",
+      "title": "Materials",
+      "type": "string"
+    },
+    "checkout": {
+      "anyOf": [
+        {
+          "format": "path",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Checkout"
+    },
+    "kernel": {
+      "anyOf": [
+        {
+          "format": "path",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Kernel"
+    },
+    "public_backend": {
+      "default": "docker",
+      "enum": [
+        "docker",
+        "podman",
+        "native_codex_sandbox",
+        "remote_spectre"
+      ],
+      "title": "Public Backend",
+      "type": "string"
+    },
+    "public_cpu_limit": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0,
+          "maximum": 1,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": 1,
+      "title": "Public Cpu Limit"
+    },
+    "public_remote": {
+      "anyOf": [
+        {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Public Remote"
+    },
+    "public_task_package": {
+      "anyOf": [
+        {
+          "format": "path",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Public Task Package"
+    },
+    "public_codex": {
+      "anyOf": [
+        {
+          "format": "path",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Public Codex"
+    },
+    "public_python": {
+      "anyOf": [
+        {
+          "format": "path",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Public Python"
+    },
+    "image": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Image"
+    },
+    "max_actions": {
+      "default": 24,
+      "minimum": 1,
+      "title": "Max Actions",
+      "type": "integer"
+    },
+    "max_simulations": {
+      "default": 4,
+      "minimum": 1,
+      "title": "Max Simulations",
+      "type": "integer"
+    },
+    "simulation_timeout_s": {
+      "default": 120,
+      "exclusiveMinimum": 0,
+      "title": "Simulation Timeout S",
+      "type": "number"
+    },
+    "max_output_bytes": {
+      "default": 16777216,
+      "minimum": 1,
+      "title": "Max Output Bytes",
+      "type": "integer"
+    },
+    "final_task_package": {
+      "format": "path",
+      "title": "Final Task Package",
+      "type": "string"
+    },
+    "final_backend": {
+      "default": "remote_spectre",
+      "enum": [
+        "remote_spectre",
+        "benchmark_opensource"
+      ],
+      "title": "Final Backend",
+      "type": "string"
+    },
+    "final_remote": {
+      "anyOf": [
+        {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Final Remote"
+    },
+    "final_opensource": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/OpensourceEvaluationConfig"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "final_timeout_s": {
+      "default": 600,
+      "exclusiveMinimum": 0,
+      "title": "Final Timeout S",
+      "type": "number"
+    },
+    "executable": {
+      "default": "codex",
+      "format": "path",
+      "title": "Executable",
+      "type": "string"
+    },
+    "auth_file": {
+      "anyOf": [
+        {
+          "format": "path",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Auth File"
+    },
+    "runtime_readonly_paths": {
+      "default": [],
+      "items": {
+        "format": "path",
+        "type": "string"
+      },
+      "title": "Runtime Readonly Paths",
+      "type": "array"
+    },
+    "allowed_hosts": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Allowed Hosts",
+      "type": "array"
+    },
+    "reasoning_effort": {
+      "default": "medium",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "xhigh"
+      ],
+      "title": "Reasoning Effort",
+      "type": "string"
+    }
+  },
+  "required": [
+    "task",
+    "materials",
+    "image",
+    "final_task_package"
+  ],
+  "title": "HarborChipsConfig",
+  "type": "object"
+}

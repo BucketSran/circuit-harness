@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "transport": "local",
+  "pin": "/private/persistent/pins/task.pin.json",
+  "run_root": "/private/scratch/experiments",
+  "python": "/usr/local/bin/python3.12",
+  "bundle": "/private/persistent/harness/chips-agent.pyz",
+  "task_id": "v4-001",
+  "job_root": "/private/scratch/jobs",
+  "archive_root": "/private/persistent/archives",
+  "policy_kind": "remote_model",
+  "pi_cli": "/private/scratch/pi-runtime/node_modules/@earendil-works/pi-coding-agent/dist/bundle/cli.js",
+  "base_url": "https://PROVIDER_ENDPOINT/v1",
+  "model": "PROVIDER_MODEL_ID",
+  "thinking": "low",
+  "episode_timeout_s": 600,
+  "max_model_calls": 12,
+  "max_request_bytes": 64000,
+  "max_output_tokens": 4096
+}

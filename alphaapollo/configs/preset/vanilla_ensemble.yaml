@@ -1,0 +1,89 @@
+version: 1
+name: vanilla_ensemble
+
+# Each replica executes this same topology independently. The reducer selects
+# the earliest candidate among tied majority answers, so selection is stable.
+#
+# This preset deliberately keeps `final` as its output step while the three
+# single-branch presets end on a terminal `certify` verifier. `selection._output_key`
+# abstains for any terminal VerificationResult whose verdict is not `pass`, so a
+# terminal verifier here would silently shrink the electorate to the branches the
+# verifier accepted -- and `majority_vote` raises when every branch abstains,
+# turning "the verifier was unsure five times" into a failed cell. Binding a
+# verdict to the ensemble winner needs its own selection contract, not this edit.
+ensemble:
+  replicas: 5
+  strategy: majority_vote
+  selection_key: declared_answer
+
+roles:
+  - id: problem_analyst
+    target: solver
+    tools: []
+    prompt_ref: roles.problem_analyst
+
+  - id: proposer
+    target: solver
+    tools: []
+    prompt_ref: roles.ensemble_proposer
+
+  - id: verifier
+    target: verifier
+    tools: []
+    prompt_ref: roles.verifier
+    # Verdict lines for the same reason as the solver presets: `roles.verifier`
+    # is one shared prompt and it now asks for verdict lines, so a preset left
+    # on `json` would fail to parse every reply.
+    output_format: verdict-line
+
+  - id: reviser
+    target: solver
+    tools: []
+    prompt_ref: roles.ensemble_reviser
+
+  - id: finalizer
+    target: solver
+    tools: []
+    prompt_ref: roles.ensemble_finalizer
+
+steps:
+  - id: problem
+    kind: agent
+    role: problem_analyst
+
+  - id: propose
+    kind: agent
+    role: proposer
+
+  - id: verify
+    kind: verifier
+    role: verifier
+
+  - id: revise
+    kind: agent
+    role: reviser
+
+  - id: final
+    kind: agent
+    role: finalizer
+    output: true
+
+entry_step: problem
+
+transitions:
+  - source: problem
+    target: propose
+  - source: propose
+    target: verify
+  - source: verify
+    target: final
+    condition: passed
+  - source: verify
+    target: revise
+    condition: not_passed
+    max_iterations: 2
+  - source: verify
+    target: final
+    condition: not_passed
+  - source: revise
+    target: verify

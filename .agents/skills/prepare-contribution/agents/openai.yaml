@@ -1,0 +1,4 @@
+interface:
+  display_name: "Prepare Contribution"
+  short_description: "Prepare Harness issues and reviewable PRs"
+  default_prompt: "Use $prepare-contribution to prepare this Harness contribution with shared pr guidance and actual evidence."

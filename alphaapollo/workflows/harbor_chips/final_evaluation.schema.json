@@ -1,0 +1,153 @@
+{
+  "$defs": {
+    "OpensourceEvaluationConfig": {
+      "additionalProperties": false,
+      "description": "The benchmark-declared replay settings; no commercial resource access.",
+      "properties": {
+        "schema_version": {
+          "const": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "image": {
+          "pattern": "^(?:[A-Za-z0-9][A-Za-z0-9._:/-]*@)?sha256:[a-f0-9]{64}$",
+          "title": "Image",
+          "type": "string"
+        },
+        "task_package_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Task Package Sha256",
+          "type": "string"
+        },
+        "solver_options": {
+          "additionalProperties": true,
+          "title": "Solver Options",
+          "type": "object"
+        },
+        "unsupported": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Unsupported",
+          "type": "array"
+        },
+        "timeout_s": {
+          "exclusiveMinimum": 0,
+          "maximum": 300,
+          "title": "Timeout S",
+          "type": "number"
+        },
+        "max_output_bytes": {
+          "maximum": 16777216,
+          "minimum": 1,
+          "title": "Max Output Bytes",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "schema_version",
+        "image",
+        "task_package_sha256",
+        "solver_options",
+        "unsupported",
+        "timeout_s",
+        "max_output_bytes"
+      ],
+      "title": "OpensourceEvaluationConfig",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "else": {
+        "not": {
+          "required": [
+            "opensource"
+          ]
+        },
+        "properties": {
+          "remote": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "remote"
+        ]
+      },
+      "if": {
+        "properties": {
+          "backend": {
+            "const": "benchmark_opensource"
+          }
+        },
+        "required": [
+          "backend"
+        ]
+      },
+      "then": {
+        "not": {
+          "required": [
+            "remote"
+          ]
+        },
+        "properties": {
+          "opensource": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "opensource"
+        ]
+      }
+    }
+  ],
+  "description": "Private verifier configuration, independent of Agent and public environment.",
+  "properties": {
+    "task_package": {
+      "format": "path",
+      "title": "Task Package",
+      "type": "string"
+    },
+    "backend": {
+      "default": "remote_spectre",
+      "enum": [
+        "remote_spectre",
+        "benchmark_opensource"
+      ],
+      "title": "Backend",
+      "type": "string"
+    },
+    "remote": {
+      "anyOf": [
+        {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Remote"
+    },
+    "opensource": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/OpensourceEvaluationConfig"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    }
+  },
+  "required": [
+    "task_package"
+  ],
+  "title": "FinalEvaluationConfig",
+  "type": "object"
+}

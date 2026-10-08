@@ -1,0 +1,92 @@
+name: Bug report
+description: Report a reproducible problem in AlphaApollo
+title: "[Bug] "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a problem. Remove secrets and private data from logs and configuration before submitting.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected area
+      description: Select the primary area affected by the problem.
+      options:
+        - common
+        - schema
+        - reasoning
+        - learning
+        - evolving
+        - workflows
+        - docs / examples / config
+        - installation / CI
+        - other
+    validations:
+      required: true
+
+  - type: textarea
+    id: related-work
+    attributes:
+      label: Related issues and pull requests
+      description: Link similar reports or fixes found during your search, or state that none were found and include the search terms.
+
+  - type: textarea
+    id: actual-behavior
+    attributes:
+      label: Actual behavior
+      description: Describe what happened, including the complete error or incorrect result.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected behavior
+      description: Describe what should have happened instead.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Provide the smallest configuration, code sample, or numbered steps that reproduce the problem.
+      placeholder: |
+        1. Configure ...
+        2. Run ...
+        3. Observe ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Include the AlphaApollo revision, Python version, relevant dependency or image versions, and hardware/runtime details.
+      value: |
+        AlphaApollo revision:
+        Python version:
+        Relevant dependencies or image:
+        OS / accelerator / runtime:
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs and additional context
+      description: Paste relevant logs, traces, screenshots, or configuration after removing sensitive values.
+      render: shell
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Submission checks
+      options:
+        - label: I searched existing issues for the same problem.
+          required: true
+        - label: I removed credentials, private data, and unrelated logs.
+          required: true

@@ -1,0 +1,837 @@
+{
+  "$defs": {
+    "Connection": {
+      "additionalProperties": false,
+      "properties": {
+        "protocol": {
+          "enum": [
+            "openai-responses",
+            "openai-chat-completions",
+            "anthropic-messages"
+          ],
+          "title": "Protocol",
+          "type": "string"
+        },
+        "model": {
+          "minLength": 1,
+          "pattern": "^\\S+$",
+          "title": "Model",
+          "type": "string"
+        },
+        "base_url": {
+          "minLength": 1,
+          "title": "Base Url",
+          "type": "string"
+        },
+        "key_env": {
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$",
+          "title": "Key Env",
+          "type": "string"
+        }
+      },
+      "required": [
+        "protocol",
+        "model",
+        "base_url",
+        "key_env"
+      ],
+      "title": "Connection",
+      "type": "object"
+    },
+    "ModelProfile": {
+      "additionalProperties": false,
+      "properties": {
+        "connections": {
+          "items": {
+            "$ref": "#/$defs/Connection"
+          },
+          "minItems": 1,
+          "title": "Connections",
+          "type": "array"
+        }
+      },
+      "required": [
+        "connections"
+      ],
+      "title": "ModelProfile",
+      "type": "object"
+    },
+    "MCPServerConfig": {
+      "description": "Configuration for an MCP server available to the agent.",
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "transport": {
+          "default": "sse",
+          "enum": [
+            "stdio",
+            "sse",
+            "streamable-http"
+          ],
+          "title": "Transport",
+          "type": "string"
+        },
+        "url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Url"
+        },
+        "command": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Command"
+        },
+        "args": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Args",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "MCPServerConfig",
+      "type": "object"
+    },
+    "AgentProfile": {
+      "properties": {
+        "name": {
+          "enum": [
+            "codex",
+            "claude-code",
+            "pi",
+            "mini-swe-agent"
+          ],
+          "type": "string"
+        },
+        "n_concurrent": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Per-agent cap on concurrent agent.run() phases. Must not exceed the job's n_concurrent_trials and is usually useful only when lower. When omitted, agent execution is only limited by n_concurrent_trials.",
+          "title": "N Concurrent"
+        },
+        "concurrency_group": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional shared concurrency pool name for agent configs that should use the same n_concurrent limit.",
+          "title": "Concurrency Group"
+        },
+        "skills": {
+          "description": "Skill directories or source strings (git URLs, org/name[@ref] shorthand, or local paths). Job.create() / Trial.create() resolve any non-local entries to cached directories in-place.",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "format": "path",
+                "type": "string"
+              }
+            ]
+          },
+          "title": "Skills",
+          "type": "array"
+        },
+        "override_timeout_sec": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Override Timeout Sec"
+        },
+        "override_setup_timeout_sec": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Override Setup Timeout Sec"
+        },
+        "max_timeout_sec": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Timeout Sec"
+        },
+        "resume_trajectory": {
+          "default": false,
+          "description": "For multi-step tasks, resume the agent's native session from the previous step instead of starting a fresh conversation on each step. Requires an agent with native resume support (capabilities.resume); the trial fails fast otherwise. No effect on single-step tasks.",
+          "title": "Resume Trajectory",
+          "type": "boolean"
+        },
+        "load_trajectory": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Path to a trajectory to load as the agent's session before the first step, which then resumes it instead of starting fresh. A .jsonl file is the agent's native session format (lossless, same agent only; capabilities.load_native_trajectory); a .json file is an ATIF trajectory converted to the agent's native format (portable across supported agents; capabilities.load_atif_trajectory). The trial fails fast if the agent lacks the needed support. Composes with resume_trajectory.",
+          "title": "Load Trajectory"
+        },
+        "extra_allowed_hosts": {
+          "description": "Run-specific hostnames or IP addresses merged into the effective agent phase allowlist during agent.run() only.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Extra Allowed Hosts",
+          "type": "array"
+        },
+        "include_logs": {
+          "description": "Glob patterns of agent log files to download, relative to the agent logs directory. When set, only matching files are kept.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Include Logs",
+          "type": "array"
+        },
+        "exclude_logs": {
+          "description": "Glob patterns of agent log files to skip when downloading. Applied after include_logs, so exclude wins on overlap.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Exclude Logs",
+          "type": "array"
+        },
+        "kwargs": {
+          "additionalProperties": true,
+          "title": "Kwargs",
+          "type": "object"
+        },
+        "env": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Env",
+          "type": "object"
+        },
+        "mcp_servers": {
+          "items": {
+            "$ref": "#/$defs/MCPServerConfig"
+          },
+          "title": "Mcp Servers",
+          "type": "array"
+        }
+      },
+      "title": "AgentConfig",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "name": {
+                "const": "codex"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "kwargs": {
+                "additionalProperties": false,
+                "properties": {
+                  "version": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "description": "Agent CLI version to install. Omit for latest.",
+                    "title": "Version"
+                  },
+                  "prompt_template_path": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "description": "Jinja2 template path; must include {{ instruction }}.",
+                    "title": "Prompt Template Path"
+                  },
+                  "config": {
+                    "default": null,
+                    "description": "Native config file path or inline JSON.",
+                    "title": "Config"
+                  },
+                  "reasoning_effort": {
+                    "anyOf": [
+                      {
+                        "enum": [
+                          "none",
+                          "minimal",
+                          "low",
+                          "medium",
+                          "high",
+                          "xhigh",
+                          "max"
+                        ],
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "description": "Model reasoning effort.",
+                    "title": "Reasoning Effort"
+                  },
+                  "reasoning_summary": {
+                    "anyOf": [
+                      {
+                        "enum": [
+                          "auto",
+                          "concise",
+                          "detailed",
+                          "none"
+                        ],
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "description": "How model reasoning is summarized.",
+                    "title": "Reasoning Summary"
+                  },
+                  "web_search": {
+                    "anyOf": [
+                      {
+                        "enum": [
+                          "disabled",
+                          "cached",
+                          "live"
+                        ],
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "description": "Web search mode.",
+                    "title": "Web Search"
+                  }
+                },
+                "title": "CodexOptions",
+                "type": "object"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "name": {
+                "const": "claude-code"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "kwargs": {
+                "additionalProperties": false,
+                "properties": {
+                  "version": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "description": "Agent CLI version to install. Omit for latest.",
+                    "title": "Version"
+                  },
+                  "prompt_template_path": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "description": "Jinja2 template path; must include {{ instruction }}.",
+                    "title": "Prompt Template Path"
+                  },
+                  "config": {
+                    "default": null,
+                    "description": "Native config file path or inline JSON.",
+                    "title": "Config"
+                  },
+                  "max_turns": {
+                    "anyOf": [
+                      {
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "description": "Maximum agent turns.",
+                    "title": "Max Turns"
+                  },
+                  "reasoning_effort": {
+                    "anyOf": [
+                      {
+                        "enum": [
+                          "low",
+                          "medium",
+                          "high",
+                          "xhigh",
+                          "max"
+                        ],
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "description": "Model reasoning effort.",
+                    "title": "Reasoning Effort"
+                  },
+                  "thinking_display": {
+                    "anyOf": [
+                      {
+                        "enum": [
+                          "summarized",
+                          "omitted"
+                        ],
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "description": "How thinking is displayed.",
+                    "title": "Thinking Display"
+                  },
+                  "max_budget_usd": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "description": "Maximum spend in USD.",
+                    "title": "Max Budget Usd"
+                  },
+                  "fallback_model": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "description": "Fallback model name.",
+                    "title": "Fallback Model"
+                  },
+                  "append_system_prompt": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "description": "Text appended to the system prompt.",
+                    "title": "Append System Prompt"
+                  },
+                  "allowed_tools": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "description": "Comma-separated allowed tools.",
+                    "title": "Allowed Tools"
+                  },
+                  "disallowed_tools": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "description": "Comma-separated disallowed tools.",
+                    "title": "Disallowed Tools"
+                  },
+                  "permission_mode": {
+                    "anyOf": [
+                      {
+                        "enum": [
+                          "default",
+                          "acceptEdits",
+                          "plan",
+                          "auto",
+                          "dontAsk",
+                          "bypassPermissions"
+                        ],
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": "bypassPermissions",
+                    "description": "Permission mode.",
+                    "title": "Permission Mode"
+                  },
+                  "max_thinking_tokens": {
+                    "anyOf": [
+                      {
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "description": "Maximum thinking tokens.",
+                    "title": "Max Thinking Tokens"
+                  },
+                  "memory_dir": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "description": "Host directory uploaded as Claude memory.",
+                    "title": "Memory Dir"
+                  }
+                },
+                "title": "ClaudeCodeOptions",
+                "type": "object"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "name": {
+                "const": "pi"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "kwargs": {
+                "additionalProperties": false,
+                "properties": {
+                  "version": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "description": "Agent CLI version to install. Omit for latest.",
+                    "title": "Version"
+                  },
+                  "prompt_template_path": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "description": "Jinja2 template path; must include {{ instruction }}.",
+                    "title": "Prompt Template Path"
+                  },
+                  "config": {
+                    "default": null,
+                    "description": "Native config file path or inline JSON.",
+                    "title": "Config"
+                  },
+                  "thinking": {
+                    "anyOf": [
+                      {
+                        "enum": [
+                          "off",
+                          "minimal",
+                          "low",
+                          "medium",
+                          "high",
+                          "xhigh"
+                        ],
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "description": "Thinking level.",
+                    "title": "Thinking"
+                  }
+                },
+                "title": "PiOptions",
+                "type": "object"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "name": {
+                "const": "mini-swe-agent"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "kwargs": {
+                "additionalProperties": false,
+                "properties": {
+                  "version": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "description": "Agent CLI version to install. Omit for latest.",
+                    "title": "Version"
+                  },
+                  "prompt_template_path": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "description": "Jinja2 template path; must include {{ instruction }}.",
+                    "title": "Prompt Template Path"
+                  },
+                  "config": {
+                    "default": null,
+                    "description": "Native config file path or inline JSON.",
+                    "title": "Config"
+                  },
+                  "cost_limit": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": "0",
+                    "description": "Cost limit.",
+                    "title": "Cost Limit"
+                  },
+                  "reasoning_effort": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "description": "Model reasoning effort.",
+                    "title": "Reasoning Effort"
+                  },
+                  "max_tokens": {
+                    "anyOf": [
+                      {
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "description": "Maximum completion tokens.",
+                    "title": "Max Tokens"
+                  },
+                  "litellm_model_registry_file": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "description": "Path to a LiteLLM model registry JSON file.",
+                    "title": "Litellm Model Registry File"
+                  },
+                  "litellm_model_registry": {
+                    "anyOf": [
+                      {
+                        "additionalProperties": true,
+                        "type": "object"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "description": "Inline LiteLLM model registry.",
+                    "title": "Litellm Model Registry"
+                  },
+                  "session_id_headers": {
+                    "anyOf": [
+                      {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "description": "HTTP headers that receive the session ID.",
+                    "title": "Session Id Headers"
+                  }
+                },
+                "title": "MiniSweAgentOptions",
+                "type": "object"
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "agents": {
+      "additionalProperties": {
+        "$ref": "#/$defs/AgentProfile"
+      },
+      "minProperties": 1,
+      "title": "Agents",
+      "type": "object"
+    },
+    "models": {
+      "additionalProperties": {
+        "$ref": "#/$defs/ModelProfile"
+      },
+      "minProperties": 1,
+      "title": "Models",
+      "type": "object"
+    }
+  },
+  "required": [
+    "agents",
+    "models"
+  ],
+  "title": "ProfileCatalog",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

@@ -1,0 +1,13 @@
+{
+  "backend": "remote_spectre",
+  "task_package": "/operator/private/final-task-package",
+  "remote": {
+    "host": "REPLACE_WITH_AUTHORIZED_SSH_ALIAS",
+    "python": "/operator/remote/runtime/bin/python3",
+    "bundle": "/operator/remote/harness-bundle",
+    "profile": "/operator/remote/private/final-profile.json",
+    "run_root": "/operator/remote/private/final-runs",
+    "archive_root": "/operator/remote/private/final-archives",
+    "upload_root": "/operator/remote/private/final-uploads"
+  }
+}

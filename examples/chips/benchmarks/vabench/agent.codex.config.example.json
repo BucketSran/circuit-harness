@@ -1,0 +1,17 @@
+{
+  "transport": "ssh",
+  "host": "lab-host",
+  "python": "/usr/local/bin/python3.12",
+  "bundle": "/private/harness/chips-agent.pyz",
+  "session": "/private/scratch/session-new-run",
+  "task_id": "v4-001",
+  "job_root": "/private/scratch/jobs",
+  "job_id": "codex-new-run",
+  "archive_root": "/private/persistent/archives",
+  "policy_kind": "remote_model",
+  "auth_kind": "chatgpt",
+  "codex_cli": "/absolute/path/to/codex",
+  "model": "OPENAI_MODEL_ID",
+  "reasoning_effort": "medium",
+  "episode_timeout_s": 600
+}

@@ -1,0 +1,7 @@
+{
+  "executable": "/usr/bin/podman",
+  "root": "/operator/private/podman-store",
+  "runroot": "/operator/private/podman-runroot",
+  "control_dir": "/operator/private/run-001",
+  "ignore_chown_errors": false
+}

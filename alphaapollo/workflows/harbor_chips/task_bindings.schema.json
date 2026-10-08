@@ -1,0 +1,101 @@
+{
+  "$defs": {
+    "TaskBinding": {
+      "additionalProperties": false,
+      "properties": {
+        "task_path": {
+          "format": "path",
+          "title": "Task Path",
+          "type": "string"
+        },
+        "task_id": {
+          "minLength": 1,
+          "title": "Task Id",
+          "type": "string"
+        },
+        "task_version": {
+          "minLength": 1,
+          "title": "Task Version",
+          "type": "string"
+        },
+        "support": {
+          "default": "supported",
+          "enum": [
+            "supported",
+            "unsupported"
+          ],
+          "title": "Support",
+          "type": "string"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reason"
+        },
+        "session_config": {
+          "anyOf": [
+            {
+              "format": "path",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Session Config"
+        },
+        "final_config": {
+          "anyOf": [
+            {
+              "format": "path",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Final Config"
+        }
+      },
+      "required": [
+        "task_path",
+        "task_id",
+        "task_version"
+      ],
+      "title": "TaskBinding",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "tasks": {
+      "items": {
+        "$ref": "#/$defs/TaskBinding"
+      },
+      "minItems": 1,
+      "title": "Tasks",
+      "type": "array"
+    }
+  },
+  "required": [
+    "tasks"
+  ],
+  "title": "TaskBindings",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

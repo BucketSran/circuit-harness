@@ -1,0 +1,57 @@
+# AlphaApollo offline DPO config. Inherits verl's FSDP SFT engine and replaces
+# only the dataset/collator/loss wiring in the AlphaApollo layer.
+
+hydra:
+  searchpath:
+    - pkg://verl.trainer.config
+
+defaults:
+  - sft_trainer_engine
+  - _self_
+
+alphaapollo:
+  off_policy_algo: dpo
+  dpo:
+    beta: 0.1
+    loss_type: sigmoid
+    label_smoothing: 0.0
+    reference_free: false
+    reference_model_path: ${model.path}
+    reference_model_revision: null
+
+data:
+  train_files: ${oc.env:AA_DPO_TRAIN_FILES,/data/dpo_train.parquet}
+  val_files: ${oc.env:AA_DPO_VAL_FILES,null}
+  train_batch_size: 128
+  micro_batch_size_per_gpu: 8
+  use_dynamic_bsz: false
+  max_length: 2048
+  truncation: right
+  pad_mode: no_padding
+  num_workers: 0
+  prompt_key: prompt
+  chosen_key: chosen
+  rejected_key: rejected
+  sample_id_key: sample_id
+  require_reference_logps: true
+  validate_reference_metadata: true
+  reference_model_path: ${alphaapollo.dpo.reference_model_path}
+  reference_model_revision: ${alphaapollo.dpo.reference_model_revision}
+  custom_cls:
+    path: pkg://alphaapollo.data_preprocess.preference_dataset
+    name: PairedPreferenceDataset
+
+model:
+  path: Qwen/Qwen2.5-3B-Instruct
+
+checkpoint:
+  save_contents: [model, optimizer, extra, hf_model]
+
+trainer:
+  project_name: aa-dpo
+  experiment_name: offline_dpo
+  total_epochs: 1
+  logger: [console]
+  default_hdfs_dir: null
+  save_freq: -1
+  test_freq: -1

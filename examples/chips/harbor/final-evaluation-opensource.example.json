@@ -1,0 +1,13 @@
+{
+  "backend": "benchmark_opensource",
+  "task_package": "/operator/private/final-task-package",
+  "opensource": {
+    "schema_version": 1,
+    "image": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+    "task_package_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "solver_options": {},
+    "unsupported": [],
+    "timeout_s": 120,
+    "max_output_bytes": 16777216
+  }
+}

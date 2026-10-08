@@ -1,0 +1,69 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Environments and secrets
+.env
+.env.*
+!.env.example
+.venv/
+venv/
+ENV/
+
+# Editors / OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Local agent/planning state
+.claude/
+.planning/
+CLAUDE.md
+
+# Runtime output
+logs/
+outputs/
+results/
+tmp/
+*.out
+*.log
+# PID/command records and logs written by examples/robotics/services/serve_local.sh
+.alphaapollo-robotics/
+
+# Local workflow run artifacts (trajectories, per-run result.json, reports).
+# Runs are reproducible from the config + seed; the outputs are not source.
+runs/
+
+# Apollo-Bio: downloaded weights, raw archives and generated mini subsets stay local.
+examples/bio/data/
+examples/bio/models/
+# Pre-layout Apollo-Bio source/tests retained only as a local migration backup.
+.apollo-bio-legacy/
+# Downloaded CGAL fixtures, generated meshes, and local binaries.
+examples/math/cgal_remeshing/artifacts/
+examples/math/cgal_remeshing/.build/
+# Prepared datasets are reproducible from their pinned source revision + manifest.
+data/
+# Local lab deployment settings and licensed/process data stay outside Git.
+examples/chips/*.local.json
+examples/chips/emx/*.local.json
+
+# Private deployment overrides and history backups, including nested task configs.
+*.local.json
+*.local.yaml
+*.local.toml
+*.bundle
+/private/

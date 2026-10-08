@@ -1,0 +1,55 @@
+# Shared AlphaApollo on-policy settings layered over the pinned verl trainer.
+
+defaults:
+  - ppo_trainer
+  - _self_
+
+alphaapollo:
+  use_invalid_action_penalty: true
+  invalid_action_penalty_coef: 0.1
+  normalize_by_length: false
+  reward_manager: episode
+
+actor_rollout_ref:
+  model:
+    path: ${oc.env:AA_MODEL_PATH,???}
+  rollout:
+    name: vllm
+    n: 1
+    tensor_model_parallel_size: 1
+    multi_turn:
+      enable: false
+    val_kwargs:
+      do_sample: true
+      n: 1
+  actor:
+    use_dynamic_bsz: false
+    ppo_mini_batch_size: 8
+    ppo_micro_batch_size_per_gpu: 4
+
+algorithm:
+  adv_estimator: grpo
+  filter_groups:
+    enable: false
+    max_num_gen_batches: 10
+
+data:
+  train_files: ${oc.env:AA_TRAIN_FILES,???}
+  val_files: ${oc.env:AA_VAL_FILES,???}
+  train_batch_size: 8
+  val_batch_size: 8
+  max_prompt_length: 4096
+  max_response_length: 1024
+  return_raw_chat: true
+
+trainer:
+  n_gpus_per_node: 2
+  nnodes: 1
+  total_training_steps: 2
+  total_epochs: 1
+  balance_batch: true
+  logger: [console]
+  project_name: alphaapollo_learning
+  save_freq: -1
+  test_freq: -1
+  val_before_train: false

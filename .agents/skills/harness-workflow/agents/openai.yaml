@@ -1,0 +1,4 @@
+interface:
+  display_name: "Harness Workflow"
+  short_description: "Select Harness stages, checks and PR handoff"
+  default_prompt: "Use $harness-workflow to resume this task at the next required stage with its existing scope and evidence."

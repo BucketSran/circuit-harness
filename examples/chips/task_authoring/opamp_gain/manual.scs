@@ -1,0 +1,12 @@
+// Operator baseline for a constructed fixture; never an Agent reference answer.
+simulator lang=spectre
+global 0
+ahdl_include "reference.va"
+VDD (vdd 0) vsource dc=1.8
+VP (vip 0) vsource dc=0.9 mag=0.5 phase=0
+VN (vin 0) vsource dc=0.9 mag=0.5 phase=180
+DUT (vip vin out vdd 0) gain_fixture gain0=1000 pole_hz=100
+RL (out 0) resistor r=1e6
+simulatorOptions options temp=27 reltol=1e-6 vabstol=1e-9 iabstol=1e-12
+ac1 ac values=[10]
+save vip vin out vdd

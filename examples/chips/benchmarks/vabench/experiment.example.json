@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "benchmark": "vabench",
+  "task_id": "v4-001",
+  "run_id": "vabench-new-run-001",
+  "agent": "pi",
+  "operator_config": "/private/config/vabench-operator.json",
+  "output": "/private/runs/chips/vabench-new-run-001"
+}

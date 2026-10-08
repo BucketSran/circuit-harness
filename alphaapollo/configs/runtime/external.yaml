@@ -1,0 +1,7 @@
+# External agent runtimes own their model loop and session. Runnable leaves
+# select the agent/model and provide only that agent's session differences.
+type: external
+options:
+  agent: ???
+  model: ???
+  concurrency: 1

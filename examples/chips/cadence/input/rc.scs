@@ -1,0 +1,7 @@
+simulator lang=spectre
+global 0
+V1 (in 0) vsource type=pulse val0=0 val1=1 period=2n width=1n rise=10p fall=10p
+R1 (in out) resistor r=1000
+C1 (out 0) capacitor c=100f
+tran1 tran stop=5n
+save in out
