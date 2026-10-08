@@ -30,7 +30,7 @@ python -m circuit_harness.harbor.evas_example prepare \
 
 `prepare` 从 Git object 导出固定 commit 的原始字节，忽略 checkout 的当前分支和本地修改。
 它调用 benchmark 原 `build_triangle_evas_replay.py`，输出原八例 checker 包、
-题面、参考候选与逐文件来源摘要。不调用旧 `triangle_evas.py` 的 AlphaApollo 单例接口。
+题面、参考候选与逐文件来源摘要。
 
 构建 EVAS runtime 需要在线下载 Rust/Cargo 依赖。先取得实际 base RepoDigest，再构建：
 
