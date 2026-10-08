@@ -15,6 +15,9 @@ from circuit_harness.execution.journal import atomic_json, file_digest
 
 SOURCE_URL = "https://github.com/BucketSran/vaEVAS"
 SOURCE_COMMIT = "f8b624f8887f5d55ce726373cff2a856c1487b79"
+# Deterministic package exported by this commit's benchmark-owned builder.
+TASK_VERSION = "dev-df643eaf9fd82a56"
+CHECKER_PACKAGE_SHA256 = "f79cff373e45c5062357f58714dcefd2d77cc6115a17770b5b376cce844d0f32"
 _ENGINE_PROBE = """
 import hashlib,json,pathlib
 root=pathlib.Path('/opt/evas')
@@ -205,16 +208,51 @@ def result(output: Path) -> dict:
     """Read verified evidence; an unavailable score remains null."""
     receipt = verify_replay(output / "replay")
     identity = json.loads((output / "replay/identity.json").read_text())
+    package = identity["package"]
+    manifest = package["manifest"]
+    if (
+        manifest["task_id"] != "va07-triangle-repair"
+        or manifest["task_version"] != TASK_VERSION
+        or package["sha256"] != CHECKER_PACKAGE_SHA256
+        or manifest["condition_id"] != "va07-original-eight-cases-df84f3123a91"
+        or manifest["criteria_sha256"]
+        != "df643eaf9fd82a569e276640d3a673fa0a632c50b7b56dcf009a83ab3ab77f10"
+        or manifest["task_set"] != "extension"
+    ):
+        raise ValueError("result is not the pinned VA07 benchmark replay")
+    inputs = json.loads((output / "inputs.json").read_text())
+    if (
+        inputs.get("source_url") != SOURCE_URL
+        or inputs.get("source_commit") != SOURCE_COMMIT
+        or inputs.get("candidate_sha256") != receipt["result"]["candidate_sha256"]
+        or inputs.get("checker_sha256") != package["sha256"]
+        or inputs.get("image") != identity["configuration"]["image"]
+    ):
+        raise ValueError("source provenance differs from sealed replay identity")
+    for exported, member in (
+        ("benchmark/checkers/triangle_evas_replay.py", "triangle_evas_replay.py"),
+        ("benchmark/checkers/triangle_oscillator.py", "triangle_oscillator.py"),
+        ("benchmark/tasks/va07-triangle-repair/tests/cases.json", "cases.json"),
+    ):
+        if inputs.get("source_files", {}).get(exported) != package["files"][member]["sha256"]:
+            raise ValueError("source provenance differs from sealed checker files")
     report_path = output / "replay/run/work" / identity["package"]["manifest"]["report_path"]
     report = json.loads(report_path.read_text()) if report_path.is_file() else {}
+    runtime = report.get("runtime")
+    if runtime is not None and (
+        inputs.get("engine", {}).get("source_commit") != inputs["source_commit"]
+        or inputs.get("engine", {}).get("kernel_sha256") != runtime.get("kernel_sha256")
+        or inputs.get("engine", {}).get("evas_python") != runtime.get("evas_python")
+    ):
+        raise ValueError("engine provenance differs from sealed checker runtime")
     return {
         "task_id": receipt["result"]["task_id"],
         "status": "development_prototype",
         "execution": receipt["result"]["execution"],
         "score": receipt["result"]["score"],
         "classification": receipt["classification"],
-        "source_url": SOURCE_URL,
-        "source_commit": SOURCE_COMMIT,
+        "source_url": inputs["source_url"],
+        "source_commit": inputs["source_commit"],
         "candidate_bundle_sha256": receipt["result"]["candidate_sha256"],
         "candidate_file_sha256": report.get("candidate_sha256"),
         "checker_package_sha256": identity["package"]["sha256"],
