@@ -1,14 +1,14 @@
 # Chips 任务集与数据集入口
 
-这是所有 Chips benchmark 的定义和登记入口。[RC-001](rc/TASK.md) 是首个可执行 Harness 基线；
+这是电路 benchmark 的定义和登记入口。首次使用先运行 [AnalogBench 快速开始](../../../docs/chips/ANALOG_QUICKSTART.md)，EVAS 开发版评测见 [VA07 重放示例](../../../docs/chips/EVAS_QUICKSTART.md)。
+
+[RC-001](rc/TASK.md) 是最小 Harness 基线；
 已接入 [VABench r53](vabench/TASK.md) 的固定任务回放与原评分器；
 新增 [Analog Design Bench 三题任务卡](analog_design_bench/TASK.md)：两道历史 RLC 和当前 OTA 已在 lab-server 用原评分脚本完成正反控；
 Analog Design Bench 已有一题 Pi/GLM 的 development 单回合与原评分器终评，尚无稳定表现或 Codex 条件验收；
 目前没有跨任务集的通用加载器。
-`examples/chips/emx/tasks.jsonl` 是 EMX 执行 smoke 输入，不是正式 benchmark。
 先复制 [TASK_TEMPLATE.md](TASK_TEMPLATE.md)，在本目录的 `<任务族>/TASK.md` 中填写。
-VABench 与 Analog 的单次 Agent 实验可分别从各自的 `experiment.example.json` 建立私有配置，
-由[共同实验入口](../../../docs/chips/UNIFIED_EXPERIMENT.md)运行与记录；任务定义和评分器仍各自固定。
+新的 Agent 实验使用 [Harbor 配置](../../../docs/chips/HARBOR.md)与[开发者接入指南](../../../docs/chips/INTEGRATION.md)；任务定义和评分器仍由 benchmark 维护。
 
 ## 每个任务族保存什么
 
