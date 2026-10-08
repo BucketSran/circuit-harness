@@ -50,7 +50,9 @@ def test_original_source_prepares_stock_oracle_job(tmp_path, task_id):
             "circuit_harness.harbor.analog_example:OriginalAnalogVerifier"
         )
     else:
-        assert job["verifier"].get("import_path") is None
+        assert job["verifier"]["import_path"] == (
+            "circuit_harness.harbor.analog_example:OriginalAnalogVerifier"
+        )
     assert job["tasks"][0]["path"] == str(source.resolve() / "tasks" / task_id)
 
 
@@ -157,4 +159,65 @@ def test_missing_uploaded_checker_is_error_before_grading(tmp_path):
         MissingCheckerEnvironment(),
     )
     with pytest.raises(RuntimeError, match="prerequisites unavailable"):
+        asyncio.run(verifier.verify())
+
+
+def test_rlc_checker_exit_trap_zero_is_error_at_real_verifier_boundary(tmp_path):
+    import asyncio
+
+    from harbor.environments.base import ExecResult
+    from harbor.models.job.config import JobConfig
+    from harbor.models.task.config import TaskOS
+    from harbor.models.task.task import Task
+    from harbor.models.trial.paths import TrialPaths
+    from harbor.verifier.factory import VerifierFactory
+
+    task_id = "rlc-rf-bandpass-100mhz"
+    roots = os.environ.get("ANALOG_EXAMPLE_SOURCES", "").split(os.pathsep)
+    source = next(
+        (Path(root) for root in roots if root and Path(root).name.endswith(TASKS[task_id].commit)),
+        None,
+    )
+    if source is None:
+        pytest.skip("requires externally downloaded pinned source")
+    paths = TrialPaths(tmp_path / "trial")
+    paths.verifier_dir.mkdir(parents=True)
+
+    class CrashedCheckerEnvironment:
+        # Simulates the separate verifier container, retaining real Harbor Verifier.
+        os = TaskOS.LINUX
+        capabilities = type("Capabilities", (), {"mounted": True})()
+
+        async def exec(self, command, **kwargs):
+            if "test.sh" in command and not command.startswith("chmod"):
+                paths.reward_json_path.write_text(
+                    json.dumps(
+                        {
+                            "reward": 0,
+                            "tests_total": 15,
+                            "tests_passed": 0,
+                            "partial": 0.0,
+                        }
+                    )
+                )
+                return ExecResult(return_code=2, stderr="checker process crashed")
+            return ExecResult(return_code=0)
+
+        async def upload_dir(self, **kwargs):
+            raise AssertionError("A uses its prebuilt separate verifier tests")
+
+        async def set_network_policy(self, policy):
+            raise AssertionError("A upstream verifier network must remain unchanged")
+
+    config_dir = tmp_path / "prepared"
+    prepare(task_id, source, config_dir, tmp_path / "jobs", oracle=True)
+    config = JobConfig.model_validate_json((config_dir / "job.json").read_text())
+    verifier = VerifierFactory.create_verifier_from_config(
+        config.verifier,
+        task=Task(source / "tasks" / task_id),
+        trial_paths=paths,
+        environment=CrashedCheckerEnvironment(),
+        skip_tests_upload=True,
+    )
+    with pytest.raises(RuntimeError, match="checker did not produce"):
         asyncio.run(verifier.verify())

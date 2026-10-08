@@ -67,13 +67,14 @@ def prepare(
         "tasks": [{"path": str(source)}],
         "environment": {"type": "docker", "override_cpus": cpus},
     }
+    job["verifier"] = {
+        "import_path": "circuit_harness.harbor.analog_example:OriginalAnalogVerifier",
+        "kwargs": {"skip_tests_upload": True} if task_id == "rlc-rf-bandpass-100mhz" else {},
+    }
     if task_id.startswith("sky130-"):
         job["environment"]["import_path"] = (
             "circuit_harness.harbor.analog_example:AnalogDockerEnvironment"
         )
-        job["verifier"] = {
-            "import_path": "circuit_harness.harbor.analog_example:OriginalAnalogVerifier"
-        }
     if oracle:
         from harbor.models.job.config import JobConfig
 
@@ -107,6 +108,7 @@ def prepare(
             "agent_network_at_source": "public" if task_id.startswith("sky130-") else "no-network",
             "verifier_phase": "no-network",
             "verifier_layout_adapter": task_id.startswith("sky130-"),
+            "verifier_evidence_guard": True,
         },
     }
     # All validation precedes writes. An existing directory is never overwritten.
@@ -138,7 +140,7 @@ class AnalogDockerEnvironment(DockerEnvironment):
 
 
 class OriginalAnalogVerifier(Verifier):
-    """Supply historical SKY130 checker's expected path during Harbor verification.
+    """Check original grading evidence and supply historical SKY130 checker paths.
 
     The original test.sh and checker bytes remain unchanged. Tests are uploaded
     only after the agent has finished, using Harbor's verifier lifecycle.
@@ -147,10 +149,30 @@ class OriginalAnalogVerifier(Verifier):
     async def verify(self):
         task_dir = self.task.paths.task_dir
         task_id = task_dir.name
-        if task_id != "sky130-ota-5t-gain40-pm60-noise50uv-pvt":
-            raise ValueError("historical checker layout applies only to the pinned SKY130 task")
+        if task_id not in EXAMPLES:
+            raise ValueError("original checker guard applies only to pinned onboarding tasks")
         if tree_digest(task_dir) != TASKS[task_id].source_sha256:
             raise ValueError("task source pin mismatch before verification")
+        if task_id == "rlc-rf-bandpass-100mhz":
+            # Harbor has already built the upstream independent verifier image.
+            # Keep its tests and no-network policy; never upload them to the agent.
+            probe = await self.environment.exec(
+                command="command -v ngspice && test -s /app/analog_arena_tests/verify.py",
+                user="root",
+            )
+            if probe.return_code != 0:
+                raise RuntimeError("upstream RLC verifier prerequisites unavailable")
+            candidate = await self.environment.exec(command="test -s /app/circuit.spi", user="root")
+            if candidate.return_code not in (0, 1):
+                raise RuntimeError("upstream RLC candidate check failed to execute")
+            result = await super().verify()
+            validate_grading_evidence(
+                result.rewards,
+                candidate.return_code,
+                self.trial_paths.verifier_dir / "new-ctrf.json",
+                expected_total=15,
+            )
+            return result
         await self.environment.set_network_policy(
             NetworkPolicy(network_mode=NetworkMode.NO_NETWORK)
         )
@@ -184,13 +206,22 @@ class OriginalAnalogVerifier(Verifier):
         return result
 
 
-def validate_grading_evidence(rewards: dict, legality_exit: int, checker_report: Path) -> None:
+def validate_grading_evidence(
+    rewards: dict,
+    legality_exit: int,
+    checker_report: Path,
+    *,
+    expected_total: int = 7,
+) -> None:
     """Reject the historical shell trap's fallback zero after checker execution failure.
 
-    A rejected netlist legitimately produces 0/7 without running the simulator.
-    A legal netlist must produce the upstream checker's seven-test CTRF report.
+    The original script can reject an absent RLC candidate or invalid SKY130 netlist
+    before simulation. All other cases must produce its complete CTRF report.
     """
-    if rewards.get("tests_total") != 7 or not 0 <= rewards.get("tests_passed", -1) <= 7:
+    if (
+        rewards.get("tests_total") != expected_total
+        or not 0 <= rewards.get("tests_passed", -1) <= expected_total
+    ):
         raise RuntimeError("upstream verifier reward has invalid test counts")
     if legality_exit == 1:
         if rewards.get("tests_passed") != 0 or rewards.get("reward") != 0:
@@ -202,7 +233,7 @@ def validate_grading_evidence(rewards: dict, legality_exit: int, checker_report:
         summary = json.loads(checker_report.read_text())["results"]["summary"]
     except (OSError, ValueError, KeyError, TypeError) as error:
         raise RuntimeError("upstream checker did not produce a valid report") from error
-    if summary.get("tests") != 7 or summary.get("passed") != rewards["tests_passed"]:
+    if summary.get("tests") != expected_total or summary.get("passed") != rewards["tests_passed"]:
         raise RuntimeError("upstream checker report and reward disagree")
 
 

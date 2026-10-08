@@ -3,7 +3,8 @@
 这两个例子使用 Analog Design Bench 原版题目和 checker。
 A 是无 PDK 的 100 MHz 被动 RLC 带通滤波器；B 是使用开放 SKY130 模型的五管 OTA。
 Harbor 负责 Agent、Job、Trial、Docker 工作区和终评；Harness 只校验固定题目源码并编译 Agent/Model 配置。
-A 直接使用 stock Harbor。B 的历史 task 需要一个小适配，将原 checker 上传到它期望的路径，
+A/B 沿用 stock Harbor 生命周期，并用轻量 verifier 核对原 checker 的执行证据。
+B 的历史 task 另需补齐原 checker 期望的上传路径，
 并在评分阶段启用 Harbor 禁网。两者都不要求 EVAS 网关或 Spectre 许可证。
 
 这条原生任务路径不同于 Harness 的私有冻结候选会话。A 使用上游独立 verifier 容器；
@@ -67,6 +68,12 @@ harbor run --config "$ANALOG_CACHE/a-oracle/job.json"
 `job.json` 是 Harbor 原生配置，`provenance.json` 记录任务提交、摘要、固定基础镜像和实际生成的覆盖项。
 准备器不改变 task 文件或镜像，不覆盖上游 timeout。CPU 只在显式指定 `--cpus` 时覆盖。
 Agent profile 自己声明的超时仍会由配置编译器传递。
+
+A 使用 `OriginalAnalogVerifier` 的证据检查，继续在原题的独立 verifier 容器中运行。
+它不向 Agent 工作区上传评分文件，也不重设上游评分网络。
+原脚本会在 checker 崩溃而没有结果时用 trap 写出 `0/15`，所以非空候选还必须有原 checker
+的十五项 CTRF 报告。没有报告是基础设施错误，原 starter 的完整 `0/15` 报告仍是有效零分。
+空候选沿用原脚本的失败评分规则。
 
 参考解应得到 `reward=1.0`、`tests_passed=15`、`tests_total=15`。
 这证明本次参考解通过该固定原题的 checker。它不证明 Agent 已解题。
@@ -150,13 +157,15 @@ Docker 报 CPU 范围错误时核对 daemon 的 CPU 数量；镜像存在但报 
 ## 本次验证范围
 
 2026-10-09 在本机 Docker 上使用上述固定源码与镜像进行验证，Docker 分配两个 CPU。
-A 的 Harbor Oracle 为 15/15；原 checker 直接执行的参考解为 15/15，starter 为 0/15。
+A 的 Harbor Oracle 为 15/15，Harbor Nop 保留 starter 为 0/15；
+原 checker 直接执行的参考解为 15/15，starter 为 0/15。
 B 的 Harbor Oracle 为 7/7，原 checker 直接执行的参考解为 7/7，starter 为 0/7。
 B 的 Harbor Nop Agent 保持原 starter，得到 0/7。
 这些都是本次控制运行，不引用历史模型成绩。当前没有运行付费模型，也没有验收真实 Agent 自主解题。
 最初 B 原生 Harbor 运行因为 checker 路径缺失，由上游 shell trap 写出零分；
 本例适配修复该路径并拒绝合法候选缺少 checker 报告的情况。
-准备边界回归涵盖源码漂移、stock job、密钥引用、缺 checker 和缺执行报告。
+准备边界回归涵盖源码漂移、stock job、密钥引用、缺 checker 和缺执行报告。A 的回归经生成配置与真实 Harbor Verifier 工厂，
+模拟 checker exit=2 但只有 trap 零分的独立 verifier 环境，确认返回基础设施错误。
 外部原题回归需设置 `ANALOG_EXAMPLE_SOURCES`，默认不下载第三方数据：
 
 ```bash
