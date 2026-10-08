@@ -1,6 +1,8 @@
 # circuit-harness
 
-独立的电路实验平台。Harbor 管理 Agent、Job 和 Trial；Circuit Harness 提供仿真接入、公开任务会话、候选冻结、独立评分和可核查的轨迹数据。Agent 与模型分别配置，runner 可部署在本机或服务器。
+Circuit Harness 是面向 AI Agent 电路设计与评测的独立实验平台。它连接仿真器和电路工具，管理公开任务会话、候选冻结、独立评分与轨迹数据。Harbor 负责 Agent、Job 和 Trial 的运行与评测调度。
+
+Agent 与模型分别配置，便于比较不同组合。runner 可部署在本机或服务器，仿真器通过本地或 SSH 接口接入。
 
 ```text
 Harbor task + Agent/Model 配置
@@ -40,10 +42,14 @@ python -m circuit_harness.harbor.profiles --help
 - `circuit_harness/reporting/` 离线读取保存的实验记录。
 - `circuit_harness/cli.py` 提供直接操作者命令，`public_mcp.py` 提供原生 Agent 的公开会话桥。
 
-本版本移除了 Apollo runtime、Robotics、通用 Workflow、Memory 和内置训练器，并将包名改为 `circuit_harness`。旧导入和旧 Agent runner 不再兼容；现有调用方与任务模板的迁移范围见[迁移说明](docs/chips/MIGRATION.md)。固定 VABench r53 和 Analog 的直接会话及评分接口保留，不等于它们已成为可直接启动的 Harbor task。
+Python 包名为 `circuit_harness`，命令行入口为 `circuit-harness`。固定 VABench r53 和 Analog 提供直接会话及评分接口；通过 Harbor 运行时，还需要准备对应的 task。旧版本调用方与任务模板的适配见[迁移说明](docs/chips/MIGRATION.md)。
 
 ## 开发与证据
 
 默认分支为 `main`。开发按 [AGENTS.md](AGENTS.md) 和[开发 SOP](docs/chips/DEVELOPMENT_SOP.md)进行，默认交付可 review 的 PR，确认后合并。[测试入口](tests/chips/README.md)说明本地检查；[历史验证记录](docs/chips/VALIDATION.md)只证明当时版本与条件，不能当作新部署的验收。
 
-公开仓库保存通用源码、合成测试和脱敏模板。真实轨迹、模型密钥、机器配置、PDK 和隐藏评分材料留在私有存储，见[发布边界](docs/chips/REPOSITORY_SCOPE.md#publication-boundary)。本项目源自 AlphaApollo，保留 Apache License 2.0 与来源归属，见 [LICENSE](LICENSE) 和 [Notice.txt](Notice.txt)。
+公开仓库保存通用源码、合成测试和脱敏模板。真实轨迹、模型密钥、机器配置、PDK 和隐藏评分材料留在私有存储，见[发布边界](docs/chips/REPOSITORY_SCOPE.md#publication-boundary)。
+
+## 许可证与历史来源
+
+本项目采用 Apache License 2.0，见 [LICENSE](LICENSE)。部分代码源自 AlphaApollo，来源归属见 [Notice.txt](Notice.txt)。当前版本独立维护，安装和运行均不依赖 Apollo，也不提供 Apollo 集成。
