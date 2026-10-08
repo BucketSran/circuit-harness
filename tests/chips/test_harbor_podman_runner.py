@@ -7,7 +7,7 @@ from pathlib import Path
 
 
 def test_podman_runner_scopes_store_endpoint_and_cleans_service(tmp_path):
-    from alphaapollo.workflows.harbor_chips import podman_runner
+    from circuit_harness.harbor import podman_runner
 
     engine = tmp_path / "engine"
     engine.write_text(
@@ -65,8 +65,8 @@ def test_podman_runner_scopes_store_endpoint_and_cleans_service(tmp_path):
 
 
 def test_runtime_schema_matches_model():
-    from alphaapollo.workflows.harbor_chips import podman_runner
-    from alphaapollo.workflows.harbor_chips.podman_runner import PodmanRuntimeConfig
+    from circuit_harness.harbor import podman_runner
+    from circuit_harness.harbor.podman_runner import PodmanRuntimeConfig
 
     schema = json.loads(Path(podman_runner.__file__).with_suffix(".schema.json").read_text())
     assert schema == PodmanRuntimeConfig.model_json_schema()
@@ -78,7 +78,7 @@ def test_runner_terminates_service_when_child_fails(tmp_path):
 
     import pytest
 
-    from alphaapollo.workflows.harbor_chips.podman_runner import run
+    from circuit_harness.harbor.podman_runner import run
 
     with tempfile.TemporaryDirectory(prefix="chips-", dir="/tmp") as short:
         control = Path(short) / "control"
@@ -139,7 +139,7 @@ def test_runner_sigterm_closes_active_child_and_service(tmp_path):
         command = [
             sys.executable,
             "-m",
-            "alphaapollo.workflows.harbor_chips.podman_runner",
+            "circuit_harness.harbor.podman_runner",
             "--config",
             str(config),
             "--",

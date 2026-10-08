@@ -1,6 +1,6 @@
 """Analog tools reuse the durable action transport with Analog commands."""
 
-from alphaapollo.common.execution.chips.analog_remote import LocalAnalog, RemoteAnalog
+from circuit_harness.execution.analog_remote import LocalAnalog, RemoteAnalog
 
 
 def test_analog_transport_uses_analog_request_and_response(tmp_path, monkeypatch):

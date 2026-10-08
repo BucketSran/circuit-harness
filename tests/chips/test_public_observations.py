@@ -8,7 +8,7 @@ import sys
 
 import pytest
 
-from alphaapollo.common.execution.chips import current_evas_session as session
+from circuit_harness.execution import current_evas_session as session
 from tests.chips.test_current_evas_session import call, make_session
 
 
@@ -347,7 +347,7 @@ def test_reads_spend_only_action_budget_and_reserve_submission(tmp_path):
 
 
 def test_offline_bundle_serves_the_same_session_observation_contract(tmp_path):
-    from alphaapollo.common.execution.chips.bundle import build_cli
+    from circuit_harness.execution.bundle import build_cli
 
     directory = make_session(tmp_path)
     bundle = tmp_path / "chips.pyz"
@@ -355,7 +355,7 @@ def test_offline_bundle_serves_the_same_session_observation_contract(tmp_path):
     code = """import json,sys
 from pathlib import Path
 sys.path.insert(0,sys.argv[1])
-from alphaapollo.common.execution.chips.current_evas_session import session_info,session_action
+from circuit_harness.execution.current_evas_session import session_info,session_action
 assert session_info(Path(sys.argv[2]))['observation_view_version']==1
 print(json.dumps(session_action(Path(sys.argv[2]), {
  'action_id':'bundled','tool':'evas_read_artifact','arguments':{'artifact_id':'manifest'}})))

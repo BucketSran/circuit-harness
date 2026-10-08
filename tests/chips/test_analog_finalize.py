@@ -4,8 +4,8 @@ import json
 
 import pytest
 
-from alphaapollo.common.execution.chips import analog_session
-from alphaapollo.common.execution.chips.journal import file_digest
+from circuit_harness.execution import analog_session
+from circuit_harness.execution.journal import file_digest
 
 
 def test_finalizer_refuses_unfrozen_and_changed_candidate(tmp_path, monkeypatch):

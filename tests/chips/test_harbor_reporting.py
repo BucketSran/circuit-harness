@@ -20,7 +20,7 @@ from harbor.models.trial.result import AgentInfo, ExceptionInfo, TrialResult
 from harbor.models.verifier.result import VerifierResult
 from test_benchmark_spectre import finish, inputs
 
-from alphaapollo.common.execution.chips.jobs import submit_benchmark_spectre
+from circuit_harness.execution.jobs import submit_benchmark_spectre
 
 
 def write(path, value):
@@ -57,9 +57,7 @@ def fixture_job(tmp_path):
         tasks=[{"path": str(task)}],
         agents=[{"name": "pi", "model_name": "openai/fixture-model"}],
         environment={
-            "import_path": (
-                "alphaapollo.workflows.harbor_chips.docker_environment:CircuitDockerEnvironment"
-            ),
+            "import_path": ("circuit_harness.harbor.docker_environment:CircuitDockerEnvironment"),
             "kwargs": {"session_config": str(public)},
         },
     )
@@ -105,10 +103,10 @@ def fixture_job(tmp_path):
                 "candidate_sha256=hashlib.sha256(p.read_bytes()).hexdigest())))"
             )
             candidate, package, profile = inputs(
-                setup, checker=shlex.join([sys.executable, "-c", code]) + "\n"
+                setup, checker=shlex.join([sys.executable, "-c", code]) + "\n", timeout=8
             )
             if status == "zero":
-                from alphaapollo.common.execution.chips.candidate_bundle import freeze_candidate
+                from circuit_harness.execution.candidate_bundle import freeze_candidate
 
                 shutil.rmtree(candidate)
                 (setup / "source/dut.va").write_text("module zero; endmodule\n")
@@ -188,7 +186,7 @@ def report(job, output):
         [
             sys.executable,
             "-m",
-            "alphaapollo.workflows.harbor_chips.reporting",
+            "circuit_harness.harbor.reporting",
             "--job",
             str(job),
             "--output",
@@ -259,7 +257,7 @@ def test_report_never_reads_host_keys_or_starts_a_process(tmp_path):
     }
     code = """
 import os,socket,subprocess,sys
-from alphaapollo.workflows.harbor_chips.reporting import main
+from circuit_harness.harbor.reporting import main
 original_get=os.environ.get
 original_item=type(os.environ).__getitem__
 def get(key,*args):
@@ -477,8 +475,8 @@ def test_report_reuses_task_bindings_for_multitask_plan_and_unsupported_entries(
 
 
 def test_report_verifies_replay_receipt_even_if_verifier_wrapper_did_not_finish(tmp_path):
-    from alphaapollo.common.execution.chips.benchmark_replay import replay_candidate
-    from alphaapollo.common.execution.chips.benchmark_spectre import package_identity
+    from circuit_harness.execution.benchmark_replay import replay_candidate
+    from circuit_harness.execution.benchmark_spectre import package_identity
 
     job = fixture_job(tmp_path)
     package = tmp_path / "checker-0/task"

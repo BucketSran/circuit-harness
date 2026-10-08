@@ -9,7 +9,7 @@ pytest.importorskip("harbor")
 
 from test_harbor_chips_trial import ControlledEnvironment
 
-from alphaapollo.workflows.harbor_chips.config import FinalEvaluationConfig
+from circuit_harness.harbor.config import FinalEvaluationConfig
 
 
 def test_final_configuration_selects_replay_and_rejects_mixed_backends(tmp_path):
@@ -40,8 +40,8 @@ def verifier_for(tmp_path, package, config, candidate):
     from harbor.models.task.task import Task
     from harbor.models.trial.paths import TrialPaths
 
-    from alphaapollo.common.execution.chips.candidate_bundle import verify_candidate
-    from alphaapollo.workflows.harbor_chips.verifier import FrozenCandidateVerifier
+    from circuit_harness.execution.candidate_bundle import verify_candidate
+    from circuit_harness.harbor.verifier import FrozenCandidateVerifier
 
     taskdir = tmp_path / "harbor-task"
     (taskdir / "environment").mkdir(parents=True)
@@ -78,7 +78,7 @@ def test_harbor_verifier_reuses_sealed_replay_for_unsupported_task(tmp_path):
 
     from test_benchmark_replay import replay_inputs
 
-    from alphaapollo.common.execution.chips.benchmark_replay import verify_replay
+    from circuit_harness.execution.benchmark_replay import verify_replay
 
     candidate, package, config = replay_inputs(tmp_path)
     config["unsupported"] = ["controlled unavailable analysis"]
@@ -145,7 +145,7 @@ time.sleep(30)
 def test_real_docker_checker_final_score_through_harbor_verifier(tmp_path, docker_image, score):
     import asyncio
 
-    from alphaapollo.common.execution.chips.benchmark_replay import verify_replay
+    from circuit_harness.execution.benchmark_replay import verify_replay
 
     candidate, package, config = docker_inputs(tmp_path, docker_image, score=score)
     verifier = verifier_for(tmp_path, package, config, candidate)
@@ -161,7 +161,7 @@ def test_real_docker_checker_final_score_through_harbor_verifier(tmp_path, docke
 def test_real_checker_failure_cannot_produce_reward(tmp_path, docker_image, mode):
     import asyncio
 
-    from alphaapollo.common.execution.chips.benchmark_replay import verify_replay
+    from circuit_harness.execution.benchmark_replay import verify_replay
 
     candidate, package, config = docker_inputs(tmp_path, docker_image, mode=mode)
     verifier = verifier_for(tmp_path, package, config, candidate)
@@ -177,7 +177,7 @@ def test_harbor_cancel_or_timeout_awaits_real_process_and_container_cleanup(
     import asyncio
     import subprocess
 
-    from alphaapollo.common.execution.chips.benchmark_replay import verify_replay
+    from circuit_harness.execution.benchmark_replay import verify_replay
 
     candidate, package, config = docker_inputs(tmp_path, docker_image, mode="slow")
     verifier = verifier_for(tmp_path, package, config, candidate)
@@ -223,13 +223,11 @@ def test_harbor_cancel_or_timeout_awaits_real_process_and_container_cleanup(
 def test_final_schema_examples_match_runtime_and_backend_constraints():
     from jsonschema import Draft202012Validator
 
-    from alphaapollo.workflows.harbor_chips.config import HarborChipsConfig
+    from circuit_harness.harbor.config import HarborChipsConfig
 
     root = Path(__file__).resolve().parents[2]
     for name, model in (("config", HarborChipsConfig), ("final_evaluation", FinalEvaluationConfig)):
-        schema = json.loads(
-            (root / f"alphaapollo/workflows/harbor_chips/{name}.schema.json").read_text()
-        )
+        schema = json.loads((root / f"circuit_harness/harbor/{name}.schema.json").read_text())
         assert schema == model.model_json_schema()
         Draft202012Validator.check_schema(schema)
     schema = FinalEvaluationConfig.model_json_schema()
@@ -257,7 +255,7 @@ def test_final_configuration_round_trip_preserves_selected_backend(tmp_path):
 
 class ReplayTrialEnvironment(ControlledEnvironment):
     async def freeze(self, reason):
-        from alphaapollo.common.execution.chips.candidate_bundle import freeze_candidate
+        from circuit_harness.execution.candidate_bundle import freeze_candidate
 
         if self.frozen is None:
             directory = self.trial_paths.trial_dir / "frozen"
@@ -281,7 +279,7 @@ def test_real_harbor_trial_uses_legacy_native_config_optional_replay(tmp_path, d
     from harbor.models.trial.config import TrialConfig
     from harbor.trial.trial import Trial
 
-    from alphaapollo.common.execution.chips.benchmark_replay import verify_replay
+    from circuit_harness.execution.benchmark_replay import verify_replay
 
     source = tmp_path / "input"
     source.mkdir()
@@ -319,13 +317,11 @@ def test_real_harbor_trial_uses_legacy_native_config_optional_replay(tmp_path, d
         trial_name="trial",
         trials_dir=tmp_path / "trials",
         agent={
-            "import_path": "alphaapollo.workflows.harbor_chips.agent:NativeCodexAgent",
+            "import_path": "circuit_harness.harbor.agent:NativeCodexAgent",
             "model_name": "controlled-model",
         },
         environment={"import_path": __name__ + ":ReplayTrialEnvironment"},
-        verifier={
-            "import_path": "alphaapollo.workflows.harbor_chips.verifier:FrozenCandidateVerifier"
-        },
+        verifier={"import_path": "circuit_harness.harbor.verifier:FrozenCandidateVerifier"},
     )
     trial = asyncio.run(Trial.create(config))
     result = asyncio.run(trial.run())
@@ -353,7 +349,7 @@ def test_task_mismatch_cannot_start_final_replay(tmp_path):
 def test_cancel_before_local_runner_starts_is_sealed_without_execution(tmp_path, docker_image):
     import threading
 
-    from alphaapollo.common.execution.chips.benchmark_replay import replay_candidate, verify_replay
+    from circuit_harness.execution.benchmark_replay import replay_candidate, verify_replay
 
     candidate, package, config = docker_inputs(tmp_path, docker_image, mode="slow")
     cancel = threading.Event()

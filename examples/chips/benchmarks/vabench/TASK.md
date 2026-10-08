@@ -16,8 +16,8 @@
 原 Testbench 评分含参考 DUT 与五个负向 mutation；沿用原安全检查、信号要求及判定，无自设替代容差。
 
 接口、命令与目录：[VABench 使用说明](../../../../docs/chips/VABENCH.md)。
-执行/固定：[vabench.py](../../../../alphaapollo/common/execution/chips/vabench.py)；
-原接口桥接：[vabench_worker.py](../../../../alphaapollo/common/execution/chips/vabench_worker.py)；
+执行/固定：[vabench.py](../../../../circuit_harness/execution/vabench.py)；
+原接口桥接：[vabench_worker.py](../../../../circuit_harness/execution/vabench_worker.py)；
 验收：[vabench_smoke.py](../../../../tests/chips/probes/vabench_smoke.py)。
 
 状态：本机与实验室服务器的真实 EVAS 六个正负例均符合预期；服务器仿真阶段断开 SSH 后完成、同 ID 不重跑。

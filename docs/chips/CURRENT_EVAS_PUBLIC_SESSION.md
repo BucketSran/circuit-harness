@@ -1,6 +1,6 @@
 # Current EVAS public sessions
 
-`alphaapollo.common.execution.chips.current_evas_session` owns public candidate
+`circuit_harness.execution.current_evas_session` owns public candidate
 editing, bounded diagnostic execution and final collection. It does not grade
 benchmark tasks. A benchmark owner must explicitly supply a public task mapping;
 there is no inferred va07 mapping or hidden checker mount.

@@ -6,7 +6,7 @@ import pytest
 from test_benchmark_spectre import task_package
 from test_current_evas_session import call, make_session
 
-from alphaapollo.common.execution.chips import current_evas_session as session
+from circuit_harness.execution import current_evas_session as session
 
 
 def test_remote_session_reuses_public_budget_and_freezes(tmp_path, monkeypatch):
@@ -32,7 +32,7 @@ def test_remote_session_reuses_public_budget_and_freezes(tmp_path, monkeypatch):
         manifest={"condition_id": "fixture-condition-v1"},
     )
     assert call(directory, "edit", "evas_write", path="dut.va", content="original")["ok"]
-    from alphaapollo.common.execution.chips import remote_public
+    from circuit_harness.execution import remote_public
 
     seen = []
 
@@ -63,7 +63,7 @@ def test_remote_session_reuses_public_budget_and_freezes(tmp_path, monkeypatch):
 def test_unknown_remote_job_resumes_without_submit_and_late_result_cannot_change_freeze(
     tmp_path, monkeypatch
 ):
-    from alphaapollo.common.execution.chips import remote_public
+    from circuit_harness.execution import remote_public
 
     package = task_package(tmp_path, purpose="public")
     manifest = json.loads((package / "manifest.json").read_text())
@@ -128,8 +128,8 @@ def test_unknown_remote_job_resumes_without_submit_and_late_result_cannot_change
 def test_public_transport_bounds_every_network_operation_by_remaining_wait(tmp_path, monkeypatch):
     import time
 
-    from alphaapollo.common.execution.chips.remote_public import RemotePublicSpectre
-    from alphaapollo.common.execution.chips.session_transport import RemoteSessionTransport
+    from circuit_harness.execution.remote_public import RemotePublicSpectre
+    from circuit_harness.execution.session_transport import RemoteSessionTransport
 
     remote = dict(
         host="fixture",
@@ -165,7 +165,7 @@ def test_public_transport_bounds_every_network_operation_by_remaining_wait(tmp_p
 
 @pytest.mark.parametrize("receipt", ["{}", "[]", '{"package":null}'])
 def test_malformed_downloaded_archive_is_durable_invalid_result(tmp_path, monkeypatch, receipt):
-    from alphaapollo.common.execution.chips.remote_public import RemotePublicSpectre
+    from circuit_harness.execution.remote_public import RemotePublicSpectre
 
     package = task_package(tmp_path, purpose="public")
     manifest = json.loads((package / "manifest.json").read_text())

@@ -10,9 +10,9 @@ pytest.importorskip("harbor")
 from harbor.models.trial.config import TrialConfig
 from harbor.trial.trial import Trial
 
-from alphaapollo.workflows.harbor_chips.agent import NativeCodexAgent as NativeCodexAgent
-from alphaapollo.workflows.harbor_chips.environment import HarborChipsEnvironment
-from alphaapollo.workflows.harbor_chips.verifier import FrozenCandidateVerifier
+from circuit_harness.harbor.agent import NativeCodexAgent as NativeCodexAgent
+from circuit_harness.harbor.environment import HarborChipsEnvironment
+from circuit_harness.harbor.verifier import FrozenCandidateVerifier
 
 
 class ControlledEnvironment(HarborChipsEnvironment):
@@ -446,7 +446,7 @@ def test_production_trial_installation_uses_real_sandbox_and_public_broker_witho
                     .read_bytes()
                     .startswith(b"\xcf\xfa\xed\xfe")
                 )
-            from alphaapollo.common.execution.chips.current_evas_session import session_info
+            from circuit_harness.execution.current_evas_session import session_info
 
             assert environment.native_conditions()["public_mcp_tools"] == [
                 schema["function"]["name"]
@@ -593,13 +593,13 @@ class RemotePublicFixtureVerifier(FrozenCandidateVerifier):
 def test_configuration_b_uses_harbor_session_preparation_and_final_freeze(tmp_path, monkeypatch):
     from test_benchmark_spectre import task_package
 
-    from alphaapollo.workflows.harbor_chips.config import HarborChipsConfig
+    from circuit_harness.harbor.config import HarborChipsConfig
 
     script = """
 import sys
 from pathlib import Path
-from alphaapollo.common.execution.chips.current_evas_session import session_action
-from alphaapollo.common.execution.chips import remote_public
+from circuit_harness.execution.current_evas_session import session_action
+from circuit_harness.execution import remote_public
 class FixtureRemote:
     submissions = 0
     def __init__(self, config, evidence, **kwargs): pass
@@ -665,7 +665,7 @@ assert session_action(root,{'action_id':'submit','tool':'evas_submit','arguments
 
 
 def test_configuration_b_rejects_overlapping_final_material_and_storage(tmp_path):
-    from alphaapollo.workflows.harbor_chips.config import HarborChipsConfig
+    from circuit_harness.harbor.config import HarborChipsConfig
 
     data = dict(
         task={},
@@ -705,7 +705,7 @@ def test_configuration_b_rejects_overlapping_final_material_and_storage(tmp_path
     "path", ["/public/../final/jobs", "/public//jobs", "/public/./jobs", "relative/jobs"]
 )
 def test_configuration_b_rejects_noncanonical_remote_roots(tmp_path, path):
-    from alphaapollo.workflows.harbor_chips.config import HarborChipsConfig
+    from circuit_harness.harbor.config import HarborChipsConfig
 
     data = dict(
         task={},

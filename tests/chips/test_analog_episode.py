@@ -4,8 +4,8 @@ import json
 
 import pytest
 
-from alphaapollo.common.execution.chips.analog_episode import archive_episode, verify_episode
-from alphaapollo.common.execution.chips.journal import file_digest
+from circuit_harness.execution.analog_episode import archive_episode, verify_episode
+from circuit_harness.execution.journal import file_digest
 
 
 def test_episode_archive_links_actions_model_trace_and_final_candidate(tmp_path):

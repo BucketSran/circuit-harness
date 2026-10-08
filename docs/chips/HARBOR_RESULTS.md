@@ -5,7 +5,7 @@ Harbor 继续负责执行和任务计划；导出器不创建 Job，不调用 Ag
 [Harbor 配置](HARBOR.md)和[任务绑定](HARBOR_TASKS.md)仍是运行入口。
 
 ```bash
-python -m alphaapollo.workflows.harbor_chips.reporting \
+python -m circuit_harness.harbor.reporting \
   --job /private/saved-harbor-job \
   --output /private/new-report-directory
 ```
@@ -22,8 +22,8 @@ python -m alphaapollo.workflows.harbor_chips.reporting \
 ## 计划与统计
 
 `schema_version=1` 的契约由
-[`ExperimentReport`](../../alphaapollo/workflows/harbor_chips/reporting.py)与相邻的
-[`reporting.schema.json`](../../alphaapollo/workflows/harbor_chips/reporting.schema.json)维护。
+[`ExperimentReport`](../../circuit_harness/harbor/reporting.py)与相邻的
+[`reporting.schema.json`](../../circuit_harness/harbor/reporting.schema.json)维护。
 Python 入口 `read_job(path)` 返回同一记录模型。
 
 导出器读取原生 `JobConfig.tasks`、`agents`、`n_attempts`，为每个任务与 Agent 配置保留
@@ -98,7 +98,7 @@ Spectre 分数来自 `verifier/transport/*/archive`，通过现有 `verify_archi
 | 批次 `score_count` / `score_mean` | `score_denominator` / `mean_score` | 均只使用有效独立分数 |
 | 用量和费用 | `usage` | 采用原生保存值，缺失保持未知 |
 
-旧 `chips_experiment`、`chips_evaluate` 入口及其记录格式保持原状；它们不读取新 schema。
+旧版本记录不改写；`chips_experiment`、`chips_evaluate` 启动器已退役，见[迁移说明](MIGRATION.md)。
 
 ## 验证范围
 

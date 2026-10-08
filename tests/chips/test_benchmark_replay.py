@@ -2,7 +2,7 @@
 
 import pytest
 
-from alphaapollo.common.execution.chips import benchmark_replay
+from circuit_harness.execution import benchmark_replay
 
 
 def result(score, *, execution="ok"):
@@ -43,7 +43,7 @@ def test_comparison_rejects_different_criteria():
 def replay_inputs(tmp_path, *, checker=None):
     from test_benchmark_spectre import inputs
 
-    from alphaapollo.common.execution.chips.benchmark_spectre import package_identity
+    from circuit_harness.execution.benchmark_spectre import package_identity
 
     args = inputs(tmp_path, checker=checker)
     package = package_identity(args[1], purpose="final")
@@ -140,7 +140,7 @@ report={{'status':'completed','reward':1,'cases':[{{'status':'graded','passed':T
     import subprocess
     import sys
 
-    from alphaapollo.common.execution.chips.bundle import build_cli
+    from circuit_harness.execution.bundle import build_cli
 
     bundle = tmp_path / "cli.pyz"
     build_cli(bundle)
@@ -185,8 +185,8 @@ def test_replay_consumes_only_verified_matching_spectre_archive(tmp_path):
 
     from test_benchmark_spectre import finish, inputs
 
-    from alphaapollo.common.execution.chips.benchmark_spectre import package_identity
-    from alphaapollo.common.execution.chips.jobs import submit_benchmark_spectre
+    from circuit_harness.execution.benchmark_spectre import package_identity
+    from circuit_harness.execution.jobs import submit_benchmark_spectre
 
     original = tmp_path / "original"
     original.mkdir()
@@ -221,7 +221,7 @@ def test_zipapp_replay_returns_sealed_unscored_backend_failure(tmp_path, monkeyp
     import subprocess
     import sys
 
-    from alphaapollo.common.execution.chips.bundle import build_cli
+    from circuit_harness.execution.bundle import build_cli
 
     candidate, package, config = replay_inputs(tmp_path)
     # Exercise the missing-Docker outcome deterministically. An ambient daemon

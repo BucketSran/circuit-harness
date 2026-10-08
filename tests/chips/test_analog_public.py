@@ -4,8 +4,8 @@ import json
 
 import pytest
 
-from alphaapollo.common.execution.chips import analog_design_bench as adb
-from alphaapollo.common.execution.chips.analog_public import (
+from circuit_harness.execution import analog_design_bench as adb
+from circuit_harness.execution.analog_public import (
     run_public_rlc,
     validate_rlc_candidate,
 )

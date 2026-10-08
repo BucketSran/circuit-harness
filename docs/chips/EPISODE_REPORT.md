@@ -9,7 +9,7 @@
 在安装项目依赖的环境中，选择一条实验及一个**不存在**的新输出目录：
 
 ```bash
-python -m alphaapollo.workflows.chips_episode_report \
+python -m circuit_harness.reporting.episode \
   /absolute/private/experiment \
   --output /absolute/private/reports/episode-001
 ```
@@ -37,7 +37,7 @@ Analog 的恢复动作也进入候选变化序列；只有记录中已有该版�
 ## 输出与复用边界
 
 - `episode-report.json`：版本化派生记录、来源文件 SHA-256/大小、证据缺口、设置、事件、动作、候选变化和终评。
-- `report.html`：复用 Apollo `workflows/visualize.py` 的转义渲染、折叠块和样式，不依赖外部网页资源。
+- `report.html`：使用 `circuit_harness/reporting/html.py` 的转义渲染、折叠块和样式，不依赖外部网页资源。
 - `report.md`：结果、计时、用量与缺口的简要摘要。
 - `timeline.csv`：模型请求与 Tool 的控制端时间区间，缺失值为空。
 
@@ -106,9 +106,9 @@ VABench 的 `development_only` 等评分权威原样保留，不升级为正式�
 
 | 文件 | 职责 |
 | --- | --- |
-| [chips_episode_report.py](../../alphaapollo/workflows/chips_episode_report.py) | 输入选择、用量与时间线投影、CLI 和私有输出 |
-| [evidence.py](../../alphaapollo/workflows/_chips_episode_report/evidence.py) | action ID 关联、候选 diff、修复序列、归档与终评核对 |
-| [view.py](../../alphaapollo/workflows/_chips_episode_report/view.py) | 复用共享 HTML 原语，渲染 Chips 报告 |
+| [chips_episode_report.py](../../circuit_harness/reporting/episode.py) | 输入选择、用量与时间线投影、CLI 和私有输出 |
+| [evidence.py](../../circuit_harness/reporting/evidence.py) | action ID 关联、候选 diff、修复序列、归档与终评核对 |
+| [view.py](../../circuit_harness/reporting/view.py) | 复用共享 HTML 原语，渲染 Chips 报告 |
 | [test_episode_report.py](../../tests/chips/test_episode_report.py) | 构造证据边界的回归测试，不冒充真实仿真 |
 
 ```bash

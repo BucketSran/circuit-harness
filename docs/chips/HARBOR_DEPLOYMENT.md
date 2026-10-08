@@ -35,12 +35,12 @@ final-evaluation 的连接声明按[终评契约](HARBOR.md)配置。预检不�
 
 ```bash
 umask 077
-python -m alphaapollo.workflows.harbor_chips.profiles \
+python -m circuit_harness.harbor.profiles \
   --catalog /operator/private/profiles.json \
   --agent pi --model glm --protocol openai-chat-completions \
   --job /operator/private/runner-job.json \
   --output /operator/private/harbor-job.generated.json
-python -m alphaapollo.workflows.harbor_chips.deployment \
+python -m circuit_harness.harbor.deployment \
   --job /operator/private/harbor-job.generated.json \
   > /operator/private/preflight-static.json
 ```
@@ -57,7 +57,7 @@ SSH、公开仿真或终评。公共 manifest 的电路语义和
 ## 显式容器网桥检查
 
 ```bash
-python -m alphaapollo.workflows.harbor_chips.deployment \
+python -m circuit_harness.harbor.deployment \
   --job /operator/private/harbor-job.generated.json \
   --check-environment --timeout-s 60 --cleanup-timeout-s 30 \
   > /operator/private/preflight-environment.json
@@ -85,7 +85,7 @@ Harbor 同步 daemon-info 检查最多额外 10 秒，每次取消清理先等�
 ## 使用 rootless Podman
 
 Podman 与 Agent/Model 独立选择。把 Job 的 `environment.import_path` 改为
-`alphaapollo.workflows.harbor_chips.podman_environment:CircuitPodmanEnvironment`，
+`circuit_harness.harbor.podman_environment:CircuitPodmanEnvironment`，
 公开会话配置改为 `public_backend: "podman"`。已有 Docker 配置和默认值继续有效。
 容器到宿主的 `gateway_host` 可使用实测可达的 `host.containers.internal`。
 
@@ -114,9 +114,9 @@ Harbor Agent 容器的 CPU 配额由 `task.toml` 的 `environment.cpus` 和 Job 
 只读根与输入、输出配额和动作期限。
 
 ```bash
-python -m alphaapollo.workflows.harbor_chips.podman_runner \
+python -m circuit_harness.harbor.podman_runner \
   --config /operator/private/podman-runtime.json -- \
-  python -m alphaapollo.workflows.harbor_chips.deployment \
+  python -m circuit_harness.harbor.deployment \
   --job /operator/private/harbor-job.generated.json \
   --check-environment --timeout-s 120 --cleanup-timeout-s 45
 ```

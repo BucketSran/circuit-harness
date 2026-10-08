@@ -7,7 +7,7 @@ python -m pip install -e '.[harbor,mcp]'
 ```
 
 Harbor 管理 Job、Trial、阶段期限、并发、Agent 安装、模型请求和原生工具。
-Harness 提供公开电路会话、候选冻结和独立终评。既有 Apollo API 与固定的 vaBench 路径保留。
+Harness 提供公开电路会话、候选冻结和独立终评。固定 vaBench 执行路径保留；Apollo API 已退役，见[迁移说明](MIGRATION.md)。
 
 运行前使用[部署配方与预检](HARBOR_DEPLOYMENT.md)，多题实验使用[私有任务绑定](HARBOR_TASKS.md)。
 运行后可[离线汇总实验结果](HARBOR_RESULTS.md)，保留失败和未启动项。
@@ -52,7 +52,7 @@ Agent 不能预设模型、端点或凭据；嵌套 native config 中的路由�
 
 `key_env` 只允许环境变量名。编译输出保留 `${KEY_ENV}`，编译器不读取密钥。
 Harbor 在构造 Agent 时解析该引用。不要把实际密钥填入目录、生成的 JobConfig 或任务文件。
-相邻 [profiles.schema.json](../../alphaapollo/workflows/harbor_chips/profiles.schema.json)
+相邻 [profiles.schema.json](../../circuit_harness/harbor/profiles.schema.json)
 由固定 Harbor 的 `AgentConfig` 和 Agent options schemas 生成，运行时还检查协议与路由冲突。
 
 ## 准备公开任务与私有配置
@@ -133,7 +133,7 @@ Colima 可以用 `colima ssh -- cat /etc/hosts` 查看主机映射，再验证�
 零值镜像摘要以及 `/operator/` 路径均为占位内容。
 
 ```bash
-python -m alphaapollo.workflows.harbor_chips.profiles \
+python -m circuit_harness.harbor.profiles \
   --catalog examples/chips/harbor/profiles.example.json \
   --agent pi --model glm --protocol anthropic-messages \
   --job /operator/private/harbor-job.json \
@@ -194,10 +194,10 @@ Prepare a Harbor single-step task with `instruction.md`, `task.toml`, and
 
 ```bash
 harbor run --path TASKS \
-  --agent alphaapollo.workflows.harbor_chips.agent:NativeCodexAgent \
+  --agent circuit_harness.harbor.agent:NativeCodexAgent \
   --model MODEL \
-  --env alphaapollo.workflows.harbor_chips.environment:HarborChipsEnvironment \
-  --verifier alphaapollo.workflows.harbor_chips.verifier:FrozenCandidateVerifier \
+  --env circuit_harness.harbor.environment:HarborChipsEnvironment \
+  --verifier circuit_harness.harbor.verifier:FrozenCandidateVerifier \
   --n-attempts 1 --n-concurrent 1 --max-retries 0
 ```
 
@@ -210,21 +210,21 @@ Equivalent custom components in a Harbor JobConfig use these import paths:
 ```json
 {
   "agents": [{
-    "import_path": "alphaapollo.workflows.harbor_chips.agent:NativeCodexAgent",
+    "import_path": "circuit_harness.harbor.agent:NativeCodexAgent",
     "model_name": "MODEL"
   }],
   "environment": {
-    "import_path": "alphaapollo.workflows.harbor_chips.environment:HarborChipsEnvironment"
+    "import_path": "circuit_harness.harbor.environment:HarborChipsEnvironment"
   },
   "verifier": {
-    "import_path": "alphaapollo.workflows.harbor_chips.verifier:FrozenCandidateVerifier"
+    "import_path": "circuit_harness.harbor.verifier:FrozenCandidateVerifier"
   }
 }
 ```
 
 The task's `harness.json` follows
-[`HarborChipsConfig`](../../alphaapollo/workflows/harbor_chips/config.py) and its adjacent
-[JSON Schema](../../alphaapollo/workflows/harbor_chips/config.schema.json). Declare:
+[`HarborChipsConfig`](../../circuit_harness/harbor/config.py) and its adjacent
+[JSON Schema](../../circuit_harness/harbor/config.schema.json). Declare:
 
 - `schema_version: 1`, a public `task` with `task_id`, `task_version`, `public_files`,
   `candidate_files`, `feedback_fields` and the public EVAS `manifest`;
@@ -348,7 +348,7 @@ configuration B run or cross-condition benchmark comparability.
 Export one completed saved Pi Trial without contacting a model, simulator or server:
 
 ```bash
-python -m alphaapollo.workflows.harbor_chips.trajectory \
+python -m circuit_harness.harbor.trajectory \
   --trial /private/jobs/job/task__trial \
   --output /private/exports/task-trial
 ```
@@ -387,8 +387,8 @@ detection or permission to publish the result. Native context can contain privat
 paths and task material; raw and derived outputs stay in private run storage.
 No environment files, provider configuration or hidden checker files are copied.
 
-For explicit dataset selection, reasoning policy, split checks and the verl
-loader, see [ATIF SFT preparation](../../alphaapollo/data_preprocess/README.md#atif-trajectories-for-sft).
+For explicit dataset selection, reasoning policy, split checks and the external-trainer dataset
+loader, see [ATIF SFT preparation](../../circuit_harness/data/README.md#atif-trajectories-for-sft).
 
 
 ### 主机原生路径的配置 B

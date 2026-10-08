@@ -12,7 +12,7 @@
     }
   ],
   "environment": {
-    "import_path": "alphaapollo.workflows.harbor_chips.docker_environment:CircuitDockerEnvironment",
+    "import_path": "circuit_harness.harbor.docker_environment:CircuitDockerEnvironment",
     "kwargs": {
       "session_config": "/operator/private/public-session.json",
       "gateway_bind_host": "0.0.0.0",
@@ -20,7 +20,7 @@
     }
   },
   "verifier": {
-    "import_path": "alphaapollo.workflows.harbor_chips.verifier:FrozenCandidateVerifier",
+    "import_path": "circuit_harness.harbor.verifier:FrozenCandidateVerifier",
     "override_timeout_sec": 600,
     "kwargs": {
       "config_path": "/operator/private/final-evaluation.json"

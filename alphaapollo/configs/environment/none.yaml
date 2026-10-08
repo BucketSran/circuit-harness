@@ -1,3 +1,0 @@
-# External runtimes own their loop, so no AlphaApollo Environment is composed.
-type: none
-options: {}

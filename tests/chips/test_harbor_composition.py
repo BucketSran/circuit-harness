@@ -13,8 +13,8 @@ from harbor.agents.installed.base import NonZeroAgentExitCodeError
 from harbor.models.trial.config import TrialConfig
 from harbor.trial.trial import Trial
 
-from alphaapollo.workflows.harbor_chips.docker_environment import CircuitDockerEnvironment
-from alphaapollo.workflows.harbor_chips.verifier import FrozenCandidateVerifier
+from circuit_harness.harbor.docker_environment import CircuitDockerEnvironment
+from circuit_harness.harbor.verifier import FrozenCandidateVerifier
 
 
 def task_config(tmp_path, agent):
@@ -42,9 +42,7 @@ def task_config(tmp_path, agent):
         trials_dir=tmp_path / "trials",
         agent={"name": agent, "model_name": "openai/fixture"},
         environment={
-            "import_path": (
-                "alphaapollo.workflows.harbor_chips.docker_environment:CircuitDockerEnvironment"
-            ),
+            "import_path": ("circuit_harness.harbor.docker_environment:CircuitDockerEnvironment"),
             "kwargs": {
                 "session_config": str(config),
                 "gateway_bind_host": "127.0.0.1",
@@ -60,7 +58,7 @@ def test_stock_agents_share_environment(tmp_path, agent, wrapped):
     config = task_config(tmp_path, agent)
     if wrapped:
         config.agent.name = None
-        config.agent.import_path = "alphaapollo.workflows.harbor_chips.installed_agent:CircuitAgent"
+        config.agent.import_path = "circuit_harness.harbor.installed_agent:CircuitAgent"
         config.agent.kwargs = {"agent_name": agent}
     trial = asyncio.run(Trial.create(config))
     assert trial.agent.to_agent_info().name == agent
@@ -128,7 +126,7 @@ class LifecycleEnvironment(CircuitDockerEnvironment):
     """Real session/gateway with no container, for phase and cancellation tests."""
 
     async def start(self, force_build):
-        from alphaapollo.workflows.harbor_chips.public_gateway import PublicSessionGateway
+        from circuit_harness.harbor.public_gateway import PublicSessionGateway
         from tests.chips.test_current_evas_session import make_session
 
         self.session_directory = make_session(self.trial_paths.trial_dir)
@@ -190,7 +188,7 @@ def lifecycle_config(tmp_path, mode):
     config = task_config(tmp_path, "nop")
     (tmp_path / "task/instruction.md").write_text(mode)
     config.agent.name = None
-    config.agent.import_path = "alphaapollo.workflows.harbor_chips.installed_agent:CircuitAgent"
+    config.agent.import_path = "circuit_harness.harbor.installed_agent:CircuitAgent"
     config.agent.kwargs = {"agent_name": __name__ + ":LifecycleAgent"}
     config.agent.override_timeout_sec = 0.15 if mode == "timeout" else 2
     config.environment.import_path = __name__ + ":LifecycleEnvironment"
@@ -259,9 +257,7 @@ def test_private_verifier_config_cannot_enter_public_task(tmp_path):
     config = task_config(tmp_path, "nop")
     private = tmp_path / "task/private.json"
     private.write_text('{"task_package":"/private/final","remote":{}}')
-    config.verifier.import_path = (
-        "alphaapollo.workflows.harbor_chips.verifier:FrozenCandidateVerifier"
-    )
+    config.verifier.import_path = "circuit_harness.harbor.verifier:FrozenCandidateVerifier"
     config.verifier.kwargs = {"config_path": str(private)}
     # Harbor creates its verifier at verification time, so construct that actual boundary.
     trial = asyncio.run(Trial.create(config))
@@ -285,7 +281,7 @@ def test_private_verifier_config_cannot_enter_public_task(tmp_path):
 def test_operator_schema_snapshots(filename, model_name):
     from jsonschema import Draft202012Validator
 
-    from alphaapollo.workflows.harbor_chips import config
+    from circuit_harness.harbor import config
 
     schema = json.loads(Path(config.__file__).with_name(filename).read_text())
     assert schema == getattr(config, model_name).model_json_schema()

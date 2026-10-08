@@ -15,7 +15,7 @@
 本地在 `main` 构建标准库 zipapp，再送到自己的服务器私有目录：
 
 ```bash
-python3 -m alphaapollo.workflows.chips bundle --output chips-agent.pyz
+python3 -m circuit_harness.cli bundle --output chips-agent.pyz
 scp chips-agent.pyz YOUR_HOST:YOUR_PRIVATE_DEPLOY_DIR/chips-agent.pyz
 ```
 

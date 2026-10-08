@@ -7,7 +7,7 @@ import urllib.request
 
 from test_current_evas_session import make_session
 
-from alphaapollo.workflows.harbor_chips.public_gateway import PublicSessionGateway
+from circuit_harness.harbor.public_gateway import PublicSessionGateway
 
 
 def request(gateway, path, body=None, *, token=None, method=None):
@@ -136,9 +136,7 @@ def test_standalone_cli_uses_config_and_ignores_inherited_proxies(tmp_path):
     from pathlib import Path
 
     directory = make_session(tmp_path)
-    client = (
-        Path(__file__).resolve().parents[2] / "alphaapollo/workflows/harbor_chips/public_client.py"
-    )
+    client = Path(__file__).resolve().parents[2] / "circuit_harness/harbor/public_client.py"
 
     async def scenario():
         gateway = await PublicSessionGateway(
@@ -248,7 +246,7 @@ def test_disconnected_write_drains_before_freeze_and_shutdown_revokes_admissions
     import fcntl
     from urllib.parse import urlsplit
 
-    from alphaapollo.common.execution.chips.current_evas_session import close_session
+    from circuit_harness.execution.current_evas_session import close_session
 
     directory = make_session(tmp_path)
 
@@ -345,9 +343,7 @@ def test_cli_does_not_retry_or_print_transport_error_details(tmp_path):
     config.write_text(
         json.dumps({"url": f"http://127.0.0.1:{server.server_port}", "token": token, "timeout": 1})
     )
-    client = (
-        Path(__file__).resolve().parents[2] / "alphaapollo/workflows/harbor_chips/public_client.py"
-    )
+    client = Path(__file__).resolve().parents[2] / "circuit_harness/harbor/public_client.py"
     try:
         result = subprocess.run(
             [sys.executable, "-I", str(client), "--config", str(config), "action"],

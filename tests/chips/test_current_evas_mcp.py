@@ -11,8 +11,8 @@ from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 from test_current_evas_session import make_session
 
-from alphaapollo.common.execution.chips.native_sandbox import NativeSandbox
-from alphaapollo.workflows.chips_public_mcp import PublicMCPBroker
+from circuit_harness.execution.native_sandbox import NativeSandbox
+from circuit_harness.public_mcp import PublicMCPBroker
 
 
 def test_broker_start_failure_removes_its_socket_directory(tmp_path, monkeypatch):

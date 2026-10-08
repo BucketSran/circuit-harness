@@ -76,7 +76,7 @@ python3.12 chips.pyz job-status /private/jobs/dut-attempt-001
 python3.12 chips.pyz job-cancel /private/jobs/dut-attempt-001
 
 # 完整下载后，在本机运行；不要求本机安装 EVAS。
-python -m alphaapollo.workflows.chips verify-job runs/chips/dut-attempt-001
+python -m circuit_harness.cli verify-job runs/chips/dut-attempt-001
 ```
 
 提交确认与执行分离，固定 worker 包由服务器独立完成评分和最终清单，SSH 断开不取消。

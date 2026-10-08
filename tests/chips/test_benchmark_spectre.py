@@ -7,8 +7,8 @@ import time
 
 import pytest
 
-from alphaapollo.common.execution.chips import benchmark_spectre
-from alphaapollo.common.execution.chips.journal import file_digest
+from circuit_harness.execution import benchmark_spectre
+from circuit_harness.execution.journal import file_digest
 
 
 def task_package(root, *, purpose="final", checker="exit 0\n"):
@@ -60,7 +60,7 @@ def test_ambiguous_checker_failure_is_not_a_model_zero():
 
 
 def inputs(root, *, report=None, checker=None, purpose="final", timeout=3):
-    from alphaapollo.common.execution.chips.candidate_bundle import freeze_candidate
+    from circuit_harness.execution.candidate_bundle import freeze_candidate
 
     source = root / "source"
     source.mkdir()
@@ -130,7 +130,7 @@ def inputs(root, *, report=None, checker=None, purpose="final", timeout=3):
 
 
 def finish(directory):
-    from alphaapollo.common.execution.chips.jobs import inspect_job
+    from circuit_harness.execution.jobs import inspect_job
 
     deadline = time.monotonic() + 10
     while time.monotonic() < deadline:
@@ -142,8 +142,8 @@ def finish(directory):
 
 
 def test_detached_frozen_checker_and_deduplicated_archive(tmp_path):
-    from alphaapollo.common.execution.chips.archive import verify_archive
-    from alphaapollo.common.execution.chips.jobs import submit_benchmark_spectre, verify_job
+    from circuit_harness.execution.archive import verify_archive
+    from circuit_harness.execution.jobs import submit_benchmark_spectre, verify_job
 
     candidate, package, profile = inputs(tmp_path)
     ack = submit_benchmark_spectre(candidate, package, profile, "attempt")
@@ -195,7 +195,7 @@ def test_detached_frozen_checker_and_deduplicated_archive(tmp_path):
     ],
 )
 def test_real_process_failure_classification(tmp_path, report, checker, timeout, execution, score):
-    from alphaapollo.common.execution.chips.jobs import submit_benchmark_spectre, verify_job
+    from circuit_harness.execution.jobs import submit_benchmark_spectre, verify_job
 
     args = inputs(tmp_path, report=report, checker=checker, timeout=timeout)
     submit_benchmark_spectre(*args, "classification")
@@ -206,9 +206,9 @@ def test_real_process_failure_classification(tmp_path, report, checker, timeout,
 
 
 def test_frozen_drift_and_unknown_never_restart(tmp_path):
-    from alphaapollo.common.execution.chips.archive import reserve_archive
-    from alphaapollo.common.execution.chips.jobs import submit_benchmark_spectre
-    from alphaapollo.common.execution.chips.journal import atomic_json
+    from circuit_harness.execution.archive import reserve_archive
+    from circuit_harness.execution.jobs import submit_benchmark_spectre
+    from circuit_harness.execution.journal import atomic_json
 
     args = inputs(tmp_path)
     identity = benchmark_spectre.benchmark_identity(*args)
@@ -228,7 +228,7 @@ def test_frozen_drift_and_unknown_never_restart(tmp_path):
 
 
 def test_public_feedback_does_not_include_final_fields(tmp_path):
-    from alphaapollo.common.execution.chips.jobs import submit_benchmark_spectre
+    from circuit_harness.execution.jobs import submit_benchmark_spectre
 
     args = inputs(
         tmp_path,
@@ -249,8 +249,8 @@ def test_public_feedback_does_not_include_final_fields(tmp_path):
 
 
 def test_archive_tamper_is_rejected(tmp_path):
-    from alphaapollo.common.execution.chips.archive import verify_archive
-    from alphaapollo.common.execution.chips.jobs import submit_benchmark_spectre
+    from circuit_harness.execution.archive import verify_archive
+    from circuit_harness.execution.jobs import submit_benchmark_spectre
 
     submit_benchmark_spectre(*inputs(tmp_path), "sealed")
     finish(tmp_path / "jobs/sealed")
@@ -270,9 +270,9 @@ def test_public_nested_final_report_is_rejected():
 
 
 def test_bundle_operator_transfer_submit_query_retrieve(tmp_path):
-    from alphaapollo.common.execution.chips.benchmark_remote import RemoteBenchmarkSpectre
-    from alphaapollo.common.execution.chips.bundle import build_cli
-    from alphaapollo.common.execution.chips.session_transport import LocalSessionTransport
+    from circuit_harness.execution.benchmark_remote import RemoteBenchmarkSpectre
+    from circuit_harness.execution.bundle import build_cli
+    from circuit_harness.execution.session_transport import LocalSessionTransport
 
     class FixtureTransport(RemoteBenchmarkSpectre):
         cli = LocalSessionTransport.cli
@@ -302,7 +302,7 @@ def test_bundle_operator_transfer_submit_query_retrieve(tmp_path):
 
 
 def test_transfer_rejects_traversal_before_execution(tmp_path):
-    from alphaapollo.common.execution.chips.benchmark_remote import stage_transfer
+    from circuit_harness.execution.benchmark_remote import stage_transfer
 
     with pytest.raises(ValueError, match="unsafe"):
         stage_transfer(
@@ -341,7 +341,7 @@ def test_package_requires_explicit_comparison_identity(tmp_path):
     ],
 )
 def test_nonzero_checker_exit_preserves_explicit_task_judgment(tmp_path, report, execution, score):
-    from alphaapollo.common.execution.chips.jobs import submit_benchmark_spectre
+    from circuit_harness.execution.jobs import submit_benchmark_spectre
 
     args = inputs(tmp_path, report=report)
     script = args[1] / "tests/test.sh"
@@ -371,7 +371,7 @@ def test_nonzero_checker_exit_preserves_explicit_task_judgment(tmp_path, report,
 def test_preflight_failure_blocks_checker_without_zero(
     tmp_path, kind, status, exit_code, execution
 ):
-    from alphaapollo.common.execution.chips.jobs import submit_benchmark_spectre, verify_job
+    from circuit_harness.execution.jobs import submit_benchmark_spectre, verify_job
 
     args = inputs(tmp_path, checker="echo checker-ran\n")
     report = {
@@ -417,7 +417,7 @@ def test_preflight_failure_blocks_checker_without_zero(
 def test_preflight_incomplete_or_bounded_failure_blocks_checker(
     tmp_path, script, timeout, execution
 ):
-    from alphaapollo.common.execution.chips.jobs import submit_benchmark_spectre
+    from circuit_harness.execution.jobs import submit_benchmark_spectre
 
     args = inputs(tmp_path, checker="echo checker-ran\n", timeout=timeout)
     (tmp_path / "preflight-fixture.sh").write_text(script)
@@ -431,7 +431,7 @@ def test_preflight_incomplete_or_bounded_failure_blocks_checker(
 
 
 def test_preflight_and_checker_share_one_budget(tmp_path):
-    from alphaapollo.common.execution.chips.jobs import submit_benchmark_spectre
+    from circuit_harness.execution.jobs import submit_benchmark_spectre
 
     args = inputs(tmp_path, checker="sleep .6\n", timeout=1)
     script = tmp_path / "preflight-fixture.sh"
@@ -445,7 +445,7 @@ def test_preflight_and_checker_share_one_budget(tmp_path):
 
 
 def test_preflight_cancellation_and_pinned_probe_source(tmp_path):
-    from alphaapollo.common.execution.chips.jobs import cancel_job, submit_benchmark_spectre
+    from circuit_harness.execution.jobs import cancel_job, submit_benchmark_spectre
 
     args = inputs(tmp_path, checker="echo checker-ran\n")
     script = tmp_path / "preflight-fixture.sh"
@@ -481,7 +481,7 @@ def test_public_agent_profile_requires_container_not_host_scripts(tmp_path):
 def test_public_job_runs_real_container_with_only_declared_inputs(tmp_path, mode):
     import os
 
-    from alphaapollo.common.execution.chips.jobs import (
+    from circuit_harness.execution.jobs import (
         cancel_job,
         inspect_job,
         submit_benchmark_spectre,

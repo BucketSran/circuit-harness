@@ -11,9 +11,9 @@ pytest.importorskip("harbor")
 from harbor.agents.nop import NopAgent
 from test_harbor_profiles import catalog
 
-from alphaapollo.workflows.harbor_chips.docker_environment import CircuitDockerEnvironment
-from alphaapollo.workflows.harbor_chips.profiles import compile_job
-from alphaapollo.workflows.harbor_chips.verifier import FrozenCandidateVerifier
+from circuit_harness.harbor.docker_environment import CircuitDockerEnvironment
+from circuit_harness.harbor.profiles import compile_job
+from circuit_harness.harbor.verifier import FrozenCandidateVerifier
 
 
 def suite(tmp_path):
@@ -86,13 +86,11 @@ def suite(tmp_path):
     job = dict(
         tasks=tasks,
         environment={
-            "import_path": (
-                "alphaapollo.workflows.harbor_chips.docker_environment:CircuitDockerEnvironment"
-            ),
+            "import_path": ("circuit_harness.harbor.docker_environment:CircuitDockerEnvironment"),
             "kwargs": {"task_bindings": str(manifest)},
         },
         verifier={
-            "import_path": "alphaapollo.workflows.harbor_chips.verifier:FrozenCandidateVerifier",
+            "import_path": "circuit_harness.harbor.verifier:FrozenCandidateVerifier",
             "kwargs": {"task_bindings": str(manifest)},
         },
     )
@@ -118,8 +116,8 @@ def test_environment_and_verifier_select_the_actual_task_and_detect_drift(tmp_pa
     from harbor.models.task.task import Task
     from harbor.models.trial.paths import TrialPaths
 
-    from alphaapollo.workflows.harbor_chips.docker_environment import CircuitDockerEnvironment
-    from alphaapollo.workflows.harbor_chips.verifier import FrozenCandidateVerifier
+    from circuit_harness.harbor.docker_environment import CircuitDockerEnvironment
+    from circuit_harness.harbor.verifier import FrozenCandidateVerifier
 
     manifest, entries, job = suite(tmp_path)
     compiled = compile_job(catalog(), "code", "glm", job)
@@ -188,7 +186,7 @@ def test_compile_rejects_bad_bindings_without_starting_tasks(tmp_path, failure):
     manifest.write_text(json.dumps({"schema_version": 1, "tasks": entries}))
     if failure.endswith("drift"):
         compiled = compile_job(catalog(), "code", "glm", job)
-        from alphaapollo.workflows.harbor_chips.task_bindings import resolve_task_binding
+        from circuit_harness.harbor.task_bindings import resolve_task_binding
 
         changed = (
             Path(entries[0]["task_path"]) / "instruction.md"
@@ -340,7 +338,7 @@ def test_trial_rejects_incomplete_compilation_pins(tmp_path):
 
 def test_compilation_ignores_evas_history_and_cache_but_pins_captured_source(tmp_path):
 
-    from alphaapollo.workflows.harbor_chips.task_bindings import resolve_task_binding
+    from circuit_harness.harbor.task_bindings import resolve_task_binding
 
     manifest, entries, job = suite(tmp_path)
     compiled = compile_job(catalog(), "code", "glm", job)
@@ -366,7 +364,7 @@ def test_real_python_link_is_accepted_and_linked_executable_bytes_are_pinned(tmp
     import shutil
     import sys
 
-    from alphaapollo.workflows.harbor_chips.task_bindings import resolve_task_binding
+    from circuit_harness.harbor.task_bindings import resolve_task_binding
 
     assert Path(sys.executable).is_symlink(), "This controlled host uses a linked Python runtime"
     manifest, entries, job = suite(tmp_path)
@@ -396,7 +394,7 @@ def test_real_python_link_is_accepted_and_linked_executable_bytes_are_pinned(tmp
 
 
 def test_bindings_accept_independent_opensource_final_configuration(tmp_path):
-    from alphaapollo.workflows.harbor_chips.task_bindings import resolve_task_binding
+    from circuit_harness.harbor.task_bindings import resolve_task_binding
 
     manifest, entries, job = suite(tmp_path)
     final_path = Path(entries[0]["final_config"])

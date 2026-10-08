@@ -1,8 +1,0 @@
-defaults:
-  - alphaapollo
-  - _self_
-
-# Agent verification needs one response per Workflow verifier step; retries are
-# controlled by Workflow transitions rather than an inner Runtime loop.
-options:
-  max_turns: 1

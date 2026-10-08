@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from alphaapollo.workflows.chips_episode_report import main
+from circuit_harness.reporting.episode import main
 
 
 def write(path: Path, value):
@@ -27,7 +27,7 @@ def action(root, ident, tool, result, start, arguments=None):
 def test_report_tracks_restore_and_whether_final_candidate_was_publicly_simulated(
     tmp_path, feedback
 ):
-    from alphaapollo.workflows.chips_episode_report import build_report
+    from circuit_harness.reporting.episode import build_report
 
     root = tmp_path / "evidence"
     first, second = "R1 IN OUT 50\n", "R1 IN OUT 100\n"
@@ -338,7 +338,7 @@ def test_extracted_analog_final_binds_frozen_bytes_and_keeps_continuous_score(tm
 
 
 def test_report_reverifies_public_archive_and_rejects_corruption(tmp_path):
-    from alphaapollo.common.execution.chips.vabench_session import archive_episode
+    from circuit_harness.execution.vabench_session import archive_episode
 
     root = tmp_path / "evidence"
     session = tmp_path / "session"

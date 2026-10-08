@@ -3,7 +3,8 @@
 This repository develops circuit-harness, a circuit experiment platform derived from AlphaApollo.
 Harness owns simulator access, public task sessions, evaluation integration and evidence
 collection. vaEVAS owns EVAS algorithms and benchmark tasks/checkers; course content stays
-in its course project. Preserve existing Apollo APIs and the pinned VABench path.
+in its course project. Preserve circuit protocols, serialized evidence and the pinned VABench path.
+Apollo runtime integration is retired; use Harbor for Agent/Job/Trial ownership.
 
 ## Start here
 
@@ -39,18 +40,18 @@ Planning/review skills use the [issue tracker](docs/agents/issue-tracker.md) and
 
 ## Ownership and compatibility
 
-- `alphaapollo/common/`: shared runtime, simulator execution and tools.
-- `alphaapollo/reasoning/`: agents, environments, verifiers and execution integration.
-- `alphaapollo/workflows/`: user-facing composition and commands.
-- `alphaapollo/learning/`: training integrations; `third_party/verl/` remains pinned unless required.
-- `tests/`: module regressions; [tests/chips](tests/chips/README.md) indexes Chips acceptance.
-- `docs/`, `examples/`, `alphaapollo/configs/`: maintained contracts, examples and configuration.
+- `circuit_harness/execution/`: simulators, public sessions, transport and evidence.
+- `circuit_harness/harbor/`: Harbor plugins, Agent/Model configuration and independent verification.
+- `circuit_harness/data/`: ATIF preparation and external-trainer dataset interfaces.
+- `circuit_harness/reporting/`: offline saved-episode reports.
+- `circuit_harness/cli.py`, `public_mcp.py`, `task_authoring.py`: operator and public protocol entries.
+- `tests/`, `docs/`, `examples/`: maintained checks, contracts and safe templates.
 
-The public `main` branch retains Chips, Robotics reference adapters and the shared Apollo
-runtime. Removed domain applications remain in private history and backups; their remote
-reference branches have been retired. Upstream synchronization must preserve this scope.
-Keep public APIs, serialized schemas,
-configuration defaults and CLI behavior compatible unless the task explicitly changes them.
+The public `main` branch contains the independent `circuit_harness` package. Apollo's
+runtime, generic Workflow, Robotics, Memory and built-in trainers are retired.
+Use the [migration guide](docs/chips/MIGRATION.md) when adapting old callers; new interfaces
+must preserve existing circuit semantics unless explicitly changed. Training engines stay
+external, with no pinned trainer submodule in this repository.
 
 ## Checks and evidence
 
@@ -62,7 +63,7 @@ adjacent JSON Schema artifacts. Report actual checks, skipped checks and their l
 
 Local fixtures do not certify a real simulator, license, model or independently graded circuit.
 Use the task's actual host, model and budget authorization for live work. Preserve native-tool
-restrictions; compatible Apollo interfaces can be reused without forcing a tool-loop migration.
+restrictions; preserve the native Harbor path without forcing a tool-loop migration.
 
 ## Workspaces and records
 

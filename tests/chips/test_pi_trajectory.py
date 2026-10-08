@@ -7,7 +7,7 @@ import pytest
 pytest.importorskip("harbor")
 from harbor.models.trajectories import Trajectory
 
-from alphaapollo.workflows.harbor_chips.pi_trajectory import read_pi_trajectory
+from circuit_harness.harbor.pi_trajectory import read_pi_trajectory
 
 
 def session(tmp_path):

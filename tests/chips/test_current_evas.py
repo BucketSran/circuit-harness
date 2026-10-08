@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from alphaapollo.common.execution.chips.current_evas import run_evas
+from circuit_harness.execution.current_evas import run_evas
 
 
 @pytest.fixture
@@ -169,11 +169,11 @@ def test_ambient_evas_controls_cannot_change_request_or_write_outside_run(
 def test_dependency_cached_before_adapter_import_cannot_misidentify_source(
     evas_request, tmp_path, dependency
 ):
-    from alphaapollo.common.execution.chips.current_evas import HARNESS_SOURCE
+    from circuit_harness.execution.current_evas import HARNESS_SOURCE
 
     original = Path(__file__).resolve().parents[2]
     isolated = tmp_path / "harness"
-    for name in (*HARNESS_SOURCE, "alphaapollo/common/execution/chips/simulator.py"):
+    for name in (*HARNESS_SOURCE, "circuit_harness/execution/simulator.py"):
         target = isolated / name
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(original / name, target)
@@ -197,10 +197,10 @@ def test_dependency_cached_before_adapter_import_cannot_misidentify_source(
     code = """
 import importlib, json, pathlib, sys
 sys.path.insert(0, sys.argv[1])
-dependency = importlib.import_module('alphaapollo.common.execution.chips.' + sys.argv[2])
+dependency = importlib.import_module('circuit_harness.execution.' + sys.argv[2])
 path = pathlib.Path(dependency.__file__)
 path.write_text(path.read_text() + '\\n# constructed edit before adapter load\\n')
-from alphaapollo.common.execution.chips.current_evas import run_evas
+from circuit_harness.execution.current_evas import run_evas
 try:
     run_evas(**json.loads(sys.argv[3]))
 except ValueError as error:
@@ -235,10 +235,10 @@ else:
 
 
 def test_loaded_harness_identity_uses_actual_source_module_bytes():
-    from alphaapollo.common.execution.chips import current_evas
-    from alphaapollo.common.execution.chips.journal import file_digest
+    from circuit_harness.execution import current_evas
+    from circuit_harness.execution.journal import file_digest
 
-    root = Path(current_evas.__file__).resolve().parents[4]
+    root = Path(current_evas.__file__).resolve().parents[2]
     assert current_evas._LOADED_HARNESS == {
         name: file_digest(root / name) for name in current_evas.HARNESS_SOURCE
     }
@@ -248,8 +248,8 @@ def test_zipimport_harness_identity_uses_actual_packaged_module_bytes(tmp_path):
     import hashlib
     from zipfile import ZipFile
 
-    from alphaapollo.common.execution.chips.bundle import build_cli
-    from alphaapollo.common.execution.chips.current_evas import HARNESS_SOURCE
+    from circuit_harness.execution.bundle import build_cli
+    from circuit_harness.execution.current_evas import HARNESS_SOURCE
 
     bundle = tmp_path / "cli.pyz"
     build_cli(bundle)
@@ -257,7 +257,7 @@ def test_zipimport_harness_identity_uses_actual_packaged_module_bytes(tmp_path):
         [
             "import json, sys",
             "sys.path.insert(0, sys.argv[1])",
-            "from alphaapollo.common.execution.chips.current_evas import _LOADED_HARNESS",
+            "from circuit_harness.execution.current_evas import _LOADED_HARNESS",
             "print(json.dumps(_LOADED_HARNESS))",
         ]
     )

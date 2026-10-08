@@ -8,8 +8,8 @@ pytest.importorskip("harbor")
 pytest.importorskip("pyarrow")
 from test_pi_trajectory import session
 
-from alphaapollo.data_preprocess.prepare_atif import prepare_dataset
-from alphaapollo.workflows.harbor_chips.pi_trajectory import read_pi_trajectory
+from circuit_harness.data.prepare_atif import prepare_dataset
+from circuit_harness.harbor.pi_trajectory import read_pi_trajectory
 
 
 def trajectory(tmp_path):

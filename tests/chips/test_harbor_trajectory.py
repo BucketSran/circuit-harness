@@ -9,7 +9,7 @@ pytest.importorskip("harbor")
 from test_harbor_reporting import fixture_job
 from test_pi_trajectory import session
 
-from alphaapollo.workflows.harbor_chips.trajectory import export_pi_trial
+from circuit_harness.harbor.trajectory import export_pi_trial
 
 
 def trial(tmp_path, index=0):

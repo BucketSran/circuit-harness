@@ -4,11 +4,11 @@ import json
 
 import pytest
 
-from alphaapollo.workflows.chips import main
+from circuit_harness.cli import main
 
 
 def test_session_cli_passes_explicit_limits_to_server(tmp_path, capsys, monkeypatch):
-    from alphaapollo.common.execution.chips import vabench_session
+    from circuit_harness.execution import vabench_session
 
     pin = tmp_path / "pin.json"
     pin.write_text('{"task_id":"v4-fixture"}')
@@ -42,7 +42,7 @@ def test_session_cli_passes_explicit_limits_to_server(tmp_path, capsys, monkeypa
 
 
 def test_preflight_reports_enforced_session_limits(tmp_path, monkeypatch):
-    from alphaapollo.common.execution.chips import vabench_session
+    from circuit_harness.execution import vabench_session
 
     root = tmp_path / "session"
     root.mkdir()
@@ -119,7 +119,7 @@ def session(tmp_path):
 
 
 def call(root, id, tool, **arguments):
-    from alphaapollo.common.execution.chips.vabench_session import session_action
+    from circuit_harness.execution.vabench_session import session_action
 
     return session_action(root, {"id": id, "tool": "vabench_" + tool, "arguments": arguments})
 
@@ -186,7 +186,7 @@ def test_unknown_previous_action_blocks_further_mutation(session):
 def test_detached_request_completes_and_deduplicates(session):
     import time
 
-    from alphaapollo.common.execution.chips.vabench_session import action_response, enqueue_action
+    from circuit_harness.execution.vabench_session import action_response, enqueue_action
 
     request = {
         "id": "detached",
@@ -208,7 +208,7 @@ def test_detached_request_completes_and_deduplicates(session):
 
 
 def test_frozen_public_trace_archive_is_repeatable_and_checked(session, tmp_path):
-    from alphaapollo.common.execution.chips.vabench_session import archive_episode
+    from circuit_harness.execution.vabench_session import archive_episode
 
     call(session, "write", "write", path="dut.va", content="CANDIDATE")
     call(session, "submit", "submit")
@@ -223,7 +223,7 @@ def test_frozen_public_trace_archive_is_repeatable_and_checked(session, tmp_path
 
 
 def test_downloaded_episode_archive_checks_members(session, tmp_path):
-    from alphaapollo.common.execution.chips.vabench_session import (
+    from circuit_harness.execution.vabench_session import (
         archive_episode,
         verify_episode_archive,
     )

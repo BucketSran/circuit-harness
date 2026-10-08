@@ -1,4 +1,4 @@
-name: Chips harness
+name: Circuit harness
 on:
   push:
     branches: [main]
@@ -16,11 +16,13 @@ jobs:
         with:
           python-version: '3.12'
       - run: sudo apt-get update && sudo apt-get install -y csh iverilog ngspice
-      - run: python -m pip install -e '.[dev,mcp,chips,harbor]'
-      - run: ruff check alphaapollo tests && ruff format --check alphaapollo tests
-      - run: python -m pytest -q tests/chips tests/common/execution/test_chips_harness.py tests/common/execution/test_chips_ngspice.py tests/common/test_import_boundaries.py tests/workflows/test_chips.py tests/workflows/test_visualize.py tests/reasoning/runtime/test_external_bridge.py tests/workflows/resources/test_composition_contract.py --junitxml=runs/chips/validation/ci/junit.xml
-      - run: python -m alphaapollo._schema_export
-      - run: python -m compileall -q alphaapollo tests
+      - run: python -m pip install -e '.[dev,chips,harbor]'
+      - run: ruff check circuit_harness tests && ruff format --check circuit_harness tests
+      - run: python -m pytest -q --junitxml=runs/chips/validation/ci/junit.xml
+      - run: python -m circuit_harness._schema_export
+      - run: python -m compileall -q circuit_harness tests
+      - run: python -m pip wheel --no-deps . --wheel-dir dist
+      - run: python tests/wheel_smoke.py dist/circuit_harness-0.1.0-py3-none-any.whl
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -36,12 +38,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: git submodule update --init third_party/verl
       - run: python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
-      - run: python -m pip install -e '.[dev,harbor]' 'transformers==4.57.6' 'tensordict==0.10.0' ray pillow pandas codetiming
-      - run: |
-          python -c 'import torch, transformers, pyarrow, verl'
-          python -m pytest -q tests/learning/off_policy/test_atif_dataset.py
+      - run: python -m pip install -e '.[dev,harbor,sft]' 'transformers==4.57.6'
+      - run: python -m pytest -q tests/test_atif_dataset.py
         env:
-          PYTHONPATH: third_party/verl
           HF_HUB_OFFLINE: '1'

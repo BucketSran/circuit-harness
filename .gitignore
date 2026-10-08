@@ -57,6 +57,8 @@ examples/math/cgal_remeshing/artifacts/
 examples/math/cgal_remeshing/.build/
 # Prepared datasets are reproducible from their pinned source revision + manifest.
 data/
+# The standalone dataset adapters are source, not prepared experiment data.
+!circuit_harness/data/
 # Local lab deployment settings and licensed/process data stay outside Git.
 examples/chips/*.local.json
 examples/chips/emx/*.local.json

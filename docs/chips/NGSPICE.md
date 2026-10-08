@@ -54,7 +54,7 @@ bash install.sh "$root" "$root/downloads/ngspice-47.tar.gz" "$scratch"
 
 ```bash
 mkdir -p runs/chips/deploy
-python -m alphaapollo.workflows.chips bundle --output runs/chips/deploy/chips.pyz
+python -m circuit_harness.cli bundle --output runs/chips/deploy/chips.pyz
 scp runs/chips/deploy/chips.pyz examples/chips/ngspice/rc.json \
   examples/chips/ngspice/run-rc.sh examples/chips/ngspice/submit-rc.sh \
   lab-host:chips-private/harness/
@@ -81,7 +81,7 @@ ssh -T lab-host python3.12 chips-private/harness/chips.pyz job-cancel \
 
 # 完成后取回整个目录，在本机检查哈希并从波形重新验收。
 scp -r lab-host:chips-private/jobs/rc-job-001 runs/chips/
-python -m alphaapollo.workflows.chips verify-job runs/chips/rc-job-001
+python -m circuit_harness.cli verify-job runs/chips/rc-job-001
 ```
 
 完整 CLI 为 `submit-rc --input task.json --root /private/path/jobs --job-id rc-job-001
@@ -149,11 +149,11 @@ python tests/chips/probes/ssh_detached_rc.py \
 | --- | --- |
 | 任务参数 JSON | [rc.json](../../examples/chips/ngspice/rc.json) |
 | 任务规格/独立复现状态 | [RC 任务卡](../../examples/chips/benchmarks/rc/TASK.md) |
-| 输入校验、生成网表、执行/恢复 | [ngspice.py](../../alphaapollo/common/execution/chips/ngspice.py) |
-| 后台提交、状态、取消与完成清单 | [jobs.py](../../alphaapollo/common/execution/chips/jobs.py) |
-| 独立解析与验收 | [rc_validation.py](../../alphaapollo/common/execution/chips/rc_validation.py) |
-| 公共命令与离线包 | [chips.py](../../alphaapollo/workflows/chips.py)、[bundle.py](../../alphaapollo/common/execution/chips/bundle.py) |
-| 回归与可选真实仿真 | [test_chips_ngspice.py](../../tests/common/execution/test_chips_ngspice.py) |
+| 输入校验、生成网表、执行/恢复 | [ngspice.py](../../circuit_harness/execution/ngspice.py) |
+| 后台提交、状态、取消与完成清单 | [jobs.py](../../circuit_harness/execution/jobs.py) |
+| 独立解析与验收 | [rc_validation.py](../../circuit_harness/execution/rc_validation.py) |
+| 公共命令与离线包 | [chips.py](../../circuit_harness/cli.py)、[bundle.py](../../circuit_harness/execution/bundle.py) |
+| 回归与可选真实仿真 | [test_chips_ngspice.py](../../tests/chips/test_ngspice.py) |
 
 评分器只服务此公开 Harness 基线，暂与 Chips 执行模块相邻，避免导入通用 grader 的其他领域依赖；
 未来有正式电路任务和评分接口后再迁移。当前新增 Python/CLI 入口，没有注册新的模型 MCP Tool。

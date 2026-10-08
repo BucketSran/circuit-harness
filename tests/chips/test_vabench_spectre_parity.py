@@ -4,7 +4,7 @@ import csv
 
 import pytest
 
-from alphaapollo.common.execution.chips.vabench_spectre_parity import compare_visible_waveforms
+from circuit_harness.execution.vabench_spectre_parity import compare_visible_waveforms
 
 
 def test_visible_psf_comparison_reports_event_and_quiet_error(tmp_path):

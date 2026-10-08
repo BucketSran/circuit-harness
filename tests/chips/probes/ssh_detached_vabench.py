@@ -18,8 +18,8 @@ import json, shlex, sys, time
 from pathlib import Path
 root, job_id = Path(sys.argv[1]), sys.argv[2]
 sys.path.insert(0, str(root / 'harness/chips-vabench.pyz'))
-from alphaapollo.common.execution.chips.jobs import submit_vabench
-from alphaapollo.common.execution.chips.vabench import pin_vabench
+from circuit_harness.execution.jobs import submit_vabench
+from circuit_harness.execution.vabench import pin_vabench
 work = root / 'validation' / job_id
 work.mkdir(mode=0o700, parents=True)
 real_python = root / 'envs/vaevas-0.8.7/bin/python'
@@ -55,7 +55,7 @@ import json, sys, time
 from pathlib import Path
 root, job_id = Path(sys.argv[1]), sys.argv[2]
 sys.path.insert(0, str(root / 'harness/chips-vabench.pyz'))
-from alphaapollo.common.execution.chips.jobs import verify_job, submit_vabench
+from circuit_harness.execution.jobs import verify_job, submit_vabench
 observed = time.time()
 job = root / 'jobs' / job_id
 result = verify_job(job)

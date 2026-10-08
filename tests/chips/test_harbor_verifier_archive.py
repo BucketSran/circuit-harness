@@ -12,10 +12,10 @@ pytest.importorskip("harbor")
 from harbor.models.trial.paths import TrialPaths
 from test_benchmark_spectre import inputs
 
-from alphaapollo.common.execution.chips.bundle import build_cli
-from alphaapollo.common.execution.chips.candidate_bundle import verify_candidate
-from alphaapollo.workflows.harbor_chips.config import HarborChipsConfig
-from alphaapollo.workflows.harbor_chips.verifier import FrozenCandidateVerifier
+from circuit_harness.execution.bundle import build_cli
+from circuit_harness.execution.candidate_bundle import verify_candidate
+from circuit_harness.harbor.config import HarborChipsConfig
+from circuit_harness.harbor.verifier import FrozenCandidateVerifier
 
 
 def verifier_fixture(tmp_path, monkeypatch, archive_state="delayed", *, final_timeout_s=10):
