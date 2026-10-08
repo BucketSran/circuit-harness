@@ -3,8 +3,13 @@
 import subprocess
 import sys
 
+import pytest
 
-def test_prepare_rejects_wrong_source_before_creating_workspace(tmp_path):
+
+@pytest.mark.parametrize(
+    "entrypoint", ["circuit_harness.harbor.evas_example", "circuit_harness.benchmarks.evas_va07"]
+)
+def test_prepare_rejects_wrong_source_before_creating_workspace(tmp_path, entrypoint):
     checkout = tmp_path / "source"
     checkout.mkdir()
     subprocess.run(["git", "init", "-q", str(checkout)], check=True)
@@ -13,7 +18,7 @@ def test_prepare_rejects_wrong_source_before_creating_workspace(tmp_path):
         [
             sys.executable,
             "-m",
-            "circuit_harness.harbor.evas_example",
+            entrypoint,
             "prepare",
             "--evas-checkout",
             str(checkout),
@@ -28,7 +33,11 @@ def test_prepare_rejects_wrong_source_before_creating_workspace(tmp_path):
     assert not workspace.exists()
 
 
-def test_run_preserves_existing_output_before_probing_runtime(tmp_path):
+@pytest.mark.parametrize(
+    "entrypoint",
+    ["circuit_harness.harbor.evas_example", "circuit_harness.benchmarks.evas_va07"],
+)
+def test_run_preserves_existing_output_before_probing_runtime(tmp_path, entrypoint):
     output = tmp_path / "existing"
     output.mkdir()
     (output / "keep.txt").write_text("previous evidence")
@@ -36,7 +45,7 @@ def test_run_preserves_existing_output_before_probing_runtime(tmp_path):
         [
             sys.executable,
             "-m",
-            "circuit_harness.harbor.evas_example",
+            entrypoint,
             "run",
             "--workspace",
             str(tmp_path / "absent"),
@@ -53,7 +62,11 @@ def test_run_preserves_existing_output_before_probing_runtime(tmp_path):
     assert (output / "keep.txt").read_text() == "previous evidence"
 
 
-def test_result_rejects_valid_replay_for_another_task(tmp_path):
+@pytest.mark.parametrize(
+    "entrypoint",
+    ["circuit_harness.harbor.evas_example", "circuit_harness.benchmarks.evas_va07"],
+)
+def test_result_rejects_valid_replay_for_another_task(tmp_path, entrypoint):
     import json
 
     from circuit_harness.execution.benchmark_replay import replay_candidate
@@ -116,7 +129,7 @@ def test_result_rejects_valid_replay_for_another_task(tmp_path):
         [
             sys.executable,
             "-m",
-            "circuit_harness.harbor.evas_example",
+            entrypoint,
             "result",
             "--output",
             str(output),

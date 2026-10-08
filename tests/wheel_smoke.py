@@ -55,6 +55,39 @@ build_cli(Path('circuit.pyz'))
         )
         output = run("-I", "-S", root / "circuit.pyz", "--help")
         assert "vabench" in output and "analog" in output
+        # The VA07 recipe remains usable without the optional Harbor dependency.
+        for entrypoint in (
+            "circuit_harness.benchmarks.evas_va07",
+            "circuit_harness.harbor.evas_example",
+        ):
+            output = run("-I", "-m", entrypoint, "--help")
+            assert "prepare" in output and "result" in output
+            existing = root / entrypoint.rsplit(".", 1)[1]
+            existing.mkdir()
+            (existing / "keep.txt").write_text("previous evidence")
+            rejected = subprocess.run(
+                [
+                    str(python),
+                    "-I",
+                    "-m",
+                    entrypoint,
+                    "run",
+                    "--workspace",
+                    str(root / "absent"),
+                    "--image",
+                    "absent",
+                    "--output",
+                    str(existing),
+                ],
+                cwd=root,
+                env=clean_env,
+                capture_output=True,
+                text=True,
+                timeout=120,
+            )
+            assert rejected.returncode == 2, rejected.stdout + rejected.stderr
+            assert "output already exists" in rejected.stderr
+            assert (existing / "keep.txt").read_text() == "previous evidence"
         # Exercise a recorded failure, not only argparse/imports.
         (root / "input.json").write_text('{"resistance_ohm":1000,"capacitance_f":1e-9}')
         failed = subprocess.run(

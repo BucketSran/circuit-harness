@@ -2,6 +2,9 @@
 
 import json
 import os
+import subprocess
+import sys
+from importlib import import_module
 from pathlib import Path
 
 import pytest
@@ -30,7 +33,11 @@ def test_prepare_rejects_changed_task_before_writing_job(tmp_path):
         "sky130-ota-5t-gain40-pm60-noise50uv-pvt",
     ],
 )
-def test_original_source_prepares_stock_oracle_job(tmp_path, task_id):
+@pytest.mark.parametrize(
+    "entrypoint",
+    ["circuit_harness.harbor.analog_example", "circuit_harness.benchmarks.analogbench"],
+)
+def test_original_source_prepares_stock_oracle_job(tmp_path, task_id, entrypoint):
     roots = os.environ.get("ANALOG_EXAMPLE_SOURCES", "").split(os.pathsep)
     source = next(
         (Path(root) for root in roots if root and Path(root).name.endswith(TASKS[task_id].commit)),
@@ -39,20 +46,19 @@ def test_original_source_prepares_stock_oracle_job(tmp_path, task_id):
     if source is None:
         pytest.skip("set ANALOG_EXAMPLE_SOURCES to externally downloaded pinned source roots")
     output = tmp_path / "prepared"
-    prepare(task_id, source, output, tmp_path / "jobs", oracle=True)
+    import_module(entrypoint).prepare(task_id, source, output, tmp_path / "jobs", oracle=True)
     job = json.loads((output / "job.json").read_text())
     assert job["agents"][0]["name"] == "oracle"
     assert job["environment"]["type"] == "docker"
     if not task_id.startswith("sky130-"):
         assert job["environment"]["import_path"] is None
     if task_id.startswith("sky130-"):
-        assert job["verifier"]["import_path"] == (
-            "circuit_harness.harbor.analog_example:OriginalAnalogVerifier"
+        assert job["environment"]["import_path"] == (
+            "circuit_harness.harbor.analogbench:AnalogDockerEnvironment"
         )
-    else:
-        assert job["verifier"]["import_path"] == (
-            "circuit_harness.harbor.analog_example:OriginalAnalogVerifier"
-        )
+    assert job["verifier"]["import_path"] == (
+        "circuit_harness.harbor.analogbench:OriginalAnalogVerifier"
+    )
     assert job["tasks"][0]["path"] == str(source.resolve() / "tasks" / task_id)
 
 
@@ -162,7 +168,8 @@ def test_missing_uploaded_checker_is_error_before_grading(tmp_path):
         asyncio.run(verifier.verify())
 
 
-def test_rlc_checker_exit_trap_zero_is_error_at_real_verifier_boundary(tmp_path):
+@pytest.mark.parametrize("plugin_module", ["analog_example", "analogbench"])
+def test_rlc_checker_exit_trap_zero_is_error_at_real_verifier_boundary(tmp_path, plugin_module):
     import asyncio
 
     from harbor.environments.base import ExecResult
@@ -212,6 +219,8 @@ def test_rlc_checker_exit_trap_zero_is_error_at_real_verifier_boundary(tmp_path)
     config_dir = tmp_path / "prepared"
     prepare(task_id, source, config_dir, tmp_path / "jobs", oracle=True)
     config = JobConfig.model_validate_json((config_dir / "job.json").read_text())
+    # Historical saved jobs retain their plugin names when reopened.
+    config.verifier.import_path = f"circuit_harness.harbor.{plugin_module}:OriginalAnalogVerifier"
     verifier = VerifierFactory.create_verifier_from_config(
         config.verifier,
         task=Task(source / "tasks" / task_id),
@@ -221,3 +230,65 @@ def test_rlc_checker_exit_trap_zero_is_error_at_real_verifier_boundary(tmp_path)
     )
     with pytest.raises(RuntimeError, match="checker did not produce"):
         asyncio.run(verifier.verify())
+
+
+@pytest.mark.parametrize(
+    "entrypoint",
+    ["circuit_harness.harbor.analog_example", "circuit_harness.benchmarks.analogbench"],
+)
+def test_cli_rejects_changed_task_before_creating_job(tmp_path, entrypoint):
+    source = tmp_path / "source"
+    task = source / "tasks/rlc-rf-bandpass-100mhz"
+    task.mkdir(parents=True)
+    (task / "instruction.md").write_text("changed task")
+    output = tmp_path / "prepared"
+    run = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            entrypoint,
+            "--task",
+            "rlc-rf-bandpass-100mhz",
+            "--source-root",
+            str(source),
+            "--output",
+            str(output),
+            "--jobs-dir",
+            str(tmp_path / "jobs"),
+            "--oracle",
+        ],
+        capture_output=True,
+        text=True,
+    )
+    assert run.returncode == 2
+    assert "pin mismatch" in run.stderr
+    assert not output.exists()
+
+
+@pytest.mark.parametrize("plugin_module", ["analog_example", "analogbench"])
+def test_saved_sky130_environment_loads_through_harbor_factory(tmp_path, plugin_module):
+    from harbor.environments.factory import EnvironmentFactory
+    from harbor.models.task.config import EnvironmentConfig, NetworkMode, NetworkPolicy
+    from harbor.models.trial.config import EnvironmentConfig as TrialEnvironmentConfig
+    from harbor.models.trial.paths import TrialPaths
+
+    from circuit_harness.harbor.analogbench import AnalogDockerEnvironment
+
+    environment_dir = tmp_path / "environment"
+    environment_dir.mkdir()
+    (environment_dir / "Dockerfile").write_text("FROM scratch\n")
+    environment = EnvironmentFactory.create_environment_from_config(
+        TrialEnvironmentConfig(
+            type="docker",
+            import_path=f"circuit_harness.harbor.{plugin_module}:AnalogDockerEnvironment",
+        ),
+        environment_dir=environment_dir,
+        environment_name="saved-sky130",
+        session_id="layout-migration",
+        trial_paths=TrialPaths(tmp_path / "trial"),
+        task_env_config=EnvironmentConfig(),
+        phase_network_policies=[NetworkPolicy(network_mode=NetworkMode.PUBLIC)],
+    )
+    assert isinstance(environment, AnalogDockerEnvironment)
+    assert environment.capabilities.dynamic_network_policy
+    assert environment.capabilities.disable_internet
