@@ -3,13 +3,16 @@
 此入口要求 Python 3.12 或更新版本，以及固定的 Harbor 0.23.0：
 
 ```bash
-python -m pip install -e '.[harbor,mcp]'
+python -m pip install -e '.[harbor]'
 ```
 
 Harbor 管理 Job、Trial、阶段期限、并发、Agent 安装、模型请求和原生工具。
 Harness 提供公开电路会话、候选冻结和独立终评。固定 vaBench 执行路径保留；Apollo API 已退役，见[迁移说明](MIGRATION.md)。
 
-运行前使用[部署配方与预检](HARBOR_DEPLOYMENT.md)，多题实验使用[私有任务绑定](HARBOR_TASKS.md)。
+第一次运行可以先用 [AnalogBench 快速开始](ANALOG_QUICKSTART.md)。它复用原生 Harbor 任务与 verifier，
+无需配置 EVAS 公开会话。自定义任务的路径选择见[开发者接入指南](INTEGRATION.md)。
+
+公开会话任务运行前使用[部署配方与预检](HARBOR_DEPLOYMENT.md)，多题实验使用[私有任务绑定](HARBOR_TASKS.md)。
 运行后可[离线汇总实验结果](HARBOR_RESULTS.md)，保留失败和未启动项。
 
 ## 分别选择 Agent 与 Model

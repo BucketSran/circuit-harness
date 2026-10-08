@@ -7,6 +7,8 @@
 `FrozenCandidateVerifier` 使用独立私有配置评价已冻结候选。
 
 协议支持、部署步骤与证据边界以 [Harbor 文档](../../docs/chips/HARBOR.md) 为准。
+首次实验见 [AnalogBench 快速开始](../../docs/chips/ANALOG_QUICKSTART.md)，
+接入自己的任务见[开发者指南](../../docs/chips/INTEGRATION.md)。
 配置与任务模板见 [examples/chips/harbor](../../examples/chips/harbor/README.md)。
 相邻 `profiles.schema.json` 描述 Agent 与 Model 目录。
 `config.schema.json` 保留可选 `NativeCodexAgent` 主机原生路径的兼容配置。
