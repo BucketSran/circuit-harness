@@ -9,8 +9,7 @@ Use shared `codebase-design` for module boundaries and `blast-radius` when a sha
 or lifecycle changes. This skill adds the repository-specific constraints; concrete examples
 are in [patterns](references/patterns.md).
 
-- Keep execution, task grading and Agent orchestration with their actual owners. Lower-level
-  common modules must not import product workflows to reach shared behavior.
+- Keep execution, task grading and Agent orchestration with their actual owners. The execution layer must not import Harbor orchestration to reach shared behavior.
 - Preserve public import paths, CLI/config defaults and serialized records unless the task
   explicitly includes migration. A facade can preserve imports while implementation moves.
 - Before moving execution code, inspect cancellation, exception timing, process groups,
@@ -23,7 +22,7 @@ are in [patterns](references/patterns.md).
   benchmark owns the score; evidence formatting must not turn absence into success or zero.
 - Inspect every consumer before consolidating shared code/resources. Preserve behavior when
   two paths differ; changing semantics is an explicit change rather than incidental cleanup.
-- Preserve the pinned training submodule and optional-import boundaries. Derive supported
+- Keep training engines external and preserve optional-import boundaries. Derive supported
   Python/dependency conditions from current manifests and CI instead of old examples.
 
 Verify the affected behavior using [chips-dev](../chips-dev/SKILL.md). Local process tests,

@@ -23,8 +23,8 @@ archive = Path(sys.argv[4]) if sys.argv[4] else None
 archive_options = {'archive_root': archive} if archive is not None else {}
 bundle = Path(sys.argv[5]) if sys.argv[5] else root / 'harness/chips.pyz'
 sys.path.insert(0, str(bundle))
-from alphaapollo.common.execution.chips.jobs import submit_rc
-from alphaapollo.common.execution.chips.journal import file_digest
+from circuit_harness.execution.jobs import submit_rc
+from circuit_harness.execution.journal import file_digest
 work = root / 'validation' / job_id
 work.mkdir(mode=0o700, parents=True, exist_ok=False)
 binary = root / 'envs/ngspice/47/bin/ngspice'
@@ -58,7 +58,7 @@ archive = Path(sys.argv[4]) if sys.argv[4] else None
 archive_options = {'archive_root': archive} if archive is not None else {}
 bundle = Path(sys.argv[5]) if sys.argv[5] else root / 'harness/chips.pyz'
 sys.path.insert(0, str(bundle))
-from alphaapollo.common.execution.chips.jobs import inspect_job, submit_rc, verify_job
+from circuit_harness.execution.jobs import inspect_job, submit_rc, verify_job
 observed_at = time.time()
 job = jobs / job_id
 state = inspect_job(job)
@@ -69,7 +69,7 @@ assert completion['result']['execution'] == 'ok'
 assert completion['result']['verdict'] == 'pass'
 archive_receipt = None
 if archive is not None:
- from alphaapollo.common.execution.chips.archive import verify_archive
+ from circuit_harness.execution.archive import verify_archive
  archive_receipt = verify_archive(archive / job_id)
  assert archive_receipt['archived_at'] < observed_at
  assert archive_receipt['completion'] == completion

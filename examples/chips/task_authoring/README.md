@@ -17,16 +17,16 @@
 系统检查引用结构及材料哈希；引用的语义、页码和电路条件仍需人工/独立检查。
 
 ```bash
-python -m alphaapollo.workflows.chips_task_authoring inspect \
+python -m circuit_harness.task_authoring inspect \
   --draft /private/draft.json --materials /private/materials \
   --requirements /private/requirements.json
 
-python -m alphaapollo.workflows.chips_task_authoring confirm \
+python -m circuit_harness.task_authoring confirm \
   --draft /private/draft.json --materials /private/materials \
   --requirements /private/requirements.json \
   --reviewer reviewer-name --kind human --output /private/confirmation.json
 
-python -m alphaapollo.workflows.chips_task_authoring verify \
+python -m circuit_harness.task_authoring verify \
   --draft /private/draft.json --materials /private/materials \
   --requirements /private/requirements.json --confirmation /private/confirmation.json
 ```
@@ -39,8 +39,8 @@ python -m alphaapollo.workflows.chips_task_authoring verify \
 `inspect` 在待澄清时返回 1；`verify` 在材料变化、确认缺失或失效时返回 1。
 当前通过只表示确认契约有效，不表示物理条件正确或电路达标。
 
-实现：[草案与确认](../../../alphaapollo/common/execution/chips/task_authoring.py)、
-[操作者 CLI](../../../alphaapollo/workflows/chips_task_authoring.py)。
+实现：[草案与确认](../../../circuit_harness/execution/task_authoring.py)、
+[操作者 CLI](../../../circuit_harness/task_authoring.py)。
 本地检查：`python -m pytest -q tests/chips/test_task_authoring.py`，不调用模型或服务器。
 
 ## 有界 Spectre 构建试验
@@ -50,7 +50,7 @@ python -m alphaapollo.workflows.chips_task_authoring verify \
 激励及测量分子/分母节点；固定框架由 `spectre_testbench.prepare_testbench` 渲染。
 这是先验证数据与执行契约的受限试验，不是任意网表生成能力的验证。
 
-`python -m alphaapollo.workflows.chips submit-spectre-gain --input REQUEST.json
+`python -m circuit_harness.cli submit-spectre-gain --input REQUEST.json
 --profile PRIVATE_PROFILE.json --job-id NEW_ID` 接受操作者准备的请求：
 `draft`、`confirmation`、`materials` 目录、`candidate`、`reference`（gain0/pole_hz）及
 `model` 文件路径。候选不能设置环境脚本、命令或模型代码。Profile 沿用 Spectre RC
@@ -73,38 +73,6 @@ python -m alphaapollo.workflows.chips_task_authoring verify \
 同一 ID 只能对应一个请求。通信状态不明时必须恢复原请求，不能另起仿真；提交后禁止继续修改。
 创建会话会固定部署/源文件哈希，不会在 Agent 运行中自动接受修改后的材料。
 
-## 本机 Codex 两阶段预试
+## Agent 自动构建
 
-`d0-notes.md` 与 `d0-interface.png` 是构造材料。数值在文字中，端口顺序只在图片中。
-本机使用已有 Apollo `CodexSession`，无需改 Pi、Codex 或模型 SDK。私有配置至少包含：
-
-```json
-{
-  "task_id": "gain-d0",
-  "materials": "/absolute/materials",
-  "notes": "d0-notes.md",
-  "image": "d0-interface.png",
-  "codex_cli": "/absolute/codex",
-  "model": "gpt-5.6-luna",
-  "reasoning_effort": "medium"
-}
-```
-
-1. `python -m alphaapollo.workflows.chips_task_authoring_agent extract --config CONFIG.json
-   --evidence NEW_EXTRACT_DIR`：图片通过 Codex `--image` 传入，输出有来源的草案，不自动确认。
-2. 操作者核对字段、来源和单位，再使用上面的 `confirm` 入口。真实材料应由研究者确认；
-   构造夹具自动核对只能标记 `scripted_confirmation`，不能称为专家确认。
-3. 用该草案/确认在服务器创建 `gain-session`。在本机配置增加 `draft`、`confirmation`
-   文件路径和 `remote`（`host` SSH 别名、`python`、固定 `bundle`、`session` 绝对路径）。
-4. `python -m alphaapollo.workflows.chips_task_authoring_agent build --config CONFIG.json
-   --evidence NEW_BUILD_DIR`：MCP 经 SSH 访问服务器会话；真实 Spectre 始终在服务器运行。
-5. 收到成功提交后，操作者下载服务器 `submission.json`，核对候选哈希，再用相同候选和
-   不同的操作者参考模型参数做独立终评。不得用公开反馈代替独立终评。
-
-两个模型阶段分别限制 360/840 秒，不自动重跑。当前只提供开发条件的工程预试，
-尚未提供 A/B/C 比较矩阵或任意文档解析器。原生 Codex 工具仍可用；“仅用两工具”是任务指令，
-不能当作强隔离。`system` 文本由现有适配器拼入用户输入，不是供应商独立 system 消息。
-
-本机证据包含完整输入、实际 argv、图片路径与哈希、原始 Codex JSONL、可见事件/usage、
-阶段时间和每次 MCP 请求/响应。服务器保存仿真动作、冻结候选和作业归档。凭据使用已有
-本机 Codex 认证，不写入任务配置；不要把含真实主机路径、材料或轨迹的输出提交到 Git。
+原 Apollo Codex 两阶段 runner 已退役。上面的草稿、确认、来源校验与有界构建接口保留，见[迁移说明](../../../docs/chips/MIGRATION.md)。将它们接入新的 Harbor task 时，须独立声明公开反馈与私有评分，不能把历史单例预试当作新任务验收。

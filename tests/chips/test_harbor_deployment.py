@@ -7,7 +7,7 @@ import pytest
 
 pytest.importorskip("harbor")
 
-from alphaapollo.workflows.harbor_chips.deployment import main
+from circuit_harness.harbor.deployment import main
 
 
 def recipe(tmp_path):
@@ -39,7 +39,7 @@ def recipe(tmp_path):
     job["verifier"]["kwargs"]["config_path"] = str(final)
     job["agents"] = [
         {
-            "import_path": "alphaapollo.workflows.harbor_chips.installed_agent:CircuitAgent",
+            "import_path": "circuit_harness.harbor.installed_agent:CircuitAgent",
             "model_name": "openai/fixture",
             "kwargs": {"agent_name": "pi"},
             "env": {"OPENAI_API_KEY": "${FIXTURE_KEY}"},
@@ -157,7 +157,7 @@ def test_environment_lifecycle_reports_failure_and_cleans_after_partial_start(
 ):
     import asyncio
 
-    from alphaapollo.workflows.harbor_chips.deployment import check_environment
+    from circuit_harness.harbor.deployment import check_environment
 
     class ExternalEnvironment:
         """Harbor environment protocol double; no Harness implementation mocked."""
@@ -270,7 +270,7 @@ def test_cancelled_harbor_command_does_not_survive_deadline(tmp_path):
     import os
     import sys
 
-    from alphaapollo.workflows.harbor_chips.deployment import PreflightEnvironment
+    from circuit_harness.harbor.deployment import PreflightEnvironment
 
     async def scenario():
         marker = tmp_path / "late-write"
@@ -319,7 +319,7 @@ def test_cancelled_cli_terminates_its_plugin_child(tmp_path):
     import os
     import sys
 
-    from alphaapollo.workflows.harbor_chips.deployment import PreflightEnvironment
+    from circuit_harness.harbor.deployment import PreflightEnvironment
 
     async def scenario():
         child_pid = tmp_path / "child.pid"
@@ -378,12 +378,12 @@ def test_preflight_preserves_stock_harbor_task_version_alias(tmp_path, capsys):
 
 
 def test_podman_recipe_compiles_and_static_preflight_preserves_cpu_declaration(tmp_path, capsys):
-    from alphaapollo.workflows.harbor_chips.config import PublicSessionConfig
-    from alphaapollo.workflows.harbor_chips.profiles import compile_job
+    from circuit_harness.harbor.config import PublicSessionConfig
+    from circuit_harness.harbor.profiles import compile_job
 
     path, job = recipe(tmp_path)
     job["environment"]["import_path"] = (
-        "alphaapollo.workflows.harbor_chips.podman_environment:CircuitPodmanEnvironment"
+        "circuit_harness.harbor.podman_environment:CircuitPodmanEnvironment"
     )
     job["environment"]["kwargs"]["gateway_host"] = "host.containers.internal"
     public_path = Path(job["environment"]["kwargs"]["session_config"])
@@ -411,7 +411,7 @@ def test_podman_preflight_rejects_public_cpu_quota_before_starting_agent_contain
 
     path, job = recipe(tmp_path)
     job["environment"]["import_path"] = (
-        "alphaapollo.workflows.harbor_chips.podman_environment:CircuitPodmanEnvironment"
+        "circuit_harness.harbor.podman_environment:CircuitPodmanEnvironment"
     )
     path.write_text(json.dumps(job))
     public_path = Path(job["environment"]["kwargs"]["session_config"])

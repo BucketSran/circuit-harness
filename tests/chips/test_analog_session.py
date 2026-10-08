@@ -4,8 +4,8 @@ import json
 
 import pytest
 
-from alphaapollo.common.execution.chips import analog_design_bench as adb
-from alphaapollo.common.execution.chips.analog_session import create_session, session_action
+from circuit_harness.execution import analog_design_bench as adb
+from circuit_harness.execution.analog_session import create_session, session_action
 
 
 @pytest.fixture
@@ -60,7 +60,7 @@ def call(root, action_id, tool, **arguments):
 def test_two_tasks_share_session_tools_but_keep_candidates_and_grading_separate(
     session, tmp_path, monkeypatch
 ):
-    from alphaapollo.common.execution.chips import analog_session as module
+    from circuit_harness.execution import analog_session as module
 
     task_id = "rlc-broadband-50-to-200-match"
     task = adb.TASKS[task_id]
@@ -269,7 +269,7 @@ def test_source_pin_change_rejected_before_session_creation(tmp_path, monkeypatc
 def test_detached_action_survives_launcher_and_deduplicates(session):
     import time
 
-    from alphaapollo.common.execution.chips.analog_session import action_response, enqueue_action
+    from circuit_harness.execution.analog_session import action_response, enqueue_action
 
     content = ".subckt rlc_rf_bandpass IN OUT COM\nR1 IN OUT 50\n.ends rlc_rf_bandpass\n"
     request = {"id": "detached", "tool": "analog_write", "arguments": {"content": content}}
@@ -288,7 +288,7 @@ def test_detached_action_survives_launcher_and_deduplicates(session):
 
 
 def test_detached_action_does_not_acknowledge_uncertain_launch(session, monkeypatch):
-    from alphaapollo.common.execution.chips.analog_session import action_response, enqueue_action
+    from circuit_harness.execution.analog_session import action_response, enqueue_action
 
     request = {"id": "uncertain", "tool": "analog_read", "arguments": {"path": ""}}
 
@@ -307,7 +307,7 @@ def test_detached_action_does_not_acknowledge_uncertain_launch(session, monkeypa
 
 
 def test_detached_action_rejects_invalid_envelope_before_launch(session):
-    from alphaapollo.common.execution.chips.analog_session import enqueue_action
+    from circuit_harness.execution.analog_session import enqueue_action
 
     with pytest.raises(ValueError, match="invalid tool"):
         enqueue_action(session, {"id": "bad", "tool": "analog_secret", "arguments": {}})
@@ -317,8 +317,8 @@ def test_detached_action_rejects_invalid_envelope_before_launch(session):
 def test_detached_budget_rejection_is_a_persisted_terminal_reply(session):
     import time
 
-    from alphaapollo.common.execution.chips.analog_session import action_response, enqueue_action
-    from alphaapollo.common.execution.chips.journal import atomic_json
+    from circuit_harness.execution.analog_session import action_response, enqueue_action
+    from circuit_harness.execution.journal import atomic_json
 
     assert call(session, "first", "read", path="")["ok"]
     config = json.loads((session / "session.json").read_text())
@@ -338,7 +338,7 @@ def test_detached_budget_rejection_is_a_persisted_terminal_reply(session):
 
 
 def test_episode_end_collects_last_candidate_once_and_prevents_late_writes(session):
-    from alphaapollo.common.execution.chips.analog_session import close_session
+    from circuit_harness.execution.analog_session import close_session
 
     content = ".subckt rlc_rf_bandpass IN OUT COM\nR1 IN OUT 50\n.ends rlc_rf_bandpass\n"
     assert call(session, "write", "write", content=content)["ok"]
@@ -352,7 +352,7 @@ def test_episode_end_collects_last_candidate_once_and_prevents_late_writes(sessi
 
 
 def test_episode_end_missing_candidate_and_explicit_submission_are_distinct(session):
-    from alphaapollo.common.execution.chips.analog_session import close_session
+    from circuit_harness.execution.analog_session import close_session
 
     receipt = close_session(session, "output_token_limit")
     assert receipt["state"] == "missing_candidate"
@@ -361,7 +361,7 @@ def test_episode_end_missing_candidate_and_explicit_submission_are_distinct(sess
 
 
 def test_episode_end_preserves_explicit_submission(session):
-    from alphaapollo.common.execution.chips.analog_session import close_session
+    from circuit_harness.execution.analog_session import close_session
 
     content = ".subckt rlc_rf_bandpass IN OUT COM\nR1 IN OUT 50\n.ends rlc_rf_bandpass\n"
     call(session, "write", "write", content=content)
@@ -375,7 +375,7 @@ def test_episode_end_preserves_explicit_submission(session):
 
 
 def test_episode_end_refuses_pending_or_unknown_server_work(session):
-    from alphaapollo.common.execution.chips.analog_session import close_session
+    from circuit_harness.execution.analog_session import close_session
 
     pending = session / "requests/pending"
     pending.mkdir(parents=True)
@@ -388,7 +388,7 @@ def test_episode_end_refuses_pending_or_unknown_server_work(session):
 
 
 def test_collected_candidate_can_be_graded_but_receipt_tampering_is_rejected(session, monkeypatch):
-    from alphaapollo.common.execution.chips import analog_session
+    from circuit_harness.execution import analog_session
 
     content = ".subckt rlc_rf_bandpass IN OUT COM\nR1 IN OUT 50\n.ends rlc_rf_bandpass\n"
     call(session, "write", "write", content=content)
@@ -411,7 +411,7 @@ def test_collected_candidate_can_be_graded_but_receipt_tampering_is_rejected(ses
 def test_collection_waits_for_active_worker_and_preserves_legacy_rules(session):
     import fcntl
 
-    from alphaapollo.common.execution.chips.analog_session import close_session
+    from circuit_harness.execution.analog_session import close_session
 
     with (session / ".session.lock").open("a") as held:
         fcntl.flock(held, fcntl.LOCK_EX)

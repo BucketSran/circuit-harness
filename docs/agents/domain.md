@@ -3,13 +3,13 @@
 Read the [Circuit Harness glossary](../../GLOSSARY.md) for the platform's terminology.
 Use the affected component's contract as the behavior authority:
 
-- [Execution module guide](../../alphaapollo/common/execution/chips/README.md): simulator,
+- [Execution module guide](../../circuit_harness/execution/README.md): simulator,
   session, transport and evidence interfaces.
 - [Development SOP](../chips/DEVELOPMENT_SOP.md): development, acceptance and delivery rules.
 - [Experiment protocol](../chips/EXPERIMENT_PROTOCOL.md): declared conditions and evidence.
 - [Test entry](../../tests/chips/README.md) and [validation record](../chips/VALIDATION.md):
   available checks and what actual evidence supports.
-- [Repository scope](../chips/REPOSITORY_SCOPE.md): retained and reference-only domains.
+- [Repository scope](../chips/REPOSITORY_SCOPE.md): retained capabilities and publication boundaries.
 - [Platform roadmap](../chips/ROADMAP.md) and [next work](../chips/NEXT_WORK.md): future outcomes and acceptance gaps.
 
 EVAS semantics and algorithms belong to vaEVAS; task contents and checker rules belong to

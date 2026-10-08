@@ -8,15 +8,15 @@ from pathlib import Path
 
 import pytest
 
-from alphaapollo.common.execution.chips.archive import verify_archive
-from alphaapollo.common.execution.chips.jobs import inspect_job, verify_job
-from alphaapollo.common.execution.chips.spectre import (
+from circuit_harness.cli import main
+from circuit_harness.execution.archive import verify_archive
+from circuit_harness.execution.jobs import inspect_job, verify_job
+from circuit_harness.execution.spectre import (
     read_psf,
     run_spectre_rc,
     spectre_identity,
     verify_spectre_rc,
 )
-from alphaapollo.workflows.chips import main
 
 TASK = {"resistance_ohm": 1000, "capacitance_f": 1e-9}
 

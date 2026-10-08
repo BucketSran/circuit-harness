@@ -1,5 +1,5 @@
 name: Bug report
-description: Report a reproducible problem in AlphaApollo
+description: Report a reproducible problem in Circuit Harness
 title: "[Bug] "
 labels:
   - bug
@@ -65,9 +65,9 @@ body:
     id: environment
     attributes:
       label: Environment
-      description: Include the AlphaApollo revision, Python version, relevant dependency or image versions, and hardware/runtime details.
+      description: Include the Circuit Harness revision, Python version, relevant dependency or image versions, and hardware/runtime details.
       value: |
-        AlphaApollo revision:
+        Circuit Harness revision:
         Python version:
         Relevant dependencies or image:
         OS / accelerator / runtime:

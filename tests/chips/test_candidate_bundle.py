@@ -2,7 +2,7 @@
 
 import pytest
 
-from alphaapollo.common.execution.chips.candidate_bundle import freeze_candidate, verify_candidate
+from circuit_harness.execution.candidate_bundle import freeze_candidate, verify_candidate
 
 
 def test_freeze_preserves_invalid_candidate_and_rejects_tampering(tmp_path):

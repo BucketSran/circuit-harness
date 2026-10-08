@@ -1,15 +1,12 @@
 # EMX smoke example
 
 This example is **layout JSON → local GDS converter → SSH → lab EMX →
-download logs/results**. `emx_simulate` is the single agent-visible tool;
-server, converter, process files and EMX command are operator-owned settings.
+download logs/results**. Server, converter, process files and EMX command are operator-owned settings.
 
-This example still selects Codex; Pi/EMX lab acceptance is pending.
-
-Install with Python 3.10+:
+Install with Python 3.12+:
 
 ```bash
-python -m pip install -e '.[chips,mcp]'
+python -m pip install -e '.[chips]'
 ```
 
 The sample converter uses [gdstk](https://heitzmann.github.io/gdstk/gettingstarted.html)
@@ -21,7 +18,7 @@ Replace it and the converter with the lab's real format/generator when available
 
 Copy `emx.config.example.json` to `emx.local.json` (ignored by Git). Replace all
 placeholder paths and `lab-emx` with a configured SSH alias. Use absolute local
-converter paths, a dedicated private remote root, remote Python 3.10+, and an
+converter paths, a dedicated private remote root, remote Python 3.12+, and an
 executable lab wrapper. SSH uses BatchMode and strict host key checking; no
 passwords, host-key bypass, PDK data or credentials go in the config/repository.
 
@@ -34,13 +31,13 @@ List all process files and wrapper scripts in `remote_input_files` so their
 content hashes are recorded. The harness does not infer dependencies or EMX flags.
 
 ```bash
-python -m alphaapollo.workflows.chips emx \
+python -m circuit_harness.cli emx \
   --config examples/chips/emx/emx.local.json --input examples/chips/emx/layout.json \
   --output runs/chips/emx-demo
-python -m alphaapollo.workflows.chips watch runs/chips/emx-demo
-python -m alphaapollo.workflows.chips report runs/chips/emx-demo
+python -m circuit_harness.cli watch runs/chips/emx-demo
+python -m circuit_harness.cli report runs/chips/emx-demo
 # After interruption, same directory + identical input and configuration:
-python -m alphaapollo.workflows.chips emx \
+python -m circuit_harness.cli emx \
   --config examples/chips/emx/emx.local.json --input examples/chips/emx/layout.json \
   --output runs/chips/emx-demo --resume
 ```
@@ -61,32 +58,12 @@ process groups and output-size polling for resource control, not a security
 sandbox or a hard disk quota. Jobs that deliberately detach from their group
 require a scheduler/container backend, outside this phase.
 
-## Existing AlphaApollo agent integration
-
-```bash
-export ALPHAAPOLLO_CHIPS_CONFIG=/absolute/path/to/emx.local.json
-python -m alphaapollo.workflows.main --config examples/chips/emx/config.yaml
-```
-
-The supplied config uses the existing Codex external runtime, preserves workspaces,
-and grants only `emx_simulate`. Change the model in YAML to your configured model.
-Its MCP tool timeout is 1900 seconds, above the example job's 1800-second budget
-and cleanup allowance, with a 2100-second agent session. Keep these limits aligned
-when changing the lab budget; Codex otherwise has a
-[60-second MCP tool default](https://developers.openai.com/zh-Hans/docs/extend/mcp).
-The existing pi external runtime can use the same MCP bridge. The library rejects
-native/default-environment routing for this host/SSH tool. A successful harness
-run is not a verifier pass; task/model ranking and independent circuit evaluation
-belong to the next phase. LLM SDK retries/costs are not inferred from SSH attempts.
-
-For Cadence/Spectre connection reuse, see [Cadence example](../cadence/README.md).
-That example records the existing vaEVAs labctl pattern and is separate from EMX.
-
 ## Checks
 
 ```bash
-pytest -q tests/common/execution/test_chips_harness.py tests/workflows/test_chips.py
+pytest -q tests/chips/test_simulator.py tests/test_cli.py
 ```
 
-See [validation](../../../docs/chips/VALIDATION.md) for measured checks and
-the remaining lab-specific acceptance requirements.
+The old Apollo `emx_simulate` bridge has been retired. The commands above remain
+operator tools; expose a new Agent-facing EMX task only after defining its public
+feedback and independent verifier. See [migration](../../../docs/chips/MIGRATION.md).

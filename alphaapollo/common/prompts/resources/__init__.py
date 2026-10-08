@@ -1,1 +1,0 @@
-"""Packaged canonical prompt resources."""

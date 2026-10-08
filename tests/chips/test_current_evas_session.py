@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from alphaapollo.common.execution.chips import current_evas_session as session
+from circuit_harness.execution import current_evas_session as session
 
 
 def make_session(

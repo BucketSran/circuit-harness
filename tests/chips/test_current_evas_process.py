@@ -4,8 +4,8 @@ import sys
 import threading
 import time
 
-from alphaapollo.common.execution.chips.journal import Journal
-from alphaapollo.common.execution.chips.process import run_process
+from circuit_harness.execution.journal import Journal
+from circuit_harness.execution.process import run_process
 
 
 def test_nested_output_is_counted_and_process_group_is_cleaned(tmp_path):

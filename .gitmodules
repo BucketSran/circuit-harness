@@ -1,3 +1,0 @@
-[submodule "third_party/verl"]
-	path = third_party/verl
-	url = https://github.com/verl-project/verl.git

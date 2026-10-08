@@ -162,10 +162,11 @@ runner 可以在本机或服务器；公开 EVAS 与独立终评按实际部署�
 不是当前 EVAS 主线的验收前置。任务判据与 EVAS 算法仍归 benchmark 与 vaEVAS。
 各部署、任务和 Agent/Model 组合分别留证；一条路径成功不代表其他组合已验收。
 
-既有 vaBench、Analog 和本机原生 Codex 经 MCP/SSH 的入口继续按受影响范围回归。
+固定 vaBench、Analog 的操作者会话及 Harbor 原生 Codex 路径继续按受影响范围回归。
+旧 Apollo Agent runner 已退役，调用方切换按[迁移说明](MIGRATION.md)验收。
 当前方向见[路线图](ROADMAP.md)，具体任务沿用已确认的 Issue 或用户要求。
 会话与作业通过 run、action、job ID 和候选摘要关联证据，回收后核验完整性。
-复用 Apollo 的 Runtime／Environment 应以实际兼容能力为前提。原生 Codex 的原生工具限制仍须遵守，
+Agent loop 与生命周期交给 Harbor。原生 Codex 的原生工具限制仍须遵守，
 不删除校验来伪造工具独占，也不把受控 `tool_loop` 迁移设为现有 Codex／SSH 链路的前置条件。
 旧草案若默认所有 Agent 都在服务器上运行，应先修订条件再执行；不沿用过时的实验矩阵。
 实验开始前按 [调用链约定](EXPERIMENT_PROTOCOL.md) 核对版本、权限、预算与证据位置。

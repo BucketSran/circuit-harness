@@ -193,7 +193,7 @@ def test_docker_experiment_failures_are_unscored_and_cleaned(tmp_path, script, e
     not os.environ.get("CHIPS_TEST_DOCKER_IMAGE"), reason="requires local Docker image"
 )
 def test_docker_missing_declared_program_is_infrastructure_failure(tmp_path):
-    from alphaapollo.common.execution.chips.current_evas_public import run_isolated_docker
+    from circuit_harness.execution.current_evas_public import run_isolated_docker
 
     result = run_isolated_docker(
         image=os.environ["CHIPS_TEST_DOCKER_IMAGE"],
@@ -214,7 +214,7 @@ def test_watchdog_checks_aggregate_output_after_fast_child_exit(tmp_path):
     import subprocess
     import sys
 
-    from alphaapollo.common.execution.chips.current_evas_public import _CONTAINER_WATCHDOG
+    from circuit_harness.execution.current_evas_public import _CONTAINER_WATCHDOG
 
     for count, expected in ((1, 0), (20, 123)):
         output = tmp_path / str(count)
@@ -289,7 +289,7 @@ def test_podman_public_measurement_records_explicit_cpu_policy(tmp_path, monkeyp
 def test_podman_quota_failure_is_not_silently_retried(tmp_path, monkeypatch, cpu_limit):
     import sys
 
-    from alphaapollo.common.execution.chips.current_evas_public import run_isolated_container
+    from circuit_harness.execution.current_evas_public import run_isolated_container
 
     engine = tmp_path / "podman"
     engine.write_text(

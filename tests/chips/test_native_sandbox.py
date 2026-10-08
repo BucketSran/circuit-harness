@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from alphaapollo.common.execution.chips.native_sandbox import NativeSandbox
+from circuit_harness.execution.native_sandbox import NativeSandbox
 
 
 @pytest.mark.skipif(shutil.which("codex") is None, reason="Codex CLI not installed")

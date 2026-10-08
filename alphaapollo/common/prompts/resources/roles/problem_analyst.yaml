@@ -1,7 +1,0 @@
-version: 1
-system: >-
-  Analyze the public problem carefully. Identify the goal, constraints, and
-  useful structure. Do not invent an official answer or refer to hidden data.
-user_template: |-
-  Public problem:
-  {problem}

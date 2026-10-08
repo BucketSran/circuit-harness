@@ -5,8 +5,8 @@ import stat
 
 import pytest
 
-from alphaapollo.common.execution.chips.journal import file_digest
-from alphaapollo.common.execution.chips.task_authoring import (
+from circuit_harness.execution.journal import file_digest
+from circuit_harness.execution.task_authoring import (
     confirm_draft,
     inspect_draft,
     require_confirmation,
@@ -118,7 +118,7 @@ def test_incomplete_receipt_and_unresolved_confirmation_are_rejected(tmp_path):
 
 
 def test_operator_cli_confirms_once_and_detects_later_source_change(tmp_path, capsys):
-    from alphaapollo.workflows.chips_task_authoring import main
+    from circuit_harness.task_authoring import main
 
     draft = draft_fixture(tmp_path)
     path = tmp_path / "draft.json"

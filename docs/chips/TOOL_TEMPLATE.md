@@ -39,7 +39,7 @@
 
 ## 代码落点
 
-领域实现优先放 `alphaapollo/common/execution/chips/`；模型接口放
-`alphaapollo/common/execution/tools/chips.py`，多个真实工具出现后按职责拆分。
+领域实现优先放 `circuit_harness/execution/`；模型接口放
+`circuit_harness/execution/` 的任务会话接口，多个真实工具出现后按职责拆分。
 复用既有 MCP/ToolCatalog 接口。相关测试放到对应的 `tests/common/execution/` 或 `tests/workflows/`。
 完整职责表见 [CONTRIBUTING.md](CONTRIBUTING.md)。

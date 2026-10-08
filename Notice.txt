@@ -1,39 +1,13 @@
-AlphaApollo Architecture Foundation
+Circuit Harness
 
-The Environment lifecycle contract is adapted from work by:
-
+Derived from AlphaApollo v3, distributed under the Apache License, Version 2.0.
+Original source and modifications include contributions from:
 Copyright 2025 Nanyang Technological University (NTU), Singapore and the
 verl-agent (GiGPO) team.
-
-Additional modifications and contributions:
-
 Copyright 2025-2026 Hong Kong Baptist University (HKBU), Hong Kong and TMLR Group.
+Copyright 2026 Circuit Harness contributors.
 
-The minimal Environment lifecycle contract came through the prior AlphaApollo
-v2 SkyRL-style environment interface. No verl implementation is vendored in
-this clean foundation. The OpenAI-compatible transport consolidates API client
-behavior previously implemented in AlphaApollo v3. Source refs and migration
-provenance were recorded under docs/design/refactor/ in the upstream history.
-Current distribution provenance is summarized in third_party/README.md.
-
-The coding-agent tool output truncation and streaming accumulation behavior in
-alphaapollo/common/execution/tools/truncate.py and
-alphaapollo/common/execution/tools/output_accumulator.py is adapted from
-earendil-works/pi:
-
-Copyright (c) 2025 Mario Zechner
-
-The original implementation is licensed under the MIT License. AlphaApollo's
-Python adaptation preserves Pi's tail-truncation and streaming accumulation
-semantics while integrating with AlphaApollo's typed tool records,
-ArtifactStore, cancellation model, and Podman sandbox execution.
-
-The derived task-suite manifest in
-alphaapollo/data_preprocess/robotics/snapshots/robocasa365_tasks.jsonl includes
-task instructions and horizon metadata from RoboCasa at revision 921c9a5:
-
-Copyright (c) 2026 the RoboCasa Team
-
-Those upstream portions are distributed under the MIT License. The full pinned
-license is retained in third_party/robocasa/LICENSE. Demonstration datasets and
-scene assets are not included; see the adjacent UPSTREAM.md for provenance.
+Circuit Harness retains circuit execution, evidence and integration code from
+AlphaApollo. Its independent package does not include Apollo's generic runtime,
+Robotics manifests, Pi tool-output adaptation, or training implementations.
+Third-party runtime packages retain their own licenses; see third_party/README.md.

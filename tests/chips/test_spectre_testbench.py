@@ -9,8 +9,8 @@ from pathlib import Path
 
 import pytest
 
-from alphaapollo.common.execution.chips.journal import file_digest
-from alphaapollo.common.execution.chips.spectre_testbench import (
+from circuit_harness.execution.journal import file_digest
+from circuit_harness.execution.spectre_testbench import (
     REQUIREMENTS,
     grade_testbench,
     measure_gain,
@@ -18,10 +18,10 @@ from alphaapollo.common.execution.chips.spectre_testbench import (
     run_testbench,
     verify_testbench,
 )
-from alphaapollo.common.execution.chips.spectre_testbench import (
+from circuit_harness.execution.spectre_testbench import (
     testbench_identity as gain_identity,
 )
-from alphaapollo.common.execution.chips.task_authoring import confirm_draft
+from circuit_harness.execution.task_authoring import confirm_draft
 
 
 def candidate():
@@ -220,8 +220,8 @@ def test_constructed_simulator_runs_confirmed_candidate_and_rechecks_archive(
 
 
 def test_offline_cli_submits_detached_gain_job_and_archives(tmp_path, gain_submission):
-    from alphaapollo.common.execution.chips.bundle import build_cli
-    from alphaapollo.common.execution.chips.jobs import inspect_job, verify_job
+    from circuit_harness.execution.bundle import build_cli
+    from circuit_harness.execution.jobs import inspect_job, verify_job
 
     payload, profile = gain_submission
     bundle = tmp_path / "chips.pyz"
@@ -258,7 +258,7 @@ def test_offline_cli_submits_detached_gain_job_and_archives(tmp_path, gain_submi
 
 
 def test_authoring_session_reserves_budget_deduplicates_and_freezes(tmp_path, gain_submission):
-    from alphaapollo.common.execution.chips.authoring_session import (
+    from circuit_harness.execution.authoring_session import (
         action_response,
         create_session,
         request_action,
@@ -290,7 +290,7 @@ def test_authoring_session_reserves_budget_deduplicates_and_freezes(tmp_path, ga
 
 
 def test_session_refuses_unconfirmed_draft_and_changed_sources(tmp_path, gain_submission):
-    from alphaapollo.common.execution.chips.authoring_session import (
+    from circuit_harness.execution.authoring_session import (
         action_response,
         create_session,
         request_action,
@@ -314,7 +314,7 @@ def test_session_refuses_unconfirmed_draft_and_changed_sources(tmp_path, gain_su
 
 
 def test_bundled_session_cli_accepts_and_returns_same_frozen_request(tmp_path, gain_submission):
-    from alphaapollo.common.execution.chips.bundle import build_cli
+    from circuit_harness.execution.bundle import build_cli
 
     bundle = tmp_path / "chips.pyz"
     build_cli(bundle)

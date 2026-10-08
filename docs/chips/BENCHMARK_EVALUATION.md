@@ -6,7 +6,7 @@ Harness 管理执行与证据；vaEVAS benchmark 声明任务、checker、判据
 
 ## 输入与任务包
 
-[`candidate_bundle`](../../alphaapollo/common/execution/chips/candidate_bundle.py) 提供：
+[`candidate_bundle`](../../circuit_harness/execution/candidate_bundle.py) 提供：
 
 ```python
 freeze_candidate(source, destination, files, *, task_id, task_version, reason)
@@ -18,7 +18,7 @@ verify_candidate(directory)
 验证重新计算文件摘要，拒绝路径穿越、链接、清单差异和超限文件。
 
 任务包是 benchmark 提供的目录，包含 `manifest.json` 和显式文件清单。
-[`package_identity`](../../alphaapollo/common/execution/chips/benchmark_spectre.py) 拒绝多余或缺少的 manifest 字段。
+[`package_identity`](../../circuit_harness/execution/benchmark_spectre.py) 拒绝多余或缺少的 manifest 字段。
 
 | 字段 | 契约 |
 | --- | --- |
@@ -101,12 +101,12 @@ triangle report 用 `returncode=0`、`timeout=false` 和 `waveform_sha256` 表�
 在执行主机调用：
 
 ```bash
-python -m alphaapollo.workflows.chips submit-benchmark-spectre \
+python -m circuit_harness.cli submit-benchmark-spectre \
   --candidate saved/frozen --task-package benchmark/final \
   --profile operator/spectre.json --job-id eval-001
-python -m alphaapollo.workflows.chips job-status operator/jobs/eval-001
-python -m alphaapollo.workflows.chips verify-job operator/jobs/eval-001
-python -m alphaapollo.workflows.chips verify-archive operator/archive/eval-001
+python -m circuit_harness.cli job-status operator/jobs/eval-001
+python -m circuit_harness.cli verify-job operator/jobs/eval-001
+python -m circuit_harness.cli verify-archive operator/archive/eval-001
 ```
 
 profile 内的根目录使用绝对路径；上面 `job-status` 的目录应指向 profile 的实际 `run_root/eval-001`。
@@ -124,7 +124,7 @@ ack 包含 `job_id`、`state` 和 `directory`。`running` 只表示 worker 已�
 
 ## 通过 SSH 提交与回收
 
-[`RemoteBenchmarkSpectre`](../../alphaapollo/common/execution/chips/benchmark_remote.py) 复用现有 SSH 传输和相同的服务器 jobs 生命周期。
+[`RemoteBenchmarkSpectre`](../../circuit_harness/execution/benchmark_remote.py) 复用现有 SSH 传输和相同的服务器 jobs 生命周期。
 配置包括 SSH config alias `host`，以及服务器绝对路径 `python`、`bundle`、`profile`、`run_root`、`archive_root`、`upload_root`。
 `evidence` 参数是客户端私有证据目录。
 
@@ -144,7 +144,7 @@ result = transport.retrieve("eval-001")  # finished 且归档已发布后调用
 
 ## 保存候选的开源单后端重评
 
-[`replay_candidate`](../../alphaapollo/common/execution/chips/benchmark_replay.py) 消费既有冻结 bundle、benchmark 声明的开源 checker 包和独立输出目录。
+[`replay_candidate`](../../circuit_harness/execution/benchmark_replay.py) 消费既有冻结 bundle、benchmark 声明的开源 checker 包和独立输出目录。
 不重新生成、修复或选择候选；输出目录存在时拒绝覆盖。
 不开 SSH，不探测 Spectre、许可证或模型。可选 Spectre 对照只读取已保存的 job 或 archive。
 
@@ -161,18 +161,18 @@ replay 配置严格包含以下字段：
 | `max_output_bytes` | 整数，1–16 MiB |
 
 容器镜像必须包含 Python 3，以运行独立时限 watchdog。
-执行复用 [`run_isolated_docker`](../../alphaapollo/common/execution/chips/current_evas_public.py)：
+执行复用 [`run_isolated_docker`](../../circuit_harness/execution/current_evas_public.py)：
 固定 `--pull=never`、无网络、只读容器根、丢弃 capabilities、禁止提权和资源上限。
 候选和任务包只读挂载，只有输出目录可写；不挂载 Docker socket 或操作者私有文件。
 调用结束清理容器，broker 消失后内部 watchdog 仍使 checker 超时退出。
 Docker daemon 必须能访问所声明的挂载目录；缺失挂载不会得到任务成绩。
 
 ```bash
-python -m alphaapollo.workflows.chips replay-benchmark \
+python -m circuit_harness.cli replay-benchmark \
   --candidate saved/frozen --task-package benchmark/opensource \
   --config operator/replay.json --output evidence/replay-v2
-python -m alphaapollo.workflows.chips verify-benchmark-replay evidence/replay-v2
-python -m alphaapollo.workflows.chips summarize-benchmark-replays evidence/replay-v2
+python -m circuit_harness.cli verify-benchmark-replay evidence/replay-v2
+python -m circuit_harness.cli summarize-benchmark-replays evidence/replay-v2
 ```
 
 若有身份匹配的旧 Spectre 结果，增加 `--spectre-record evidence/spectre-archive`。

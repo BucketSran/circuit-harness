@@ -57,7 +57,7 @@ python3.12 "$chips_cli" job-cleanup "$chips_work/jobs/rc-001"
 源码缓存若移到另一条路径，应重新 pin 并核验源码身份；不能编辑旧 pin 来掩盖改变。
 
 下载时只需复制对应归档目录，包含 `job.tar.gz` 和 `receipt.json`，然后在本机运行
-`python -m alphaapollo.workflows.chips verify-archive <下载目录>`。
+`python -m circuit_harness.cli verify-archive <下载目录>`。
 核验无需服务器路径、仿真器或 EVAS 环境，会在系统临时目录中解包并复核；可用 `TMPDIR` 指定核验临时盘。
 归档含候选、原始日志和可能的隐藏评分材料，只供操作者保存；不能作为 Agent 公开任务目录。
 

@@ -18,7 +18,7 @@ Use this checklist selectively. Spend most review effort on correctness and cont
 - For optional dependencies, ensure base installs still import and extras remain correctly declared.
 - Derive supported Python and dependency conditions from the current manifests and CI;
   distinguish declared compatibility from versions actually exercised by this change.
-- Treat `third_party/verl` as a pinned external contract; verify adapters rather than assuming upstream internals.
+- Verify external dataset consumers without introducing a bundled training runtime.
 
 ## Tests and CI
 

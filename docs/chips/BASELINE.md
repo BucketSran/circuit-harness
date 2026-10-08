@@ -50,12 +50,12 @@
 该运行的 NFS 文件修改时间比 worker 写入的事件时间落后约 108 秒。
 原状态检测拿执行节点时钟减去文件系统 mtime，错误地认为心跳已过期。
 
-修复位于 [ssh_worker.py](../../alphaapollo/common/execution/chips/ssh_worker.py)：
+修复位于 [ssh_worker.py](../../circuit_harness/execution/ssh_worker.py)：
 由提交端先写入 job_submitted 事件，随后用执行节点写入的应用事件时间判断新鲜度。
 没有可信事件、事件过期或来自未来时仍返回 unknown；不会通过延长阈值或重新提交掩盖问题。
 最终 result 继续优先于心跳。已有任务的恢复保留原版本/内容身份检查。
 
-[回归测试](../../tests/common/execution/test_chips_harness.py) 通过实际 worker CLI 注入文件时间偏差，
+[回归测试](../../tests/chips/test_simulator.py) 通过实际 worker CLI 注入文件时间偏差，
 覆盖新鲜心跳、过期心跳、未来时间和缺失心跳。复现经历了 Red → Green；
 受影响的 Harness/Workflow 测试共 29 项通过。真实服务器复测也通过。
 

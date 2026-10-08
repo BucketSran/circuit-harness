@@ -8,7 +8,7 @@ pytest.importorskip("harbor")
 
 from harbor.agents.factory import AgentFactory
 
-from alphaapollo.workflows.harbor_chips.profiles import compile_agent
+from circuit_harness.harbor.profiles import compile_agent
 
 
 @pytest.fixture(autouse=True)
@@ -226,7 +226,7 @@ def test_cli_writes_stock_job_and_harbor_resolves_reference_only_at_factory(tmp_
     command = [
         sys.executable,
         "-m",
-        "alphaapollo.workflows.harbor_chips.profiles",
+        "circuit_harness.harbor.profiles",
         "--catalog",
         str(catalog_path),
         "--agent",
@@ -253,7 +253,7 @@ def test_cli_writes_stock_job_and_harbor_resolves_reference_only_at_factory(tmp_
 
 
 def test_compile_job_rejects_unknown_stock_job_and_nested_settings():
-    from alphaapollo.workflows.harbor_chips.profiles import compile_job
+    from circuit_harness.harbor.profiles import compile_job
 
     for job in (
         {"typo": True},
@@ -319,12 +319,10 @@ def test_published_catalog_schema_and_example(tmp_path, monkeypatch):
 
     from jsonschema import Draft202012Validator
 
-    from alphaapollo.workflows.harbor_chips.profiles import catalog_schema
+    from circuit_harness.harbor.profiles import catalog_schema
 
     root = Path(__file__).resolve().parents[2]
-    schema = json.loads(
-        (root / "alphaapollo/workflows/harbor_chips/profiles.schema.json").read_text()
-    )
+    schema = json.loads((root / "circuit_harness/harbor/profiles.schema.json").read_text())
     assert schema == catalog_schema()
     Draft202012Validator.check_schema(schema)
     example = json.loads((root / "examples/chips/harbor/profiles.example.json").read_text())
@@ -368,7 +366,7 @@ def test_mini_swe_chat_rejects_reasoning_option_that_harbor_routes_to_responses(
 
 
 def test_circuit_job_wraps_only_stock_lifecycle_and_preserves_selected_connection():
-    from alphaapollo.workflows.harbor_chips.profiles import compile_job
+    from circuit_harness.harbor.profiles import compile_job
 
     job = compile_job(
         catalog(),
@@ -377,7 +375,7 @@ def test_circuit_job_wraps_only_stock_lifecycle_and_preserves_selected_connectio
         {
             "environment": {
                 "import_path": (
-                    "alphaapollo.workflows.harbor_chips.docker_environment:CircuitDockerEnvironment"
+                    "circuit_harness.harbor.docker_environment:CircuitDockerEnvironment"
                 ),
                 "kwargs": {"config": {"fixture": True}},
             }
@@ -385,7 +383,7 @@ def test_circuit_job_wraps_only_stock_lifecycle_and_preserves_selected_connectio
     )
     selected = job.agents[0]
     assert selected.name is None
-    assert selected.import_path == "alphaapollo.workflows.harbor_chips.installed_agent:CircuitAgent"
+    assert selected.import_path == "circuit_harness.harbor.installed_agent:CircuitAgent"
     assert selected.kwargs == {
         "agent_name": "codex",
         "agent_kwargs": {"reasoning_effort": "medium"},
@@ -395,7 +393,7 @@ def test_circuit_job_wraps_only_stock_lifecycle_and_preserves_selected_connectio
 
 
 def test_circuit_job_rejects_unimplemented_resume_contract():
-    from alphaapollo.workflows.harbor_chips.profiles import compile_job
+    from circuit_harness.harbor.profiles import compile_job
 
     data = catalog()
     data["agents"]["code"]["resume_trajectory"] = True
@@ -407,8 +405,7 @@ def test_circuit_job_rejects_unimplemented_resume_contract():
             {
                 "environment": {
                     "import_path": (
-                        "alphaapollo.workflows.harbor_chips.docker_environment:"
-                        "CircuitDockerEnvironment"
+                        "circuit_harness.harbor.docker_environment:CircuitDockerEnvironment"
                     )
                 }
             },
@@ -431,7 +428,7 @@ def test_mini_swe_rejects_native_connection_override_and_invalid_model_settings(
 
 
 def test_mutated_catalog_is_revalidated_before_composition():
-    from alphaapollo.workflows.harbor_chips.profiles import ProfileCatalog
+    from circuit_harness.harbor.profiles import ProfileCatalog
 
     data = ProfileCatalog.model_validate(catalog())
     data.agents["code"]["kwargs"]["config"] = {"model_provider": "wrong"}
@@ -484,7 +481,7 @@ def test_runtime_rejects_ambient_connection_override_after_compilation(
     wrapped = selected.model_copy(
         update={
             "name": None,
-            "import_path": "alphaapollo.workflows.harbor_chips.installed_agent:CircuitAgent",
+            "import_path": "circuit_harness.harbor.installed_agent:CircuitAgent",
             "kwargs": {"agent_name": name, "agent_kwargs": selected.kwargs},
         }
     )

@@ -1,1 +1,0 @@
-"""Robot execution contract tests."""

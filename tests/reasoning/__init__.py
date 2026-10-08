@@ -1,1 +1,0 @@
-"""Reasoning contract tests."""

@@ -2,7 +2,7 @@
 
 Harness 复用 Harbor 0.23 的任务与 Trial 调度。操作者为每个实际本地任务目录声明公开会话和私有终评配置，两种配置都留在私有 runner 目录。单题继续使用 `session_config` 与 `config_path`；多题使用同一份 `task_bindings`，两种方式互斥。
 
-私有 manifest 的格式见 [示例](../../examples/chips/harbor/task-bindings.example.json) 和 [schema](../../alphaapollo/workflows/harbor_chips/task_bindings.schema.json)。`task_path` 必须是绝对路径。选择按解析后的完整目录路径进行，两个不同目录可以有相同 basename。重复路径或重复 `task_id/task_version`、缺失计划项、未计划项与身份不一致都会拒绝。`task_id/task_version` 必须与公开会话和终评 package manifest 一致。
+私有 manifest 的格式见 [示例](../../examples/chips/harbor/task-bindings.example.json) 和 [schema](../../circuit_harness/harbor/task_bindings.schema.json)。`task_path` 必须是绝对路径。选择按解析后的完整目录路径进行，两个不同目录可以有相同 basename。重复路径或重复 `task_id/task_version`、缺失计划项、未计划项与身份不一致都会拒绝。`task_id/task_version` 必须与公开会话和终评 package manifest 一致。
 
 在 Job 的 `environment.kwargs.task_bindings` 与 `verifier.kwargs.task_bindings` 指定同一份 manifest。保持 [Job 示例](../../examples/chips/harbor/job.example.json) 的环境与 verifier import_path、gateway 设置，在 `tasks` 列出实际本地任务，并移除两个 scalar 配置参数。用既有 profiles `compile_job` 或 CLI 编译 Job。编译检查不启动模型、容器或仿真，但会读取并哈希本地任务、配置和资源文件，允许调用 Git 读取源码身份。新映射模式只支持显式本地任务；远程 Git、dataset 与动态下载会在编译前拒绝。Harbor 仍拥有 agents、attempts 与并发控制。
 

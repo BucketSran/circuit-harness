@@ -13,7 +13,7 @@
 | CHIPS-RECOVERY | 实际长作业断开客户端后可查；取消/超时回收；重试不重复启动 | 对隔离作业中断客户端/注入通信故障，核对 job/PID/结果 | ngspice 真实 SSH 断线通过；Spectre 后台提交后 SSH 退出、终态查询与同 ID 去重通过；Spectre 强制断线、取消/超时待验收 |
 | CHIPS-STORAGE | 本地文件系统与 NFS 对同一真实负载的影响 | `probes/storage_compare.py`：固定有界源码包、交替运行、记录缓存与负载 | 795 文件源码包三轮真实对照已完成；见存储验证记录，不能外推为求解器或物理磁盘性能 |
 | CHIPS-ARCHIVE | 后台 scratch 执行后独立归档与可控清理 | `test_chips_ngspice.py`、`test_vabench.py`；真实 SSH 探针可指定工作/归档根目录 | 自动归档、仅归档重试、清理门禁、持久 ID 和阶段计时已实现；范围及证据见 [存储说明](../../docs/chips/STORAGE.md) 和验证记录 |
-| CHIPS-VABENCH-AGENT | 公开候选修复、冻结、隔离终评、关联归档与 Pi 请求限额 | `test_vabench_session.py`、`test_vabench_agent.py`、`probes/pi_vabench.py` | 三类任务脚本闭环与真实 Pi/SSH/EVAS 协议测试通过；模型响应为脚本 fixture，GLM 实测待服务配置 |
+| CHIPS-VABENCH-AGENT | 公开候选修复、冻结、隔离终评、关联归档与 Pi 请求限额 | `test_vabench_session.py`；旧 Agent runner 已退役，见迁移说明 | 三类任务脚本闭环与真实 Pi/SSH/EVAS 协议测试通过；模型响应为脚本 fixture，旧 Agent 证据按原版本解释；新 Harbor task 需独立验收 |
 | CHIPS-EPISODE-REPORT | 已有轨迹离线重建成功、修复和预算停止；未知数据不造零；候选/归档不一致拒绝 | `test_episode_report.py`、`tests/workflows/test_visualize.py`；四条真实历史证据离线核对 | 已实现，见[报告说明](../../docs/chips/EPISODE_REPORT.md)和验证记录；不调用新模型或仿真 |
 | CHIPS-PLACEMENT | 本机 Agent + 服务器 Tools vs 全服务器的耗时、稳定性和成本 | 固定任务、工具、模型、预算，分别运行，核对结果有效性 | 待两条路径具备同等功能后执行 |
 

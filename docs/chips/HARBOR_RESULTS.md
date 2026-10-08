@@ -5,7 +5,7 @@ Harbor 继续负责执行和任务计划；导出器不创建 Job，不调用 Ag
 [Harbor 配置](HARBOR.md)和[任务绑定](HARBOR_TASKS.md)仍是运行入口。
 
 ```bash
-python -m alphaapollo.workflows.harbor_chips.reporting \
+python -m circuit_harness.harbor.reporting \
   --job /private/saved-harbor-job \
   --output /private/new-report-directory
 ```
@@ -22,8 +22,8 @@ python -m alphaapollo.workflows.harbor_chips.reporting \
 ## 计划与统计
 
 `schema_version=1` 的契约由
-[`ExperimentReport`](../../alphaapollo/workflows/harbor_chips/reporting.py)与相邻的
-[`reporting.schema.json`](../../alphaapollo/workflows/harbor_chips/reporting.schema.json)维护。
+[`ExperimentReport`](../../circuit_harness/harbor/reporting.py)与相邻的
+[`reporting.schema.json`](../../circuit_harness/harbor/reporting.schema.json)维护。
 Python 入口 `read_job(path)` 返回同一记录模型。
 
 导出器读取原生 `JobConfig.tasks`、`agents`、`n_attempts`，为每个任务与 Agent 配置保留

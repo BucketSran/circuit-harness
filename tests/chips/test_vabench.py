@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from alphaapollo.common.execution.chips.vabench import replay_result
+from circuit_harness.execution.vabench import replay_result
 
 
 @pytest.mark.parametrize(
@@ -31,7 +31,7 @@ def test_exit_zero_without_known_structured_verdict_is_not_success():
 
 
 def test_pin_rejects_drift_and_symlink_candidates(tmp_path):
-    from alphaapollo.common.execution.chips.vabench import candidate_files, verify_pin
+    from circuit_harness.execution.vabench import candidate_files, verify_pin
 
     candidate = tmp_path / "candidate"
     candidate.mkdir()
@@ -45,7 +45,7 @@ def test_pin_rejects_drift_and_symlink_candidates(tmp_path):
 
 
 def test_vabench_detached_submission_freezes_candidate(tmp_path, monkeypatch):
-    from alphaapollo.common.execution.chips import jobs
+    from circuit_harness.execution import jobs
 
     source = tmp_path / "submission"
     source.mkdir()
@@ -55,7 +55,7 @@ def test_vabench_detached_submission_freezes_candidate(tmp_path, monkeypatch):
         "pin": {},
         "candidate": {"dut.va": {"sha256": "unused", "bytes": 17}},
     }
-    from alphaapollo.common.execution.chips.vabench import candidate_files
+    from circuit_harness.execution.vabench import candidate_files
 
     identity["candidate"] = candidate_files(source)
     monkeypatch.setattr(jobs, "vabench_identity", lambda *args: identity)
@@ -154,7 +154,7 @@ else:
     candidate = tmp_path / "submission"
     candidate.mkdir()
     (candidate / "dut.va").write_text("bad")
-    from alphaapollo.common.execution.chips.vabench import pin_vabench
+    from circuit_harness.execution.vabench import pin_vabench
 
     return pin_vabench(source, executable, "v4-001"), candidate
 
@@ -162,7 +162,7 @@ else:
 def wait_finished(directory):
     import time
 
-    from alphaapollo.common.execution.chips.jobs import inspect_job
+    from circuit_harness.execution.jobs import inspect_job
 
     deadline = time.monotonic() + 12
     while time.monotonic() < deadline:
@@ -174,7 +174,7 @@ def wait_finished(directory):
 
 
 def test_detached_replay_deduplicates_and_verifies_nested_evidence(protocol_vendor, tmp_path):
-    from alphaapollo.common.execution.chips.jobs import submit_vabench, verify_job
+    from circuit_harness.execution.jobs import submit_vabench, verify_job
 
     pin, candidate = protocol_vendor
     root = tmp_path / "jobs"
@@ -191,8 +191,8 @@ def test_detached_replay_deduplicates_and_verifies_nested_evidence(protocol_vend
 def test_vabench_archives_negative_evidence_and_replay_timings(protocol_vendor, tmp_path):
     import time
 
-    from alphaapollo.common.execution.chips.archive import verify_archive
-    from alphaapollo.common.execution.chips.jobs import job_timings, submit_vabench
+    from circuit_harness.execution.archive import verify_archive
+    from circuit_harness.execution.jobs import job_timings, submit_vabench
 
     pin, candidate = protocol_vendor
     root, archive = tmp_path / "jobs", tmp_path / "archives"
@@ -211,7 +211,7 @@ def test_vabench_archives_negative_evidence_and_replay_timings(protocol_vendor, 
 
 
 def test_pinned_scorer_change_is_rejected_before_submission(protocol_vendor, tmp_path):
-    from alphaapollo.common.execution.chips.jobs import submit_vabench
+    from circuit_harness.execution.jobs import submit_vabench
 
     pin, candidate = protocol_vendor
     scorer = Path(pin["source"]) / "runners/agent_harness.py"
@@ -223,7 +223,7 @@ def test_pinned_scorer_change_is_rejected_before_submission(protocol_vendor, tmp
 
 @pytest.mark.parametrize("cancel", [False, True])
 def test_vabench_timeout_and_cancel_are_not_candidate_failures(protocol_vendor, tmp_path, cancel):
-    from alphaapollo.common.execution.chips.jobs import cancel_job, submit_vabench, verify_job
+    from circuit_harness.execution.jobs import cancel_job, submit_vabench, verify_job
 
     pin, candidate = protocol_vendor
     (candidate / "dut.va").write_text("sleep")
@@ -237,7 +237,7 @@ def test_vabench_timeout_and_cancel_are_not_candidate_failures(protocol_vendor, 
 
 
 def test_runtime_explicitly_selects_r53_without_inheriting_operator_secrets():
-    from alphaapollo.common.execution.chips.vabench import runtime_env
+    from circuit_harness.execution.vabench import runtime_env
 
     env = runtime_env("/private/venv/bin/python")
     assert env["VABENCH_EVAS_PROFILE"] == "r53"
@@ -245,7 +245,7 @@ def test_runtime_explicitly_selects_r53_without_inheriting_operator_secrets():
 
 
 def test_public_export_contains_no_evaluator_or_score_material(protocol_vendor, tmp_path):
-    from alphaapollo.common.execution.chips.vabench import export_vabench
+    from circuit_harness.execution.vabench import export_vabench
 
     pin, _ = protocol_vendor
     output = tmp_path / "model-public"

@@ -1,5 +1,0 @@
-# AgentVerifier adapter. The referenced runtime is independently composed under
-# runtimes.verifier_runtime by the Workflow composition root.
-type: agent
-options:
-  runtime: verifier_runtime

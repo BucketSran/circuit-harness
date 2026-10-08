@@ -6,8 +6,8 @@ import sys
 
 import pytest
 
-from alphaapollo.common.execution.chips.bundle import build_cli
-from alphaapollo.workflows import chips
+from circuit_harness import cli as chips
+from circuit_harness.execution.bundle import build_cli
 
 
 @pytest.mark.parametrize("task_id", [None, "rlc-broadband-50-to-200-match"])

@@ -14,7 +14,7 @@ import platform
 import shutil
 import stat
 import subprocess
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from urllib.parse import urlsplit
 
@@ -156,7 +156,7 @@ def main() -> int:
     args = parser.parse_args()
     report = {
         "schema_version": 1,
-        "captured_at_utc": datetime.now(timezone.utc).isoformat(),
+        "captured_at_utc": datetime.now(UTC).isoformat(),
         "acceptance": "not_evaluated",
         "host": {
             "system": platform.system(),

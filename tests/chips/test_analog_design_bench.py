@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from alphaapollo.common.execution.chips import analog_design_bench as adb
+from circuit_harness.execution import analog_design_bench as adb
 
 
 def test_tree_digest_detects_changed_or_extra_verifier_file(tmp_path: Path) -> None:
