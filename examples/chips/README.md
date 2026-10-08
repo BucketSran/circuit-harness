@@ -1,6 +1,6 @@
 # 电路示例
 
-首次实验从 [AnalogBench RLC 快速开始](../../docs/chips/ANALOG_QUICKSTART.md)开始，随后可以运行 SKY130 OTA 或 [EVAS VA07 候选重放](../../docs/chips/EVAS_QUICKSTART.md)。接入自己的任务按[开发者指南](../../docs/chips/INTEGRATION.md)准备，再使用 [Harbor 模板](harbor/README.md)。
+首次实验从 [AnalogBench RLC 快速开始](../analogbench/README.md)开始，随后可以运行 SKY130 OTA 或 [EVAS VA07 候选重放](../evas-va07/README.md)。接入自己的任务按[开发者指南](../../docs/guides/integration.md)准备，再使用 [Harbor 模板](harbor/README.md)。
 
 直接操作者工具包括 [EMX](emx/README.md)、[ngspice RC](../../docs/chips/NGSPICE.md)、[Spectre RC](../../docs/chips/SPECTRE_RC.md)、[VABench](../../docs/chips/VABENCH.md)、[Analog Design Bench](../../docs/chips/ANALOG_DESIGN_BENCH.md) 和[任务构建](task_authoring/README.md)。
 

@@ -13,26 +13,26 @@ Circuit Harness 是面向开发者的电路智能体实验框架。你可以接�
 
 ## 跑第一个实验
 
-从 [AnalogBench 快速开始](docs/chips/ANALOG_QUICKSTART.md)运行一个 100 MHz 无源滤波器任务。它只需要 R、L、C 与 ngspice，不需要 PDK 或商业许可证。先用参考解检查运行环境，再提供模型连接运行 Agent。示例引用固定版本的外部任务，保留原题面和评分规则。
+从 [AnalogBench 快速开始](examples/analogbench/README.md)运行一个 100 MHz 无源滤波器任务。它只需要 R、L、C 与 ngspice，不需要 PDK 或商业许可证。先用参考解检查运行环境，再提供模型连接运行 Agent。示例引用固定版本的外部任务，保留原题面和评分规则。
 
 要求 Python 3.12+ 与可用的 Docker。Harbor 固定为 0.23.0。
 
 ```bash
 python -m pip install -e '.[harbor]'
-python -m circuit_harness.harbor.analog_example --help
+python -m circuit_harness.benchmarks.analogbench --help
 ```
 
 | 示例 | 仿真与评测 | 用途 |
 | --- | --- | --- |
-| [A：AnalogBench RLC](docs/chips/ANALOG_QUICKSTART.md) | ngspice，原任务 verifier，无 PDK | 首次准备任务并运行 Harbor |
-| [B：AnalogBench SKY130 OTA](docs/chips/ANALOG_QUICKSTART.md) | ngspice、开源 SKY130 模型，原任务 verifier | 接入需要工艺模型的晶体管电路 |
-| [EVAS：vaBench VA07](docs/chips/EVAS_QUICKSTART.md) | 固定 EVAS 源码，benchmark 自有八例 checker | 重放保存候选，查看开发版后端的评分和不可评原因 |
+| [A：AnalogBench RLC](examples/analogbench/README.md) | ngspice，原任务 verifier，无 PDK | 首次准备任务并运行 Harbor |
+| [B：AnalogBench SKY130 OTA](examples/analogbench/README.md) | ngspice、开源 SKY130 模型，原任务 verifier | 接入需要工艺模型的晶体管电路 |
+| [EVAS：vaBench VA07](examples/evas-va07/README.md) | 固定 EVAS 源码，benchmark 自有八例 checker | 重放保存候选，查看开发版后端的评分和不可评原因 |
 
 EVAS 示例是开发版评测路径，其结果不能代替任务声明的正式 Spectre 成绩。每个示例分别说明已验证的运行层级和限制，参考解通过也不表示某个 Agent 已解出该题。
 
 ## 接入你的实验
 
-按[开发者接入指南](docs/chips/INTEGRATION.md)准备任务、公开工具和 verifier，再选择 Agent、模型及部署方式。
+按[开发者接入指南](docs/guides/integration.md)准备任务、公开工具和 verifier，再选择 Agent、模型及部署方式。
 
 - **Benchmark** 提供题面、候选接口、评测条件和 checker。可以引用 AnalogBench、接入 vaBench，或编写自己的 Harbor 任务。
 - **仿真器** 按任务需要选择。已有 ngspice、EVAS、Spectre 等具体执行接口；新后端需要适配其输入、输出与错误语义。不同仿真器的分析能力和模型语法并不通用。
@@ -57,6 +57,6 @@ EVAS 示例是开发版评测路径，其结果不能代替任务声明的正式
 
 ## 参与开发
 
-Python 包名是 `circuit_harness`，命令行入口是 `circuit-harness`。执行代码在 `circuit_harness/execution/`，Harbor 接入在 `circuit_harness/harbor/`，训练数据准备在 `circuit_harness/data/`。训练器由使用者另行选择。
+Python 包名是 `circuit_harness`，命令行入口是 `circuit-harness`。benchmark 准备与候选重放在 `circuit_harness/benchmarks/`，执行代码在 `circuit_harness/execution/`，Harbor 插件在 `circuit_harness/harbor/`，训练数据准备在 `circuit_harness/data/`。训练器由使用者另行选择。
 
 默认分支为 `main`。开发约定见 [AGENTS.md](AGENTS.md) 和[开发 SOP](docs/chips/DEVELOPMENT_SOP.md)，检查入口见[测试说明](tests/chips/README.md)。

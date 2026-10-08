@@ -3,6 +3,7 @@
 Read the [Circuit Harness glossary](../../GLOSSARY.md) for the platform's terminology.
 Use the affected component's contract as the behavior authority:
 
+- [Integration guide](../guides/integration.md): benchmark adapters, task execution paths and experiment setup.
 - [Execution module guide](../../circuit_harness/execution/README.md): simulator,
   session, transport and evidence interfaces.
 - [Development SOP](../chips/DEVELOPMENT_SOP.md): development, acceptance and delivery rules.
