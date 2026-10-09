@@ -61,6 +61,19 @@ python3.12 chips-agent.pyz analog-public \
 创建会话时固定任务源、运行镜像及预算，随后通过 `analog-info` 查看会话合同。
 这些是操作者接口；Agent 实验与模型连接按 Harbor 任务配置，不使用本页会话作为通用 Agent runner。
 
+例如，显式选择宽带题，避免使用默认的 100 MHz 题：
+
+```bash
+python3.12 chips-agent.pyz analog-session \
+  --task-id rlc-broadband-50-to-200-match \
+  --source-root "$CHIPS_SOURCE_ROOT" \
+  --output "$CHIPS_RUN_ROOT/broadband-session-001" \
+  --runtime-image "$RUNTIME_IMAGE_ID" \
+  --offline-image-archive "$IMAGE_TAR" \
+  --podman-single-id --podman-no-cpu-limit \
+  --max-actions 40 --max-simulations 8
+```
+
 新会话为 schema v3，记录 `task_contract_sha256`；任务接口发生漂移时拒绝继续。
 旧 v1/v2 仅兼容原 100 MHz 题，不允许把历史会话改名为宽带题。
 两题的真实上游文件已通过本地离线部署包的建会话、读写、历史恢复、提交和归档校验；

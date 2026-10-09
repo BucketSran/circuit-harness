@@ -47,8 +47,10 @@ python -m circuit_harness.reporting.episode \
 缺少内容或摘要时保持未知。候选 diff 只比较已记录版本，第一份写入不假定为
 官方 starter。独立评分遵循原归档核验器，不将 Agent 自报或工具退出码当成成绩。
 
-Pi 逐响应 usage 与 Codex 回合累计 usage 分别解释。reasoning 属于 output 的细项，
-不重复相加；缺少账单或逐请求信息时，用量和费用保持未知。
+Pi 按已记录的逐响应 usage 汇总，并保留字段覆盖范围；Codex 的 outcome usage
+按原值保存为 `reported_outcome_usage`，不默认它是整个 Episode 的总用量。
+reasoning 属于 output 的细项，不重复相加；缺少账单或逐请求信息时，
+未覆盖的用量和费用保持未知。
 
 对应检查是 `tests/chips/test_episode_report.py`。
 它们验证保存文件的读取和展示，不调用真实模型或仿真器。
