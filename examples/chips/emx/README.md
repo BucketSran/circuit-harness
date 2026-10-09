@@ -64,6 +64,7 @@ require a scheduler/container backend, outside this phase.
 pytest -q tests/chips/test_simulator.py tests/test_cli.py
 ```
 
-The old Apollo `emx_simulate` bridge has been retired. The commands above remain
-operator tools; expose a new Agent-facing EMX task only after defining its public
-feedback and independent verifier. See [migration](../../../docs/chips/MIGRATION.md).
+The commands above are operator interfaces. To connect an Agent, define a Harbor
+task with explicit public feedback and an independent verifier under the
+[integration guide](../../../docs/guides/integration.md). A successful EMX process
+does not establish circuit correctness.

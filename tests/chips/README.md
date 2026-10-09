@@ -8,7 +8,7 @@
 - `test_vabench*.py`、`test_analog*.py` 保留固定任务、公开会话、冻结、终评和归档边界。它们不调用真实模型或实验室服务器。
 - `test_task_authoring.py` 检查草稿来源、确认、单位与操作者 CLI。
 - `test_episode_report.py` 检查旧轨迹离线读取、HTML 转义、缺失证据与归档校验。
-- [test_standalone.py](../test_standalone.py) 阻止 Apollo/verl 导入，检查新 CLI 与 Harbor 插件。
+- [test_standalone.py](../test_standalone.py) 检查独立包依赖边界、CLI 与 Harbor 插件。
 - [wheel_smoke.py](../wheel_smoke.py) 在隔离环境安装 wheel，在仓库之外检查 CLI、资源和纯标准库 zipapp。
 - `tests/test_analog_example.py` 和 `tests/test_evas_example.py` 检查入门任务的准备、配置与证据读取边界。真实 ngspice 与 EVAS 控制实验另见 [Analog 入门](../../docs/chips/ANALOG_QUICKSTART.md)和 [EVAS 入门](../../docs/chips/EVAS_QUICKSTART.md)，这些回归不发送模型请求。
 
@@ -54,8 +54,8 @@ python -m pip wheel --no-deps . --wheel-dir dist
 python tests/wheel_smoke.py dist/circuit_harness-0.1.0-py3-none-any.whl
 ```
 
-缺少可选软件或指定镜像时报告 skip。容器测试不自动拉取镜像；macOS Docker 的临时目录须在 daemon 可挂载范围，必要时指定新的 ignored `--basetemp`。CI 的 CPU SFT job 独立安装 Torch/Transformers，无 verl 子模块。
+缺少可选软件或指定镜像时报告 skip。容器测试不自动拉取镜像；macOS Docker 的临时目录须在 daemon 可挂载范围，必要时指定新的 ignored `--basetemp`。CI 的 CPU SFT job 独立安装 Torch/Transformers，不依赖训练器子模块。
 
 `probes/host_snapshot.py`、`storage_compare.py`、`vabench_smoke.py` 和 SSH 断线探针只在明确的主机、存储与预算授权下调用。保存原始证据到私有运行目录。探针存在不代表对应实验已运行。
 
-Apollo 通用 runtime、旧 Agent/批次入口和训练器的测试随功能退役；电路协议回归保留。具体范围见[迁移说明](../../docs/chips/MIGRATION.md)。历史运行记录见 [VALIDATION](../../docs/chips/VALIDATION.md)。
+测试范围按当前组件职责选择，见[仓库范围](../../docs/chips/REPOSITORY_SCOPE.md)。已有真实运行及其版本边界见[验证记录](../../docs/chips/VALIDATION.md)。

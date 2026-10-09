@@ -75,4 +75,4 @@ python -m circuit_harness.task_authoring verify \
 
 ## Agent 自动构建
 
-原 Apollo Codex 两阶段 runner 已退役。上面的草稿、确认、来源校验与有界构建接口保留，见[迁移说明](../../../docs/chips/MIGRATION.md)。将它们接入新的 Harbor task 时，须独立声明公开反馈与私有评分，不能把历史单例预试当作新任务验收。
+上面的草稿、确认、来源校验与有界构建接口属于操作者工具。接入新的 [Harbor task](../../../docs/guides/integration.md) 时，分别声明公开反馈与私有评分；历史单例预试不能代替新任务验收。

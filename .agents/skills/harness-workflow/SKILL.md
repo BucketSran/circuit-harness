@@ -40,6 +40,7 @@ defines the local adaptations to shared defaults.
 Use pstack methods for their specific need: `blast-radius` for consequential shared changes,
 `benchmark-checklist` for measured performance, `correct` for evidenced recurrence,
 `show-me-your-work` for substantial multi-stage/unattended work, and `unslop` for prose.
+For documentation, locate its owner through the [documentation index](../../../docs/README.md).
 Use `writing-for-agents` for instructions, `technical-writing` for human-facing docs,
 and `diagnosing-bugs` for a debugging task. These are conditional entries, not a checklist
 to invoke for every change.

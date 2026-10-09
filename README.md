@@ -63,4 +63,4 @@ EVAS 示例是开发版评测路径，其结果不能代替任务声明的正式
 
 Python 包名是 `circuit_harness`，命令行入口是 `circuit-harness`。benchmark 准备与候选重放在 `circuit_harness/benchmarks/`，执行代码在 `circuit_harness/execution/`，Harbor 插件在 `circuit_harness/harbor/`，训练数据准备在 `circuit_harness/data/`。训练器由使用者另行选择。
 
-默认分支为 `main`。开发约定见 [AGENTS.md](AGENTS.md) 和[开发 SOP](docs/chips/DEVELOPMENT_SOP.md)，检查入口见[测试说明](tests/chips/README.md)。
+完整文档见[文档导航](docs/README.md)。默认分支为 `main`。开发约定见 [AGENTS.md](AGENTS.md) 和[开发 SOP](docs/chips/DEVELOPMENT_SOP.md)，检查入口见[测试说明](tests/chips/README.md)。

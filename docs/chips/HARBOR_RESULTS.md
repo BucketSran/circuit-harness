@@ -111,7 +111,7 @@ Spectre 分数来自 `verifier/transport/*/archive`，通过现有 `verify_archi
 | 批次 `score_count` / `score_mean` | `score_denominator` / `mean_score` | 均只使用有效独立分数 |
 | 用量和费用 | `usage` | 采用原生保存值，缺失保持未知 |
 
-旧版本记录不改写；`chips_experiment`、`chips_evaluate` 启动器已退役，见[迁移说明](MIGRATION.md)。
+以上是保存记录的字段对应，不是启动命令或配置转换器。当前运行由 Harbor 管理；保留原始证据，不改写旧记录。
 
 ## 验证范围
 

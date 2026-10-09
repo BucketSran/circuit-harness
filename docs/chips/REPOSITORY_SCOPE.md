@@ -1,8 +1,8 @@
 # circuit-harness 仓库范围
 
-本仓库维护独立的电路实验平台。模块职责见 [README](../../README.md)，有意收缩的旧 API、配置与调用方迁移见 [MIGRATION](MIGRATION.md)。
+本仓库维护独立的电路实验平台。模块职责与使用入口见 [README](../../README.md)和[文档导航](../README.md)。
 
-保留电路执行、公开会话、独立 verifier、Harbor 集成、离线报告与 ATIF 数据接口。Apollo runtime、通用 Workflow、Robotics、Memory 和内置训练器已经移除。固定 VABench r53 的执行协议与旧 Episode 读取能力保留。
+仓库包含 benchmark 适配、电路执行、公开会话、独立 verifier、Harbor 集成、离线报告与 ATIF 数据接口。Harbor 负责实验调度与 Agent 执行；训练器由使用者提供。固定 VABench r53 协议和兼容 Episode 读取能力继续维护。
 
 清理后的源码仍需本地回归和安装包检查；这些检查不能认证真实模型、EDA 许可证或新任务成绩。历史实测条件见 [VALIDATION](VALIDATION.md)。
 
@@ -11,7 +11,7 @@
 ## 公开源码与私有材料
 
 Python distribution 是 `circuit-harness`，导入包是 `circuit_harness`。
-包名迁移不改变任务评分规则；运行路径与安装方式见迁移说明。公开仓库的首次提交是审查后的源码快照；
+安装方式见[安装指南](../../INSTALL.md)，任务评分规则由 benchmark 声明。公开仓库的首次提交是审查后的源码快照；
 完整研发历史、旧 Issue/PR 和 Actions 记录留在私有的 `circuit-harness-private`。
 指向该仓库的历史链接需要原有权限，不能当作本公开仓库的同号议题。
 

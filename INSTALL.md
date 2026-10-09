@@ -19,4 +19,4 @@ circuit-harness --help
 | `sft` | CPU/GPU PyTorch Dataset 与本地 tokenizer 验证，不含训练器 |
 | `dev` | pytest、Ruff、Parquet 与测试使用的 MCP 客户端 |
 
-开发安装 `.[dev,harbor,chips,sft]`，检查步骤见 [测试入口](tests/chips/README.md)。只安装所需 extras；直接 CLI 和服务器 zipapp 不加载 Harbor 或训练库。实验还需要对应的 EVAS checkout、镜像、仿真器、模型凭据与私有任务配置，见 [部署说明](docs/chips/HARBOR_DEPLOYMENT.md)。
+开发安装 `.[dev,harbor,chips,sft]`，检查步骤见 [测试入口](tests/chips/README.md)。只安装所需 extras；直接 CLI 和服务器 zipapp 不加载 Harbor 或训练库。实验还需要对应的 EVAS checkout、镜像、仿真器、模型凭据与私有任务配置，见[开发者接入指南](docs/guides/integration.md)。全部文档见[文档导航](docs/README.md)。

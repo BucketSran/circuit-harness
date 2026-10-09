@@ -1,4 +1,4 @@
-# Chips 测试记录模板
+# Circuit Harness 测试记录模板
 
 复制到本人私有的 `runs/chips/validation/<run-id>/record.md` 或部署归档位置后填写。
 这是记录模板，不会执行命令或授予外部操作权限。对外只分享审查过的脱敏版本。

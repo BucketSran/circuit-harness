@@ -152,25 +152,17 @@ Git 管理的临时目录在确认可退役后通过 Git 移除。同步后更�
 
 ## 当前真实实验主线
 
-新电路任务使用 [Harbor 集成](HARBOR.md)：Harbor 负责 Agent、Job 和 Trial，Harness
-提供公开会话、冻结候选和私有终评。Agent 与 Model 分别配置，支持的协议组合由配置编译器校验。
-runner 可以在本机或服务器；公开 EVAS 与独立终评按实际部署连接，不强制先在本机解题再上传。
-服务器可使用 Pi 与 GLM，Codex 不是服务器部署的前置条件。
+按[接入指南](../guides/integration.md)选择任务执行路径。原生 Harbor 任务保留环境与 checker；
+公开会话补充受控仿真、候选冻结与私有终评。Harbor 负责 Agent、Job 和 Trial，Agent 与 Model 分别配置。
+runner 可以在本机或服务器；Pi 与 GLM 的服务器运行不要求本地 Codex 参与。
 
-当前主线使用公开 EVAS；独立终评选择任务已经声明和校准的 Spectre 或开源 checker。
-公开 Spectre 是可选扩展（[历史私有议题 #6](https://github.com/BucketSran/circuit-harness-private/issues/6)），
-不是当前 EVAS 主线的验收前置。任务判据与 EVAS 算法仍归 benchmark 与 vaEVAS。
-各部署、任务和 Agent/Model 组合分别留证；一条路径成功不代表其他组合已验收。
+任务判据归 benchmark，EVAS 算法归 vaEVAS，执行与证据归 Harness。
+公开工具与终评可使用不同后端，按任务声明和校准条件验收；各部署与组合分别留证。
 
-固定 vaBench、Analog 的操作者会话及 Harbor 原生 Codex 路径继续按受影响范围回归。
-旧 Apollo Agent runner 已退役，调用方切换按[迁移说明](MIGRATION.md)验收。
-当前方向见[路线图](ROADMAP.md)，具体任务沿用已确认的 Issue 或用户要求。
-会话与作业通过 run、action、job ID 和候选摘要关联证据，回收后核验完整性。
-Agent loop 与生命周期交给 Harbor。原生 Codex 的原生工具限制仍须遵守，
-不删除校验来伪造工具独占，也不把受控 `tool_loop` 迁移设为现有 Codex／SSH 链路的前置条件。
-旧草案若默认所有 Agent 都在服务器上运行，应先修订条件再执行；不沿用过时的实验矩阵。
-实验开始前按 [调用链约定](EXPERIMENT_PROTOCOL.md) 核对版本、权限、预算与证据位置。
-撰写计划、已有凭据或存在历史成功记录，都不自动授权启动新实验。
+固定 vaBench、Analog 操作者协议和主机原生 Codex 接口继续按受影响范围回归。
+保留原生工具限制；受控电路入口不表示 Agent 的其他工具被禁用。
+实验前按[调用链约定](EXPERIMENT_PROTOCOL.md)核对版本、权限、预算与证据位置。
+计划、已有凭据或历史成功记录不自动授权新实验。
 
 ## 1. 先定义这次要验证的行为
 
@@ -245,7 +237,7 @@ CI 的测试报告仅含本地检查；Artifacts 有保留期限，需要长期�
 ## 6. 完成交付
 
 运行受影响的 Chips 检查和必要静态检查，检查 diff；只有跨通用边界的实际风险才扩大测试。
-本项目不因流程要求启动 Bio/Robotics/Math 领域评测。
+按实际受影响的组件选择验收范围。
 按 [PR 交付规则](#delivery-and-review) 提供改动、复现命令、实际检查和未验证项，
 在已有 Issue/PR 留下源码身份、下一项依赖及 [工作区交接状态](#workspace-handoff)。
 文档／skill 重构检查指令触发、正文与 UI 元数据一致性、链接及目标提交中的文件可用性；

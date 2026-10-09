@@ -1,9 +1,9 @@
 # VABench / vaEVAS 接入
 
-Chips 使用 vaEVAS-next 的 VABench v4/r53 和 EVAS 0.8.7，执行冻结提交的独立回放。
+固定回放使用 vaEVAS-next 的 VABench v4/r53 和 EVAS 0.8.7，执行冻结提交的独立回放。
 原项目负责公开任务导出、artifact gate、提交冻结、评分规则及不可变 score sidecar；
-Chips 负责版本固定、后台作业、超时/取消、事件日志与产物回收。
-固定回放入口是 **operator CLI**；另有 [公开工具与 Pi 闭环](VABENCH_AGENT.md)。
+Harness 负责版本固定、后台作业、超时/取消、事件日志与产物回收。
+固定回放入口是操作者 CLI。新的 Agent 实验按[开发者接入指南](../guides/integration.md)准备 Harbor task，公开会话与独立终评分开绑定。
 可信评分器始终不注册为模型可调用的 Tool。
 
 首批验收是 family 001 的 DUT、bugfix、Testbench 三种任务及正负例。
@@ -22,14 +22,14 @@ EVAS 是电压域行为级 Verilog-A 仿真器；此处的结果不能标成 Spe
 跨平台下载时还需显式指定平台、Python 与 ABI，其他平台必须单独安装验收。
 Linux 发行 wheel 包含 Rust 动态库，仍需实际检查 `evas --version` 与案例运行，
 不能只凭 pip 安装成功就声称求解器可用。保存 wheel SHA-256、安装日志及完整依赖版本。
-没有要求在服务器安装 Apollo 的训练或模型依赖；Chips CLI zipapp 本身只使用标准库。
+服务器 CLI zipapp 只使用标准库，仿真器环境独立部署。
 
 参考源码提交：`0685aae05c346e8e60f33ba48e2f64daff54d4f2`。
 源码和数据放在本人 0700 根目录，按 [部署规范](DEPLOYMENT.md) 管理。
 可以部署完整固定 checkout；如果 NFS 上小文件操作慢，可使用经过哈希记录的依赖子集。
 子集须保留原路径及原始字节：根 `runners/`、包内 `runners/scripts/operations` Python 源码、
 r53 共享配置与所选完整任务目录。保留完整 MANIFEST/TASK_INDEX 不表示所有任务已经部署。
-不得编辑封存 release、金标准、fault 或原评分器来适应 Chips。
+不得编辑封存 release、金标准、fault 或原评分器来适应 Harness。
 
 在仿真器主机上执行（以下均为占位路径）：
 
@@ -123,9 +123,7 @@ python3.12 vabench_smoke.py check --cli /private/chips.pyz \
   --root /private/validation/new-vabench-smoke
 ```
 
-公开 EVAS Tool 与 Pi 脚本闭环已接通；GLM 5.3 Flash 的 `v4-001` 单任务闭环已通过独立终评。
-后续扩展任务集时仍须保持固定任务、可见输入、预算、提交和最终评分，
-分别记录模型、Agent 与 Tool；r53 正式条件不允许跨任务 memory。
-Spectre 仍是独立的条件审计：可复用原 staging/PSF 解析，但原 labctl 的上传→仿真→下载→清理循环
-需要适配服务器自主收尾。lab-server 专用环境已通过单次无 PDK RC 仿真，
-但当前 VABench 接入不宣称这条商业后端已经通过。
+固定 r53 的公开动作和独立回放按本页协议执行；当前 Harbor 接入需要分别准备
+公开材料与 final package，见[任务绑定](HARBOR_TASKS.md)。EVAS0.8.7 的历史结果不能
+认证当前 EVAS 源码或任意任务，已观察范围见[验证记录](VALIDATION.md)。
+Spectre 使用独立任务包与判据接入，不能把这里的 EVAS 回放成绩改标为 Spectre 成绩。

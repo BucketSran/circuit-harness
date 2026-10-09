@@ -2,6 +2,7 @@
 
 可选集成要求 Python 3.12 或更新版本，以及 Harbor 0.23.0。
 `profiles` 把独立的 Agent 设置和 Model 协议连接编译为 Harbor JobConfig。
+原生 Harbor 任务保留自身环境与 verifier；下面的会话插件用于需要受控仿真和候选冻结的任务。
 `CircuitDockerEnvironment` 和 `CircuitPodmanEnvironment` 提供公开电路工具，`CircuitAgent` 委托 stock Harbor Agent，
 并在 Agent 阶段结束时关闭公开动作入口、冻结候选。
 `FrozenCandidateVerifier` 使用独立私有配置评价已冻结候选。
