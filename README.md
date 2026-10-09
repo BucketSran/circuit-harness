@@ -47,20 +47,20 @@ EVAS 示例是开发版评测路径，其结果不能代替任务声明的正式
 
 | 需要 | 入口 |
 | --- | --- |
-| 配置 Agent 与模型 | [Harbor 配置](docs/chips/HARBOR.md) |
-| 将公开工具与私有评分材料分开 | [公开会话](docs/chips/CURRENT_EVAS_PUBLIC_SESSION.md)、[任务绑定](docs/chips/HARBOR_TASKS.md) |
-| 本地、服务器及许可证环境 | [部署步骤](docs/chips/HARBOR_DEPLOYMENT.md)、[独立终评](docs/chips/BENCHMARK_EVALUATION.md) |
-| 查看结果与准备训练数据 | [结果报告](docs/chips/HARBOR_RESULTS.md)、[ATIF 数据](circuit_harness/data/README.md) |
+| 配置 Agent 与模型 | [Harbor 配置](docs/reference/HARBOR.md) |
+| 将公开工具与私有评分材料分开 | [公开会话](docs/reference/CURRENT_EVAS_PUBLIC_SESSION.md)、[任务绑定](docs/reference/HARBOR_TASKS.md) |
+| 本地、服务器及许可证环境 | [部署步骤](docs/guides/HARBOR_DEPLOYMENT.md)、[独立终评](docs/reference/BENCHMARK_EVALUATION.md) |
+| 查看结果与准备训练数据 | [结果报告](docs/guides/HARBOR_RESULTS.md)、[ATIF 数据](circuit_harness/data/README.md) |
 | 直接调用仿真器或重放候选 | [执行模块](circuit_harness/execution/README.md)、[其他示例](examples/chips/README.md) |
 
 ## 公共代码与私有配置
 
 仓库保存适配代码、示例准备脚本、安全模板和合成测试。外部任务、PDK、真实服务器配置、许可证、模型密钥与运行产物分别保存在操作者的私有目录。`.gitignore` 覆盖 `private/`、`runs/`、`.env` 和 `*.local.json` 等常见位置；运行时还需要控制 Agent 能读取的文件，Git 忽略规则不能代替隔离。
 
-框架代码采用 [Apache License 2.0](LICENSE)，来源声明见 [Notice.txt](Notice.txt)。外部 benchmark 内容、仿真器和 PDK 适用各自的许可证。提供商业仿真器适配代码不包含该软件、工艺库或使用许可。来源和发布规则见[发布边界](docs/chips/REPOSITORY_SCOPE.md#publication-boundary)。
+框架代码采用 [Apache License 2.0](LICENSE)，来源声明见 [Notice.txt](Notice.txt)。外部 benchmark 内容、仿真器和 PDK 适用各自的许可证。提供商业仿真器适配代码不包含该软件、工艺库或使用许可。来源和发布规则见[发布边界](docs/development/REPOSITORY_SCOPE.md#publication-boundary)。
 
 ## 参与开发
 
 Python 包名是 `circuit_harness`，命令行入口是 `circuit-harness`。benchmark 准备与候选重放在 `circuit_harness/benchmarks/`，执行代码在 `circuit_harness/execution/`，Harbor 插件在 `circuit_harness/harbor/`，训练数据准备在 `circuit_harness/data/`。训练器由使用者另行选择。
 
-完整文档见[文档导航](docs/README.md)。默认分支为 `main`。开发约定见 [AGENTS.md](AGENTS.md) 和[开发 SOP](docs/chips/DEVELOPMENT_SOP.md)，检查入口见[测试说明](tests/chips/README.md)。
+完整文档见[文档导航](docs/README.md)。默认分支为 `main`。开发约定见 [AGENTS.md](AGENTS.md) 和[开发 SOP](docs/development/DEVELOPMENT_SOP.md)，检查入口见[测试说明](tests/chips/README.md)。

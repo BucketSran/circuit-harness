@@ -7,7 +7,7 @@ PRs as an external request surface: off.
 
 ## Work and completion
 
-Start with the [roadmap](../chips/ROADMAP.md), [next work](../chips/NEXT_WORK.md) and the
+Start with the [roadmap](../development/ROADMAP.md), [next work](../development/NEXT_WORK.md) and the
 current public issue for the task. Reuse accepted scope instead of creating duplicate trackers.
 Pre-publication issues and PRs remain in `circuit-harness-private` and require its access
 permission. Their numbers are not public issue IDs; never use them as unqualified closing references.
@@ -33,7 +33,7 @@ Search both open and closed work for a new contribution; reuse that search for t
 Read full bodies and relevant discussion before updating. Every PR body creation/update uses
 shared `pr`, mapped into the project template.
 
-Publication and human review follow the [delivery policy](../chips/DEVELOPMENT_SOP.md#delivery-and-review).
+Publication and human review follow the [delivery policy](../development/DEVELOPMENT_SOP.md#delivery-and-review).
 Use exact issue references in closing keywords only when completion is justified. Preserve
 raw evidence and machine-specific information in private storage; publish safe summaries.
 

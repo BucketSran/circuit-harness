@@ -41,6 +41,6 @@ State what was inspected, checks actually run and coverage limits; no findings i
 of untested lab/model behavior. The coordinator validates and prioritizes actionable findings.
 
 A review request inspects and reports. Repair, publication and merging follow the current
-task's authorization and [delivery policy](../../../docs/chips/DEVELOPMENT_SOP.md#delivery-and-review).
+task's authorization and [delivery policy](../../../docs/development/DEVELOPMENT_SOP.md#delivery-and-review).
 Implementation tasks include fixing actionable findings, checking the affected behavior and
 refreshing the reviewed revision. Ordinary completion does not trigger the three-round hardening skill.

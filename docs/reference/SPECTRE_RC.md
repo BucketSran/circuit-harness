@@ -39,4 +39,4 @@ python3 chips-agent.pyz verify-archive /private/persistent/chips-spectre-archive
 
 进程超时、取消、输出缺失或许可证 `SPECTRE-209` 都标为 `not_evaluated`，不会混作电路失败。许可证错误归类为 `infrastructure_error`。配置或工作环境在提交后变化，会拒绝运行并保留诊断证据。服务器宕机/进程被外部杀死后的不完整作业不会自动重启；须先人工检查再换 ID。此处不是 PDK signoff、VABench Spectre Tool，也没有做多人共享账号的权限验收。
 
-真实主机、管理员脚本路径、许可证变量及原始仿真日志属于私有部署信息，不放入本仓库。个人验收见[验证记录](VALIDATION.md)；构造夹具见[测试](../../tests/chips/test_spectre_rc.py)。
+真实主机、管理员脚本路径、许可证变量及原始仿真日志属于私有部署信息，不放入本仓库。个人验收见[验证记录](../validation/VALIDATION.md)；构造夹具见[测试](../../tests/chips/test_spectre_rc.py)。

@@ -1,6 +1,6 @@
 # Circuit Harness 测试入口
 
-按受影响边界选择测试。开发遵循 [SOP](../../docs/chips/DEVELOPMENT_SOP.md)；真实实验使用 [CASES](CASES.md) 和[记录模板](RECORD_TEMPLATE.md)，不能以本地夹具代替实验室证据。
+按受影响边界选择测试。开发遵循 [SOP](../../docs/development/DEVELOPMENT_SOP.md)；真实实验使用 [CASES](CASES.md) 和[记录模板](RECORD_TEMPLATE.md)，不能以本地夹具代替实验室证据。
 
 ## 执行与报告
 
@@ -10,7 +10,7 @@
 - `test_episode_report.py` 检查旧轨迹离线读取、HTML 转义、缺失证据与归档校验。
 - [test_standalone.py](../test_standalone.py) 检查独立包依赖边界、CLI 与 Harbor 插件。
 - [wheel_smoke.py](../wheel_smoke.py) 在隔离环境安装 wheel，在仓库之外检查 CLI、资源和纯标准库 zipapp。
-- `tests/test_analog_example.py` 和 `tests/test_evas_example.py` 检查入门任务的准备、配置与证据读取边界。真实 ngspice 与 EVAS 控制实验另见 [Analog 入门](../../docs/chips/ANALOG_QUICKSTART.md)和 [EVAS 入门](../../docs/chips/EVAS_QUICKSTART.md)，这些回归不发送模型请求。
+- `tests/test_analog_example.py` 和 `tests/test_evas_example.py` 检查入门任务的准备、配置与证据读取边界。真实 ngspice 与 EVAS 控制实验另见 [Analog 入门](../../examples/analogbench/README.md)和 [EVAS 入门](../../examples/evas-va07/README.md)，这些回归不发送模型请求。
 
 ## 新平台的协议与隔离检查
 
@@ -34,9 +34,9 @@
 | `test_pi_trajectory.py` / `test_harbor_trajectory.py` / `test_atif_sft.py` | 原生 Pi 到 ATIF 的上下文、调用和可见输出；独立评分关联；SFT 选择、脱敏、去重和 split 边界 | Harbor 与 PyArrow；全部为本地夹具，不请求模型或仿真 |
 | [test_atif_dataset.py](../test_atif_dataset.py) | Parquet 工具结构、完整模板 token、assistant loss mask、截断拒绝及独立 Dataset 加载 | CPU tokenizer 夹具；需 Torch/Transformers，阻止导入旧训练器；CI 独立离线 job |
 
-任务和后端要求见[当前 EVAS 会话](../../docs/chips/CURRENT_EVAS_PUBLIC_SESSION.md)、
-[独立评测与回放](../../docs/chips/BENCHMARK_EVALUATION.md)和
-[Harbor 适配](../../docs/chips/HARBOR.md)。缺少工具或固定镜像时明确记录 skip，
+任务和后端要求见[当前 EVAS 会话](../../docs/reference/CURRENT_EVAS_PUBLIC_SESSION.md)、
+[独立评测与回放](../../docs/reference/BENCHMARK_EVALUATION.md)和
+[Harbor 适配](../../docs/reference/HARBOR.md)。缺少工具或固定镜像时明确记录 skip，
 测试不自动拉取镜像。Docker 的测试目录必须在 daemon 可挂载的文件系统内。
 macOS 的虚拟机后端可能不共享默认临时目录，此时把 pytest `--basetemp`
 指向 worktree 中一个新的、已被忽略的 `.planning/chips/` 子目录。
@@ -58,4 +58,4 @@ python tests/wheel_smoke.py dist/circuit_harness-0.1.0-py3-none-any.whl
 
 `probes/host_snapshot.py`、`storage_compare.py`、`vabench_smoke.py` 和 SSH 断线探针只在明确的主机、存储与预算授权下调用。保存原始证据到私有运行目录。探针存在不代表对应实验已运行。
 
-测试范围按当前组件职责选择，见[仓库范围](../../docs/chips/REPOSITORY_SCOPE.md)。已有真实运行及其版本边界见[验证记录](../../docs/chips/VALIDATION.md)。
+测试范围按当前组件职责选择，见[仓库范围](../../docs/development/REPOSITORY_SCOPE.md)。已有真实运行及其版本边界见[验证记录](../../docs/validation/VALIDATION.md)。

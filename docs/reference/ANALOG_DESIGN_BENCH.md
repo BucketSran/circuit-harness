@@ -109,7 +109,7 @@ python3.12 chips-agent.pyz analog-finalize \
 
 Podman 在无网络容器内挂载原版 `tests/test.sh`、候选快照和专用结果目录，并用只读根文件系统运行。这里使用的是**固定的上游基础镜像加挂载的原版任务脚本**，不是上游逐题构建的完整验证镜像。`--backend bubblewrap --ngspice "$NGSPICE_BIN"` 是无容器的替代路径；它保留上游评分脚本但使用指定的本机 ngspice 版本，不等同于固定镜像环境。OTA 的原生模式还要求上游 Sky130 模型和 checker 已在预期 `/opt` 路径，缺失时在仿真前报错。
 
-本任务的开发约定：Bubblewrap 用于快速 smoke、故障定位和与镜像结果核对；正式对照固定使用上述 Podman 镜像路径。每次运行只选一个 `--backend`，并在报告中保留后端与版本。Agent 不选择后端；`analog-bench` 始终是操作者侧评分器，公开诊断与会话动作另走上述入口。参见 [Chips 开发 SOP](DEVELOPMENT_SOP.md#3-区分测试层次)。
+本任务的开发约定：Bubblewrap 用于快速 smoke、故障定位和与镜像结果核对；正式对照固定使用上述 Podman 镜像路径。每次运行只选一个 `--backend`，并在报告中保留后端与版本。Agent 不选择后端；`analog-bench` 始终是操作者侧评分器，公开诊断与会话动作另走上述入口。参见 [Chips 开发 SOP](../development/DEVELOPMENT_SOP.md#3-区分测试层次)。
 
 `<run-id>/manifest.json` 记录源码提交/哈希、候选哈希、后端、镜像 digest 和原生仿真器版本；`inputs/circuit.spi` 是实际输入快照；`verifier.log` 与 `verifier/` 保留原始诊断和评分文件；`result.json` 给出执行状态、得分和归档位置。归档复制后逐文件校验；失败时保留 scratch 供恢复，不自动删除。原始输入、日志和参考电路留在私有归档，公开文档只发布经审核的摘要。
 
