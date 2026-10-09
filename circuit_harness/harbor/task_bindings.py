@@ -96,7 +96,7 @@ def content_identity(path):
 
 
 def _evas_source_identity(checkout):
-    from circuit_harness.execution.current_evas import EVAS_SOURCE, snapshot_repository
+    from circuit_harness.execution.backends.current_evas import EVAS_SOURCE, snapshot_repository
 
     with tempfile.TemporaryDirectory(prefix="harbor-evas-identity-") as directory:
         source = snapshot_repository(Path(checkout), Path(directory) / "source", EVAS_SOURCE)

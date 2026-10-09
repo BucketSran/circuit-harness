@@ -54,7 +54,7 @@ class FrozenCandidateVerifier(BaseVerifier):
             self.final_config = FinalEvaluationConfig.model_validate_json(path.read_text())
 
     async def evaluate(self, environment, candidate):
-        from circuit_harness.execution.benchmark_spectre import package_identity
+        from circuit_harness.execution.evaluation.benchmark_spectre import package_identity
 
         config = self.final_config
         if config is None:
@@ -71,7 +71,7 @@ class FrozenCandidateVerifier(BaseVerifier):
 
             result = await evaluate_replay(candidate, config, self.trial_paths.verifier_dir)
             return {"state": "completed", **result}
-        from circuit_harness.execution.benchmark_remote import RemoteBenchmarkSpectre
+        from circuit_harness.execution.transport.benchmark_remote import RemoteBenchmarkSpectre
 
         transport = RemoteBenchmarkSpectre(
             config.remote, self.trial_paths.verifier_dir / "transport"

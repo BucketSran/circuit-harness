@@ -17,7 +17,7 @@ class CircuitPodmanEnvironment(
 
         from harbor.environments.docker.docker import _sanitize_docker_compose_project_name
 
-        from circuit_harness.execution.journal import atomic_json
+        from circuit_harness.execution.runtime.journal import atomic_json
 
         super().__init__(*args, **kwargs)
         self._podman_project = _sanitize_docker_compose_project_name(self.session_id)

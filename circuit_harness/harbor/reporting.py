@@ -23,8 +23,8 @@ from harbor.models.trial.config import TrialConfig
 from harbor.models.trial.result import TrialResult
 from pydantic import BaseModel, ConfigDict, Field
 
-from circuit_harness.execution.candidate_bundle import verify_candidate
-from circuit_harness.execution.journal import file_digest
+from circuit_harness.execution.evaluation.candidate_bundle import verify_candidate
+from circuit_harness.execution.runtime.journal import file_digest
 
 from .config import FinalEvaluationConfig, PublicSessionConfig, require_harbor_version
 from .evidence import checked_evaluation as _checked_evaluation
@@ -169,7 +169,7 @@ def _public(config, task, path=None) -> dict:
 
 
 def _final(config, task, path=None) -> dict:
-    from circuit_harness.execution.benchmark_spectre import package_identity
+    from circuit_harness.execution.evaluation.benchmark_spectre import package_identity
 
     path = path or config.verifier.kwargs.get("config_path")
     if path is None:
@@ -396,7 +396,7 @@ def _project(record: AttemptRecord, directory: Path, trial_config: TrialConfig) 
         for key in ("backend", "image", "kernel_sha256", "codex_sha256", "python_sha256")
     }
     record.actual_conditions["public"]["source_sha256"] = _digest(session.get("source"))
-    from circuit_harness.execution.current_evas_session import tool_schemas
+    from circuit_harness.execution.sessions.current_evas_session import tool_schemas
 
     view_version = session.get("observation_view_version")
     if view_version not in (None, 1):

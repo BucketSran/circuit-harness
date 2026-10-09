@@ -5,7 +5,7 @@ import json
 import os
 from pathlib import Path
 
-from circuit_harness.execution.task_authoring import (
+from circuit_harness.execution.sessions.task_authoring import (
     confirm_draft,
     inspect_draft,
     require_confirmation,

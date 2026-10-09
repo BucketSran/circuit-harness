@@ -10,7 +10,7 @@ from harbor.models.task.config import NetworkMode, NetworkPolicy
 from harbor.verifier.verifier import Verifier
 
 from circuit_harness.benchmarks.analogbench import EXAMPLES
-from circuit_harness.execution.analog_design_bench import TASKS, tree_digest
+from circuit_harness.execution.evaluation.analog_design_bench import TASKS, tree_digest
 
 
 class AnalogDockerEnvironment(DockerEnvironment):

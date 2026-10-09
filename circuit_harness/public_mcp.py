@@ -202,7 +202,7 @@ def serve(directory: Path):
     from mcp.server.lowlevel import Server
     from mcp.server.stdio import stdio_server
 
-    from circuit_harness.execution.current_evas_session import (
+    from circuit_harness.execution.sessions.current_evas_session import (
         session_action,
         session_info,
     )
