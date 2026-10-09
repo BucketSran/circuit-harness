@@ -1,4 +1,4 @@
-# Chips 任务集与数据集入口
+# Circuit Harness 任务集与数据集入口
 
 这是电路 benchmark 的定义和登记入口。首次使用先运行 [AnalogBench 快速开始](../../analogbench/README.md)，EVAS 开发版评测见 [VA07 重放示例](../../evas-va07/README.md)。
 

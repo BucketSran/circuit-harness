@@ -200,3 +200,10 @@ B 的 Harbor Nop Agent 保持空 subcircuit starter，仿真前合法性检查�
 export ANALOG_EXAMPLE_SOURCES="$RLC_SOURCE:$SKY130_SOURCE"
 python -m pytest -q tests/test_analog_example.py
 ```
+
+### 服务器自主 RLC 实验
+
+2026-10-09 的单次 Pi + GLM RLC Trial 在1800秒 Agent预算内自然完成，
+原独立 verifier 为15/15。运行使用私有模型元数据适配与预装Pi镜像，且没有CPU硬配额；
+它不表示只用本页公开配置就能复现该服务器部署。版本、轨迹支持范围与限制见
+[验证记录](../../docs/chips/VALIDATION.md#原生-harbor-的-pi--glm-自主-rlc-实验)。

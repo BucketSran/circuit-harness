@@ -1,4 +1,4 @@
-# Chips 部署规范：目录、访问边界与模型网络
+# Circuit Harness 部署规范：目录、访问边界与模型网络
 
 本文补充 [平台路线图](ROADMAP.md)。
 适用于个人部署和小组协作；是部署约定及验收要求，不代表这些检查已经在 Harness 中实现。
@@ -42,8 +42,8 @@
 [存储验证记录](STORAGE_VALIDATION.md)。后台 RC/VABench 已提供 `--root` / `--archive-root`、
 自动归档、归档单独重试和显式校验后清理，详见 [存储使用说明](STORAGE.md)。
 表中的环境变量仍是逻辑约定；自动选盘、源码/环境迁移和保留期调度尚未实现。
-VABench 的服务器端个人 profile 和新实验准备入口已单独实现，见
-[lab-server 同机部署](SERVER_LOCAL_DEPLOYMENT.md)；它不改变其他后端的逻辑目录约定。
+Harbor 的实际镜像、容器资源与预检合同见[服务器部署](HARBOR_DEPLOYMENT.md)。
+旧运行配置不自动成为 Harbor JobConfig，各部署分别验收。
 
 ## 2. 谁可以看见
 

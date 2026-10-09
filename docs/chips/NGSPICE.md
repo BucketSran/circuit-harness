@@ -1,7 +1,7 @@
 # ngspice RC Harness
 
-本次新增后端的规格：在安装了 ngspice 的同一台主机上完成任务生成、AC/瞬态仿真和独立验收；
-服务器使用标准库 CLI 包，避免在实验室安装 Apollo 的模型/训练依赖。
+本后端在安装了 ngspice 的同一台主机上完成任务生成、AC/瞬态仿真和独立验收；
+服务器使用标准库 CLI 包，无需安装 Harbor、模型客户端或训练库。
 
 - 输入：带 SI 单位的 RC 参数 JSON；算例为理想 R、C 和 1 V 激励，无 PDK。
 - 输出：网表、原始数值、工具版本/二进制哈希、事件、过程日志、指标、结果和产物校验和。
@@ -16,7 +16,7 @@
 
 验收条件：真实服务器上的 AC 与瞬态均通过；完成结果 resume 不重复启动求解器；
 构造坏输出不能被判成功；异常任务的进程组清理、事件与退出码可检查。
-本次不验证任意晶体管模型、商业 PDK、模型 Agent、EMX 替代性或大规模电路性能。
+这个 RC 合同不覆盖任意晶体管模型、商业 PDK、Agent 解题或大规模电路性能。
 
 后台提交可用 `--root` 指定服务器本地工作区、`--archive-root` 指定持久目录。
 自动归档、单独重试、校验后清理和阶段计时见 [存储使用说明](STORAGE.md)。
@@ -60,7 +60,7 @@ scp runs/chips/deploy/chips.pyz examples/chips/ngspice/rc.json \
   lab-host:chips-private/harness/
 ```
 
-服务器需要 Python 3.10+；无需安装 Apollo 的训练、模型或 MCP 依赖。
+服务器 zipapp 需要 Python 3.10+，只使用标准库；完整 Python 包安装要求 Python 3.12+。
 随包快捷脚本使用 `python3.12`；若部署的版本不同，显式选择对应解释器。
 升级时保留旧包与 SHA-256，运行记录绑定实际 Harness 内容。ngspice RC 不使用 GDS/EMX 配置。
 

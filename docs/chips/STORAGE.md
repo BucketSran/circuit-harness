@@ -1,6 +1,6 @@
 # 工作目录、持久归档与阶段计时
 
-关联 [Harness 共建 #1](https://github.com/BucketSran/circuit-harness-private/issues/1)。
+本页定义后台作业的存储、归档与清理合同。
 `submit-rc` 和 `submit-vabench` 支持在服务器本地 scratch 执行，再把封存证据打包到持久目录。
 这里的“本地”指仿真服务器自己的盘，不要求把实验移到操作者电脑。
 EMX、前台命令及 Agent 运行目录尚未接入这套归档生命周期。

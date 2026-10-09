@@ -47,7 +47,7 @@ python3.12 chips-agent.pyz analog-public \
   --podman-single-id --podman-no-cpu-limit
 ```
 
-`analog-public` 是供操作者直接调用的单次诊断命令；下文的受控会话另有 Pi Tool 桥接。
+`analog-public` 是供操作者直接调用的单次诊断命令；下文另述受控会话的动作接口。
 标准 `chips.pyz` 的此入口已在 lab-server 用固定镜像和低性能候选执行，返回 15 个公开测量值，且结果归档保存在本人私有目录；这不代表 Agent 解题成功。
 
 ### 用任务配置复用同一条 RLC 链路
@@ -57,24 +57,22 @@ python3.12 chips-agent.pyz analog-public \
 | `rlc-rf-bandpass-100mhz` | `.subckt rlc_rf_bandpass IN OUT COM` | 上游 `tb_ac.spi`、`tb_stopband.spi` 的标量测量 |
 | `rlc-broadband-50-to-200-match` | `.subckt rlc_broadband_match IN OUT COM` | 上游 `analyze_broadband.py`：3.3–3.8 GHz 的 11 点有限 Q 扫频 |
 
-两题复用同一套六个 Tool、会话实现、英文 system prompt 和 Pi 启动能力。
-宽带题执行原公开分析脚本的有限 Q 转换，不用理想器件直接跑 testbench 来代替它；
-公开反馈给出逐点 `gamma`、`transducer_gain` 和汇总指标。扫描点缺失、非法值或频率不符
-记为 `simulation_error`。101 点扫描及容差组合仍由原隐藏评分器在冻结后执行。
-公开诊断执行成功只说明数据完整，不说明电路达标。
+两题复用六个公开动作和候选冻结协议，以 `task_id` 选择候选接口与公开诊断。
+创建会话时固定任务源、运行镜像及预算，随后通过 `analog-info` 查看会话合同。
+这些是操作者接口；Agent 实验与模型连接按 Harbor 任务配置，不使用本页会话作为通用 Agent runner。
 
-任务契约在 [任务注册表](../../circuit_harness/execution/analog_design_bench.py) 的
-`TASKS[task_id].public_rlc` 声明子电路名、端口、公开文件和诊断入口；
-[公开运行器](../../circuit_harness/execution/analog_public.py) 执行并解析诊断，
-[会话](../../circuit_harness/execution/analog_session.py) 管理候选、动作、冻结和恢复，
-自动 Agent runner 已退役，见[迁移说明](MIGRATION.md)；下面描述保留的操作者会话。
+例如，显式选择宽带题，避免使用默认的 100 MHz 题：
 
-创建宽带会话时，在 `analog-session` 中显式使用
-`--task-id rlc-broadband-50-to-200-match`，其余镜像与预算参数同原 RLC 会话。
-把同机 operator 模板复制到私有目录，设置同样的 `task_id` 和新会话路径；
-再复制 旧实验模板已退役，参见迁移说明，
-填写 operator 路径及新的运行、终评和归档目录。实验配置、operator、会话的任务 ID
-必须一致，否则在启动模型前拒绝。旧 operator 未填写 `task_id` 时保留 100 MHz 默认。
+```bash
+python3.12 chips-agent.pyz analog-session \
+  --task-id rlc-broadband-50-to-200-match \
+  --source-root "$CHIPS_SOURCE_ROOT" \
+  --output "$CHIPS_RUN_ROOT/broadband-session-001" \
+  --runtime-image "$RUNTIME_IMAGE_ID" \
+  --offline-image-archive "$IMAGE_TAR" \
+  --podman-single-id --podman-no-cpu-limit \
+  --max-actions 40 --max-simulations 8
+```
 
 新会话为 schema v3，记录 `task_contract_sha256`；任务接口发生漂移时拒绝继续。
 旧 v1/v2 仅兼容原 100 MHz 题，不允许把历史会话改名为宽带题。

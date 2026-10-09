@@ -1,4 +1,4 @@
-# Chips execution module map
+# Circuit execution module map
 
 This package owns simulator execution, bounded public task sessions, durable
 jobs, and operator-only verification. Agent orchestration and experiment scheduling

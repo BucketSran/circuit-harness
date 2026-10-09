@@ -1,43 +1,39 @@
-# Chips 验收案例目录
+# Circuit Harness 验收案例
 
-本表定义要验证什么；“已有测试”不等于本次已执行。每次运行依据 [模板](RECORD_TEMPLATE.md) 记录结果。
+本表定义需要验证的边界，不表示本次已经执行。按[测试入口](README.md)选择检查，
+真实实验按[记录模板](RECORD_TEMPLATE.md)填写版本、资源、证据与限制。
 
-| ID | 验证目标 | 入口/方法 | 当前覆盖 |
+| ID | 验证目标 | 当前检查入口 | 证据边界 |
 | --- | --- | --- | --- |
-| CHIPS-PROBE | 只读采集；默认无网络；缺路径/网络失败保留证据；不把 403 当认证成功 | `test_host_snapshot.py`、`probes/host_snapshot.py` | 可执行本地回归；curl 响应为构造夹具 |
-| CHIPS-TRANSPORT | 非法输入不提交；重试有界；断线恢复不重复启动；产物完整性 | `tests/common/execution/test_chips_harness.py` | 已有构造 SSH/EMX 回归；不能证明真实网络/EMX |
-| CHIPS-RC | 理想 RC 的真实 ngspice AC/瞬态、独立解析验收、完成恢复、产物哈希 | `tests/common/execution/test_chips_ngspice.py`、`ngspice-rc` / `verify-rc` | 本地构造进程回归及可选真实 ngspice；服务器实测结果单列 |
-| CHIPS-ACCESS | 不同普通账号的读取/写入边界、同组访问、父目录及 ACL | 临时无秘密文件，获准的第二测试账号独立尝试 | 元数据探针已具备；跨账号执行步骤待具体环境提供，不模拟成通过 |
-| CHIPS-NET | 实际 endpoint 的 DNS/TCP/TLS/HTTP；再分别验证认证与模型协议 | 无认证探针 → 获准的最小模型请求 → 一次工具调用 | 无认证探针已具备；真实模型验收未接入自动入口 |
-| CHIPS-EDA | 确定性输入，经真实转换、EMX/Spectre、解析和独立评分 | 专家确认样例、版本、端口/单位、参考指标和容差 | EMX 厂商样例数值一致性通过；Spectre 的无 PDK RC-001 真实仿真及解析解评分通过；专家/PDK 任务待接入 |
-| CHIPS-RECOVERY | 实际长作业断开客户端后可查；取消/超时回收；重试不重复启动 | 对隔离作业中断客户端/注入通信故障，核对 job/PID/结果 | ngspice 真实 SSH 断线通过；Spectre 后台提交后 SSH 退出、终态查询与同 ID 去重通过；Spectre 强制断线、取消/超时待验收 |
-| CHIPS-STORAGE | 本地文件系统与 NFS 对同一真实负载的影响 | `probes/storage_compare.py`：固定有界源码包、交替运行、记录缓存与负载 | 795 文件源码包三轮真实对照已完成；见存储验证记录，不能外推为求解器或物理磁盘性能 |
-| CHIPS-ARCHIVE | 后台 scratch 执行后独立归档与可控清理 | `test_chips_ngspice.py`、`test_vabench.py`；真实 SSH 探针可指定工作/归档根目录 | 自动归档、仅归档重试、清理门禁、持久 ID 和阶段计时已实现；范围及证据见 [存储说明](../../docs/chips/STORAGE.md) 和验证记录 |
-| CHIPS-VABENCH-AGENT | 公开候选修复、冻结、隔离终评、关联归档与 Pi 请求限额 | `test_vabench_session.py`；旧 Agent runner 已退役，见迁移说明 | 三类任务脚本闭环与真实 Pi/SSH/EVAS 协议测试通过；模型响应为脚本 fixture，旧 Agent 证据按原版本解释；新 Harbor task 需独立验收 |
-| CHIPS-EPISODE-REPORT | 已有轨迹离线重建成功、修复和预算停止；未知数据不造零；候选/归档不一致拒绝 | `test_episode_report.py`、`tests/workflows/test_visualize.py`；四条真实历史证据离线核对 | 已实现，见[报告说明](../../docs/chips/EPISODE_REPORT.md)和验证记录；不调用新模型或仿真 |
-| CHIPS-PLACEMENT | 本机 Agent + 服务器 Tools vs 全服务器的耗时、稳定性和成本 | 固定任务、工具、模型、预算，分别运行，核对结果有效性 | 待两条路径具备同等功能后执行 |
+| CHIPS-PROBE | 主机与网络探针失败保留证据 | `test_host_snapshot.py`、`probes/host_snapshot.py` | 本地夹具不证明真实 endpoint 或认证可用 |
+| CHIPS-TRANSPORT | 有界重试、相同作业恢复与产物完整性 | `test_simulator.py` | 构造 SSH/EMX，不认证实际网络与许可证 |
+| CHIPS-RC | RC 仿真、独立解析解与恢复 | `test_ngspice.py`、`ngspice-rc`、`verify-rc` | 本地回归和可选真实 ngspice；服务器条件另记 |
+| CHIPS-ACCESS | Agent/普通账号读取与写入边界 | `test_native_sandbox.py`、`test_harbor_public_gateway.py`；实际不同 UID 探针 | 同 UID 或元数据检查不代替跨账号访问验收 |
+| CHIPS-NET | 模型 endpoint 的连接、认证和协议 | 无认证探针、获准的模型请求、实际 Agent Trial | 403、HTTP200或能访问其他网站都不单独证明协议可用 |
+| CHIPS-EDA | 真实仿真、解析与独立电路判定 | EMX、Spectre RC 和 benchmark 对照 | 参考控制、Agent 成绩与任意PDK验收分别报告 |
+| CHIPS-RECOVERY | 独立后台完成、断线查询、取消/超时 | `test_ngspice.py`、`test_spectre_rc.py`；获准 SSH 故障探针 | 本地进程回归不认证所有远端取消条件 |
+| CHIPS-STORAGE | 固定输入下的存储与归档 | `probes/storage_compare.py`、`test_ngspice.py`、`test_vabench.py` | 历史测量见[存储记录](../../docs/chips/STORAGE_VALIDATION.md)，不外推求解器性能 |
+| CHIPS-ARCHIVE | 后台归档、仅归档重试与校验后清理 | `test_ngspice.py`、`test_vabench.py` | 操作者协议覆盖不代表自动选盘或保留期调度 |
+| CHIPS-VABENCH-AGENT | 固定公开动作、冻结与终评 | `test_vabench_session.py`；当前 Agent 接入按 Harbor task 验收 | 固定操作者协议不等于开箱即用的 Agent 任务 |
+| CHIPS-EPISODE-REPORT | 保存记录、候选与归档的离线读取 | `test_episode_report.py` | 不执行模型或重新评分；只支持既定来源布局 |
+| CHIPS-HARBOR | Agent/Model 配置、Trial 生命周期与部署 | `test_harbor_profiles.py`、`test_harbor_composition.py`、`test_harbor_deployment.py` | 协议、容器与模型/许可证验收分别判断 |
+| CHIPS-FINAL | 冻结候选与独立评分关联 | `test_harbor_verifier_archive.py`、`test_harbor_opensource_verifier.py`、`test_harbor_reporting.py` | checker 夹具不认证真实电路或商业后端 |
+| CHIPS-TRAJECTORY | 完整轨迹、评分关联与数据筛选 | `test_pi_trajectory.py`、`test_harbor_trajectory.py`、`test_atif_sft.py` | 目前正式 Pi 导出依赖公开会话冻结证据 |
+| CHIPS-PLACEMENT | 不同部署的真实可用性与比较 | 同任务、工具、模型、预算，分别运行 | 原生 RLC 已有单次服务器成功；部署差异的因果比较仍待执行 |
 
-2026-09-22 真实验证进展见 [服务器基线](../../docs/chips/BASELINE.md)：EMX 厂商例子已通过真实 SSH/Harness；
-完成任务的 resume 和下载哈希已验证；NFS mtime 偏差导致的状态误判已补回归并修复。
-2026-09-23 管理员指定的环境脚本已解除无 PDK RC 的 Spectre 许可证阻塞；
-服务器本地 RC-001 作业、PSF 解析、独立评分和持久归档通过，见[验证记录](../../docs/chips/VALIDATION.md)。
-EMX/Spectre 的强制运行中断线、取消/超时与真实工艺任务仍待验收。
-ngspice 的真实 SSH 断线、重连前自主结束、同 ID 去重及 RC 独立评分已通过，
-后台取消/超时另有本地真实进程与构造波形回归，详见 [验证记录](../../docs/chips/VALIDATION.md)。
+## 实际执行要求
 
-## 实验室案例必须补齐的条件
+执行前固定主机、账号、私有目录、允许的数据、软件与工艺身份、资源/费用预算、
+停止条件和恢复方式。复用已有用户授权；模板和技能不会自动授权新模型调用或实验。
 
-执行前填清实际主机、账号/工作目录、允许的数据、工具/工艺身份、资源/费用预算、停止条件和恢复方式。
-复用已有用户授权；模板或 Skill 不会授予登录、付费调用、数据外发或操作其他账号的权限。
-元数据权限检查不能替代不同 UID 的实际访问测试；第二账号未提供时明确记为 blocked/not_run。
-同样不测试或承诺对 root/存储管理员不可见。
+独立 checker 判断设计成绩。分别记录执行成功、设计不达标、不可评、平台失败及
+Agent 是否主动提交。计划中的失败与未启动项保留，不能只统计成功样本。
+比较方案前固定条件与重复次数；证据不足时不报告因果结论或外推分位数。
 
-EDA 参考结果由独立的数值/结构判定验证，不由被测 Agent 自评。
-记录成功、设计不达标、执行失败和不可评四种不同事实；比较时保存全部预定任务的结果。
-性能阈值和重复次数在预试后固定；记录配对任务、中位数/波动、峰值内存和所需传输量。
-超出样本支持范围的分位数或因果结论标为证据不足。
+已有实测范围见[验证记录](../../docs/chips/VALIDATION.md)，后续条件见
+[后续工作](../../docs/chips/NEXT_WORK.md)。历史成功不自动认证当前版本或新任务。
 
 ## 增加案例
 
-出现新故障时，先将最小复现加入相关模块测试，再在这里登记它支持的验收能力。
-新案例只新增其实际需要的 fixture、脚本或规格，不为空的“将来测试”创建目录树。
+将实际故障的最小复现加入相关模块测试，再登记其覆盖的验收边界。
+只增加真实需要的 fixture、脚本与规格。

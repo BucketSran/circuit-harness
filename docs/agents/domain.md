@@ -1,6 +1,7 @@
 # Domain documents
 
 Read the [Circuit Harness glossary](../../GLOSSARY.md) for the platform's terminology.
+Locate current guides through the [documentation index](../README.md).
 Use the affected component's contract as the behavior authority:
 
 - [Integration guide](../guides/integration.md): benchmark adapters, task execution paths and experiment setup.
