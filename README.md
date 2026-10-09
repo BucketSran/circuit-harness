@@ -34,12 +34,16 @@ EVAS 示例是开发版评测路径，其结果不能代替任务声明的正式
 
 按[开发者接入指南](docs/guides/integration.md)准备任务、公开工具和 verifier，再选择 Agent、模型及部署方式。
 
+已有完整 Harbor 任务时，优先保留原任务环境与 verifier。需要受控仿真访问、动作预算和候选冻结时，再接入 Harness 公开会话。两条路径都由 Harbor 调度，都可以在本机或服务器运行；公开会话是在 Harbor 上增加的电路实验能力。选择标准见[任务执行方式](docs/guides/integration.md#2-选择任务执行方式)。
+
 - **Benchmark** 提供题面、候选接口、评测条件和 checker。可以引用 AnalogBench、接入 vaBench，或编写自己的 Harbor 任务。
 - **仿真器** 按任务需要选择。已有 ngspice、EVAS、Spectre 等具体执行接口；新后端需要适配其输入、输出与错误语义。不同仿真器的分析能力和模型语法并不通用。
 - **Agent 与 Model** 分别配置。已有 Harbor 配置入口支持 Pi、Codex、Claude Code、mini-swe-agent，具体组合取决于模型服务提供的协议。
 - **运行环境** 可以在本机或服务器。用户提供实际工具安装、工艺模型、模型凭据以及商业仿真器所需的许可证。
 
 解题时使用的仿真器与最终 verifier 可以不同。例如用 EVAS 提供公开调试反馈，再由独立 Spectre verifier 评分。正式比较需要固定任务版本、评分器与运行条件。
+
+原生 Harbor 任务使用自身的结果与 Agent 日志。当前 Harness 离线报告和正式 Pi 轨迹导出依赖公开会话的冻结证据，尚未覆盖任意原生任务；具体支持范围见[证据查看方式](docs/guides/integration.md#5-验收并查看证据)。
 
 | 需要 | 入口 |
 | --- | --- |

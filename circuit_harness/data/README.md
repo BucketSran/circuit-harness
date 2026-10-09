@@ -3,8 +3,14 @@
 ## ATIF trajectories for SFT
 
 The [offline Pi exporter](../../docs/chips/HARBOR.md#offline-pi-trajectory-export)
-creates the initial supported source. Use a private selection file to name every
-trajectory, split and task family. Paths are relative to that file:
+creates the initial supported source from completed Harness public-session Trials.
+It requires frozen-candidate evidence; a native Harbor conversation and task reward
+alone are not a supported scored export. Conversation conversion does not verify
+candidate/grade association. For the current evidence paths, see the
+[integration guide](../../docs/guides/integration.md#5-验收并查看证据).
+
+Use a private selection file to name every trajectory, split and task family.
+Paths are relative to that file:
 
 ```json
 [

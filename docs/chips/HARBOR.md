@@ -13,7 +13,8 @@ Harness 提供公开电路会话、候选冻结和独立终评。固定 vaBench 
 无需配置 EVAS 公开会话。自定义任务的路径选择见[开发者接入指南](../guides/integration.md)。
 
 公开会话任务运行前使用[部署配方与预检](HARBOR_DEPLOYMENT.md)，多题实验使用[私有任务绑定](HARBOR_TASKS.md)。
-运行后可[离线汇总实验结果](HARBOR_RESULTS.md)，保留失败和未启动项。
+公开会话任务运行后可[离线汇总实验结果](HARBOR_RESULTS.md)，保留失败和未启动项。
+原生任务先查看 Harbor 自身的结果与 Agent 日志；当前 Harness 报告依赖冻结候选与独立终评凭据。
 
 ## 分别选择 Agent 与 Model
 
@@ -362,6 +363,14 @@ Trial. Branches, compaction, changing model/tool definitions, unmatched calls,
 unfinished sessions and unsupported content fail before publication. Other
 Agents need their own native-to-ATIF adapter. The training consumer uses ATIF,
 so adding an Agent does not require a new exporter for every model.
+
+This entry requires a Harness public session, a frozen candidate and its collection
+receipt. A completed native Harbor Pi Trial without that evidence is not supported.
+Native task rewards alone cannot establish the candidate/grade association required
+by this exporter. Reading a native Pi session with `read_pi_trajectory` converts
+the conversation only; it does not verify that association. Keep native tasks on
+their original execution path and retain their results and logs until a supported
+export is available. See [task path selection](../guides/integration.md#2-选择任务执行方式).
 
 Native files remain unchanged. ATIF preserves source SHA-256 and line numbers,
 ordered system sections, actual tool definitions, native calls and the tool
