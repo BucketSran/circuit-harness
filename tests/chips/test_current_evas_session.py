@@ -143,6 +143,16 @@ def test_simulation_snapshot_does_not_block_edit_or_deadline_collection(tmp_path
     seen = []
 
     def run(**kwargs):
+        import json
+
+        action = directory / "actions/sim"
+        assert json.loads((action / "request.json").read_text()) == {
+            "action_id": "sim",
+            "tool": "evas_simulate",
+            "arguments": {},
+        }
+        assert (action / "snapshot.json").is_file()
+        assert not (action / "response.json").exists()
         started.set()
         assert finish.wait(3)
         seen.append((kwargs["candidate"] / "files/dut.va").read_text())

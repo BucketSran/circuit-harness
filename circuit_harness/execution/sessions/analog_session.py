@@ -17,6 +17,7 @@ from circuit_harness.execution.evaluation.analog_design_bench import (
     tree_digest,
 )
 from circuit_harness.execution.runtime.journal import atomic_json, file_digest
+from circuit_harness.execution.sessions.action_store import ActionStore
 from circuit_harness.execution.sessions.analog_public import (
     TASK_ID,
     run_public_rlc,
@@ -186,24 +187,13 @@ def session_action(directory: Path, request: dict) -> dict:
     """Persist each call before executing it; an uncertain call is never replayed."""
     action_id, tool, arguments = _validate_request(request)
     directory = Path(directory).absolute()
-    with (directory / ".session.lock").open("a") as lock:
-        fcntl.flock(lock, fcntl.LOCK_EX)
-        actions = directory / "actions"
+    store = ActionStore(directory)
+    with store.lock():
+        actions = store.actions
         actions.mkdir(mode=0o700, exist_ok=True)
-        action = actions / action_id
-        if action.exists():
-            if json.loads((action / "request.json").read_text()) != request:
-                raise ValueError("action ID belongs to another request")
-            response = action / "response.json"
-            return (
-                json.loads(response.read_text())
-                if response.exists()
-                else {
-                    "ok": False,
-                    "error": "unknown_execution",
-                    "retry_safe": False,
-                }
-            )
+        record = store.lookup(action_id, request)
+        if record is not None:
+            return record.cached_response()
         config = json.loads((directory / "session.json").read_text())
         session_task_id(config)
         if (directory / "ending.json").exists():
@@ -217,17 +207,14 @@ def session_action(directory: Path, request: dict) -> dict:
         rejected = budget_rejection(directory, config, tool)
         if rejected is not None:
             return rejected
-        action.mkdir(mode=0o700)
-        atomic_json(action / "request.json", request)
+        record = store.begin(action_id, request)
         started = time.monotonic()
         try:
             reply = {"ok": True, "result": _execute(directory, config, action_id, tool, arguments)}
         except (ValueError, OSError) as error:
             reply = {"ok": False, "error": type(error).__name__}
         reply = with_budget(reply, directory, config)
-        atomic_json(action / "measurement.json", {"elapsed_s": time.monotonic() - started})
-        atomic_json(action / "response.json", reply)
-        return reply
+        return record.complete(reply, started=started)
 
 
 def _validate_request(request: dict) -> tuple[str, str, dict]:
