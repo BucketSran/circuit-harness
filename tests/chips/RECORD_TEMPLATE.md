@@ -30,7 +30,7 @@
 | 仿真器、后端、目录权限与可用空间 |  |  |
 | 本次正负控、预算、停止与恢复规则 |  |  |
 
-开跑约定见 [单次实验调用链](../../docs/chips/EXPERIMENT_PROTOCOL.md)。
+开跑约定见 [单次实验调用链](../../docs/guides/EXPERIMENT_PROTOCOL.md)。
 连通性探测只证明对应网络阶段，不代替真实模型认证或 Tool 调用。
 
 ## 复现输入

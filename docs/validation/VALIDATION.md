@@ -70,12 +70,12 @@ EVAS 语义和算法由 vaEVAS 改进，Harness 负责支持范围诊断和证�
 | VABench r53 / EVAS0.8.7 | family001三类任务的正负例回放与固定源码身份 | 整个任务集或当前EVAS版本的验收 |
 | scratch与归档 | 固定输入下归档完整性、单独重试、校验后清理 | 自动选盘、保留期调度或磁盘性能承诺 |
 
-操作合同分别见 [EMX 示例](../../examples/chips/emx/README.md)、[ngspice](NGSPICE.md)、
-[Spectre RC](SPECTRE_RC.md)、[VABench](VABENCH.md)和[存储记录](STORAGE_VALIDATION.md)。
+操作合同分别见 [EMX 示例](../../examples/chips/emx/README.md)、[ngspice](../reference/NGSPICE.md)、
+[Spectre RC](../reference/SPECTRE_RC.md)、[VABench](../reference/VABENCH.md)和[存储记录](STORAGE_VALIDATION.md)。
 旧实现的详细运行记录可以在 Git 历史中查阅，不再作为当前操作指南。
 
 ## 尚未验收
 
-按[后续工作](NEXT_WORK.md)补齐配置化服务器部署、原生任务的统一结果与正式轨迹导出、
+按[后续工作](../development/NEXT_WORK.md)补齐配置化服务器部署、原生任务的统一结果与正式轨迹导出、
 更多任务和重复尝试、其他 Agent/模型组合，以及实际训练器和目标 tokenizer 的训练效果。
 新增记录明确区分本地夹具、真实仿真、参考控制、Agent Trial 与独立成绩。

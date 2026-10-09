@@ -25,7 +25,7 @@ Linux 发行 wheel 包含 Rust 动态库，仍需实际检查 `evas --version` �
 服务器 CLI zipapp 只使用标准库，仿真器环境独立部署。
 
 参考源码提交：`0685aae05c346e8e60f33ba48e2f64daff54d4f2`。
-源码和数据放在本人 0700 根目录，按 [部署规范](DEPLOYMENT.md) 管理。
+源码和数据放在本人 0700 根目录，按 [部署规范](../guides/DEPLOYMENT.md) 管理。
 可以部署完整固定 checkout；如果 NFS 上小文件操作慢，可使用经过哈希记录的依赖子集。
 子集须保留原路径及原始字节：根 `runners/`、包内 `runners/scripts/operations` Python 源码、
 r53 共享配置与所选完整任务目录。保留完整 MANIFEST/TASK_INDEX 不表示所有任务已经部署。
@@ -125,5 +125,5 @@ python3.12 vabench_smoke.py check --cli /private/chips.pyz \
 
 固定 r53 的公开动作和独立回放按本页协议执行；当前 Harbor 接入需要分别准备
 公开材料与 final package，见[任务绑定](HARBOR_TASKS.md)。EVAS0.8.7 的历史结果不能
-认证当前 EVAS 源码或任意任务，已观察范围见[验证记录](VALIDATION.md)。
+认证当前 EVAS 源码或任意任务，已观察范围见[验证记录](../validation/VALIDATION.md)。
 Spectre 使用独立任务包与判据接入，不能把这里的 EVAS 回放成绩改标为 Spectre 成绩。

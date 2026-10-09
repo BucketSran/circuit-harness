@@ -8,7 +8,7 @@
 Analog Design Bench 已有一题 Pi/GLM 的 development 单回合与原评分器终评，尚无稳定表现或 Codex 条件验收；
 目前没有跨任务集的通用加载器。
 先复制 [TASK_TEMPLATE.md](TASK_TEMPLATE.md)，在本目录的 `<任务族>/TASK.md` 中填写。
-新的 Agent 实验使用 [Harbor 配置](../../../docs/chips/HARBOR.md)与[开发者接入指南](../../../docs/guides/integration.md)；任务定义和评分器仍由 benchmark 维护。
+新的 Agent 实验使用 [Harbor 配置](../../../docs/reference/HARBOR.md)与[开发者接入指南](../../../docs/guides/integration.md)；任务定义和评分器仍由 benchmark 维护。
 
 ## 每个任务族保存什么
 

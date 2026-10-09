@@ -5,7 +5,7 @@ description: Implement or validate Circuit Harness simulator adapters, task sess
 
 # Develop and validate Harness behavior
 
-Read the affected component contract, [SOP](../../../docs/chips/DEVELOPMENT_SOP.md#development-workflow)
+Read the affected component contract, [SOP](../../../docs/development/DEVELOPMENT_SOP.md#development-workflow)
 and [test entry](../../../tests/chips/README.md). Preserve the task's operation: selecting
 checks does not run them, and reanalysis consumes saved evidence without a new model or simulator run.
 
@@ -36,12 +36,12 @@ Candidate errors follow the benchmark contract; infrastructure failure is not a 
 
 Harness owns execution and evidence. EVAS algorithms/semantics and benchmark grading belong
 to vaEVAS; course materials stay in their project. For cross-repository changes, use the
-[SOP](../../../docs/chips/DEVELOPMENT_SOP.md#shared-backend-workflow) and verify the combined call path.
+[SOP](../../../docs/development/DEVELOPMENT_SOP.md#shared-backend-workflow) and verify the combined call path.
 
 ## Deliver
 
 Report actual checks, failures, skips, evidence limitations and pending external acceptance.
 Use [review-pr](../review-pr/SKILL.md) for the required review and
 [prepare-contribution](../prepare-contribution/SKILL.md) for publication.
-Follow the [delivery policy](../../../docs/chips/DEVELOPMENT_SOP.md#delivery-and-review);
+Follow the [delivery policy](../../../docs/development/DEVELOPMENT_SOP.md#delivery-and-review);
 reuse review evidence for the same revision instead of stacking complete review workflows.

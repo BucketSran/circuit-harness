@@ -16,8 +16,8 @@ Distinguish discussion, implementation, review, check selection, execution and e
 Reuse agreed test boundaries and prior authorization within the same task and resource limits.
 
 Check the actual checkout, branch and unrelated changes using the
-[workspace policy](../../../docs/chips/DEVELOPMENT_SOP.md#workspace-handoff).
-For cross-repository work, follow the [shared backend contract](../../../docs/chips/DEVELOPMENT_SOP.md#shared-backend-workflow).
+[workspace policy](../../../docs/development/DEVELOPMENT_SOP.md#workspace-handoff).
+For cross-repository work, follow the [shared backend contract](../../../docs/development/DEVELOPMENT_SOP.md#shared-backend-workflow).
 
 ## Choose the next stage
 
@@ -34,7 +34,7 @@ For cross-repository work, follow the [shared backend contract](../../../docs/ch
 Load shared skills from the actual client catalog when applicable, respecting invocation settings.
 A missing optional skill is not a reason to initialize an unrelated tracker or restart settled
 design. Apply available project contracts and report any method that could not be used.
-Never claim an unavailable skill ran. The [SOP](../../../docs/chips/DEVELOPMENT_SOP.md#development-workflow)
+Never claim an unavailable skill ran. The [SOP](../../../docs/development/DEVELOPMENT_SOP.md#development-workflow)
 defines the local adaptations to shared defaults.
 
 Use pstack methods for their specific need: `blast-radius` for consequential shared changes,
@@ -47,7 +47,7 @@ to invoke for every change.
 
 ## Finish the requested stage
 
-The [delivery policy](../../../docs/chips/DEVELOPMENT_SOP.md#delivery-and-review) governs PR,
+The [delivery policy](../../../docs/development/DEVELOPMENT_SOP.md#delivery-and-review) governs PR,
 human review, merging and daily-checkout synchronization. Normal development ends at a
 reviewable PR pending human review; explicit autonomous-merge authorization continues through integration.
 Report completed checks, unresolved findings, external acceptance still pending, and where

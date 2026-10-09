@@ -19,7 +19,7 @@ Harbor run 的 Agent 安装由 Harbor 管理。预检不会安装 Agent，也不
 导出的公开 task、私有 public-session 配置、final-evaluation 配置和 Harbor jobs 目录分别放置。
 私有配置及其资源必须在所有公开 task 与 jobs 导出目录之外。
 public-session 的容器 EVAS checkout、Linux kernel 和 materials 是本机路径；
-final-evaluation 的连接声明按[终评契约](HARBOR.md)配置。预检不会联系终评主机或评分。
+final-evaluation 的连接声明按[终评契约](../reference/HARBOR.md)配置。预检不会联系终评主机或评分。
 模型连接留在[profile](../../examples/chips/harbor/profiles.example.json)中，凭据使用环境变量名引用，
 运行时由操作者的凭据系统提供。勿把真实路径、密钥或主机配置提交进公开 task 或 Git。
 
@@ -46,7 +46,7 @@ python -m circuit_harness.harbor.deployment \
 ```
 
 默认检查配置结构、字段、任务和私有配置位置，以及本地声明路径是否存在。
-多任务使用[共享 task_bindings](HARBOR_TASKS.md)，同一次预检解析所有显式本地任务；
+多任务使用[共享 task_bindings](../reference/HARBOR_TASKS.md)，同一次预检解析所有显式本地任务；
 共享解析器读取私有配置、包 manifest 身份元数据与资源内容摘要，并核对编译时 pins。
 多个任务不得使用 scalar session_config/config_path，也不支持在预检中解析远程 dataset。
 拒绝重复 JSON key、未知 Harbor 字段、未知 adapter 选项、未知公共任务字段与冲突。
@@ -161,7 +161,7 @@ harbor run --config /operator/private/harbor-job.generated.json
 Harbor 将结果保留在 JobConfig 的 `jobs_dir/job_name` 下。读取 job 的 `result.json`
 与各 trial 的 `result.json`、`public-session`、`verifier` 记录，按任务身份与候选摘要关联证据。
 基础设施失败看 `exception_info`；缺失评分不能当成零分。运行和结果契约见
-[Harbor 适配说明](HARBOR.md)与[独立评测](BENCHMARK_EVALUATION.md)。
+[Harbor 适配说明](../reference/HARBOR.md)与[独立评测](../reference/BENCHMARK_EVALUATION.md)。
 
 本次代码回归验证的是本地文件、外部 Docker 命令夹具和环境生命周期协议。
 真实本机容器网桥、服务器 Pi + GLM、商业许可证及独立电路终评按实际部署单独验收；

@@ -2,7 +2,7 @@
 
 报告入口只读取保存的 Harbor 0.23 Job、Trial、冻结候选及独立终评凭据。
 Harbor 继续负责执行和任务计划；导出器不创建 Job，不调用 Agent、SSH、Docker 或评分器。
-[Harbor 配置](HARBOR.md)和[任务绑定](HARBOR_TASKS.md)仍是运行入口。
+[Harbor 配置](../reference/HARBOR.md)和[任务绑定](../reference/HARBOR_TASKS.md)仍是运行入口。
 
 ## 支持的任务路径
 
@@ -12,8 +12,8 @@ Harbor 继续负责执行和任务计划；导出器不创建 Job，不调用 Ag
 
 AnalogBench 等原生任务继续使用自身的 Trial 结果、原 verifier 输出和 Agent 日志。
 原任务的独立评分不要求 Harness session；缺少 Harness 冻结证据也不表示原 checker
-成绩无效。两条路径的选择见[接入指南](../guides/integration.md#2-选择任务执行方式)。
-原生任务的统一结果关联仍是[后续工作](NEXT_WORK.md)，不能补造冻结收据来套用此入口。
+成绩无效。两条路径的选择见[接入指南](integration.md#2-选择任务执行方式)。
+原生任务的统一结果关联仍是[后续工作](../development/NEXT_WORK.md)，不能补造冻结收据来套用此入口。
 
 ## 导出报告
 

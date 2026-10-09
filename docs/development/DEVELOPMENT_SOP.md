@@ -14,8 +14,8 @@
 | [测试记录模板](../../tests/chips/RECORD_TEMPLATE.md) | 本次测试范围、版本、预算、原始证据和结论 |
 | [harness-workflow](../../.agents/skills/harness-workflow/SKILL.md) | 选择阶段、项目入口与共享 skills |
 | [chips-dev](../../.agents/skills/chips-dev/SKILL.md) | 开发、检查选择、实际验证与证据重分析 |
-| [部署规范](DEPLOYMENT.md) | 目录、权限、凭据、网络与数据边界 |
-| [验证记录](VALIDATION.md) | 已完成的具体检查及尚未验收项 |
+| [部署规范](../guides/DEPLOYMENT.md) | 目录、权限、凭据、网络与数据边界 |
+| [验证记录](../validation/VALIDATION.md) | 已完成的具体检查及尚未验收项 |
 
 Markdown 和 Skill 是工作约定；可执行测试和 CI 提供自动检查。
 文档本身不会强制 Agent 遵守，也不能替代服务器权限或测试结果。
@@ -133,7 +133,7 @@ Git 管理的临时目录在确认可退役后通过 Git 移除。同步后更�
 | --- | --- |
 | 未定稿计划、方案推演、临时执行清单 | 已被忽略的 `.planning/chips/`；不强制加入 Git，不为每轮讨论新增长期文档 |
 | 需要协作的范围、问题、验收条件与进度 | 在当前授权范围内优先更新所属仓库的已有 Issue；公开 Issue 只写可分享的范围与结论 |
-| 已确定的接口、使用方式、部署规范 | 更新现有 `docs/chips/` 对应文档；只有独立、持续维护的职责才新增文件 |
+| 已确定的接口、使用方式、部署规范 | 更新 `docs/guides/`、`docs/reference/`、`docs/development/` 或 `docs/validation/` 中对应的正式文档；只有独立、持续维护的职责才新增文件 |
 | 可复现实验条件与回归 | 无凭据的配置模板、任务定义、测试代码和安全夹具进入 `examples/chips/`、`tests/` 等所属位置 |
 | 原始 prompt、模型轨迹、仿真日志／波形、实际主机配置 | 留在私有 `runs/` 或部署规范指定的存储；Git 忽略不代替目录权限与备份 |
 | 有长期参考价值的调查结果 | 选择性保留经审查的精简结论、条件、限制与证据引用；优先更新现有验证记录，不复制完整运行产物 |
@@ -161,7 +161,7 @@ runner 可以在本机或服务器；Pi 与 GLM 的服务器运行不要求本�
 
 固定 vaBench、Analog 操作者协议和主机原生 Codex 接口继续按受影响范围回归。
 保留原生工具限制；受控电路入口不表示 Agent 的其他工具被禁用。
-实验前按[调用链约定](EXPERIMENT_PROTOCOL.md)核对版本、权限、预算与证据位置。
+实验前按[调用链约定](../guides/EXPERIMENT_PROTOCOL.md)核对版本、权限、预算与证据位置。
 计划、已有凭据或历史成功记录不自动授权新实验。
 
 ## 1. 先定义这次要验证的行为

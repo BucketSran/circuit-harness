@@ -12,7 +12,7 @@
 | CHIPS-NET | 模型 endpoint 的连接、认证和协议 | 无认证探针、获准的模型请求、实际 Agent Trial | 403、HTTP200或能访问其他网站都不单独证明协议可用 |
 | CHIPS-EDA | 真实仿真、解析与独立电路判定 | EMX、Spectre RC 和 benchmark 对照 | 参考控制、Agent 成绩与任意PDK验收分别报告 |
 | CHIPS-RECOVERY | 独立后台完成、断线查询、取消/超时 | `test_ngspice.py`、`test_spectre_rc.py`；获准 SSH 故障探针 | 本地进程回归不认证所有远端取消条件 |
-| CHIPS-STORAGE | 固定输入下的存储与归档 | `probes/storage_compare.py`、`test_ngspice.py`、`test_vabench.py` | 历史测量见[存储记录](../../docs/chips/STORAGE_VALIDATION.md)，不外推求解器性能 |
+| CHIPS-STORAGE | 固定输入下的存储与归档 | `probes/storage_compare.py`、`test_ngspice.py`、`test_vabench.py` | 历史测量见[存储记录](../../docs/validation/STORAGE_VALIDATION.md)，不外推求解器性能 |
 | CHIPS-ARCHIVE | 后台归档、仅归档重试与校验后清理 | `test_ngspice.py`、`test_vabench.py` | 操作者协议覆盖不代表自动选盘或保留期调度 |
 | CHIPS-VABENCH-AGENT | 固定公开动作、冻结与终评 | `test_vabench_session.py`；当前 Agent 接入按 Harbor task 验收 | 固定操作者协议不等于开箱即用的 Agent 任务 |
 | CHIPS-EPISODE-REPORT | 保存记录、候选与归档的离线读取 | `test_episode_report.py` | 不执行模型或重新评分；只支持既定来源布局 |
@@ -30,8 +30,8 @@
 Agent 是否主动提交。计划中的失败与未启动项保留，不能只统计成功样本。
 比较方案前固定条件与重复次数；证据不足时不报告因果结论或外推分位数。
 
-已有实测范围见[验证记录](../../docs/chips/VALIDATION.md)，后续条件见
-[后续工作](../../docs/chips/NEXT_WORK.md)。历史成功不自动认证当前版本或新任务。
+已有实测范围见[验证记录](../../docs/validation/VALIDATION.md)，后续条件见
+[后续工作](../../docs/development/NEXT_WORK.md)。历史成功不自动认证当前版本或新任务。
 
 ## 增加案例
 
