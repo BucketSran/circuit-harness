@@ -10,6 +10,7 @@
 - `test_episode_report.py` 检查旧轨迹离线读取、HTML 转义、缺失证据与归档校验。
 - [test_standalone.py](../test_standalone.py) 阻止 Apollo/verl 导入，检查新 CLI 与 Harbor 插件。
 - [wheel_smoke.py](../wheel_smoke.py) 在隔离环境安装 wheel，在仓库之外检查 CLI、资源和纯标准库 zipapp。
+- `tests/test_analog_example.py` 和 `tests/test_evas_example.py` 检查入门任务的准备、配置与证据读取边界。真实 ngspice 与 EVAS 控制实验另见 [Analog 入门](../../docs/chips/ANALOG_QUICKSTART.md)和 [EVAS 入门](../../docs/chips/EVAS_QUICKSTART.md)，这些回归不发送模型请求。
 
 ## 新平台的协议与隔离检查
 

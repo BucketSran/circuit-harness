@@ -1,49 +1,66 @@
 # circuit-harness
 
-独立的电路实验平台。Harbor 管理 Agent、Job 和 Trial；Circuit Harness 提供仿真接入、公开任务会话、候选冻结、独立评分和可核查的轨迹数据。Agent 与模型分别配置，runner 可部署在本机或服务器。
+Circuit Harness 是面向开发者的电路智能体实验框架。你可以接入自己的 benchmark，通过仿真器适配代码连接电路工具，并组合不同的 Agent 与模型开展实验。框架提供任务接入、仿真执行、独立评测和轨迹处理；Harbor 负责 Agent 安装、Job 与 Trial 调度。
+
+研究者与外部开发者使用同一套代码。任务、仿真器、PDK、模型连接和部署资源按实验配置提供，真实凭据与服务器配置留在本地或私有存储。
 
 ```text
-Harbor task + Agent/Model 配置
-  → Agent 调用公开电路工具 → EVAS / 公开测量 → 修改候选
-  → 会话结束、冻结候选 → 私有 verifier → 评分与证据
-  → ATIF 导出 → 用户选择数据 → 外部训练器
+选择 benchmark + Agent + Model + 运行环境
+  → Agent 阅读任务、修改电路、调用公开仿真工具
+  → 收取候选 → 按任务声明的 verifier 评分
+  → 查看成绩、失败原因、轨迹和执行证据
 ```
 
-Spectre 可用于独立终评，开源 checker 也可按任务配置选择。公开反馈与隐藏评分材料隔离；运行成功、结果有效和电路达标分别记录。任务内容与判据归 benchmark，EVAS 算法归 vaEVAS。
+## 跑第一个实验
 
-## 开始使用
+从 [AnalogBench 快速开始](examples/analogbench/README.md)运行一个 100 MHz 无源滤波器任务。它只需要 R、L、C 与 ngspice，不需要 PDK 或商业许可证。先用参考解检查运行环境，再提供模型连接运行 Agent。示例引用固定版本的外部任务，保留原题面和评分规则。
 
-完整平台要求 Python 3.12+，Harbor 固定为 0.23.0：
+要求 Python 3.12+ 与可用的 Docker。Harbor 固定为 0.23.0。
 
 ```bash
-python -m pip install -e '.[harbor,data]'
-circuit-harness --help
-python -m circuit_harness.harbor.profiles --help
+python -m pip install -e '.[harbor]'
+python -m circuit_harness.benchmarks.analogbench --help
 ```
 
-根据 [Harbor 配置说明](docs/chips/HARBOR.md)、[任务接入](docs/chips/HARBOR_TASKS.md)和[部署步骤](docs/chips/HARBOR_DEPLOYMENT.md)填写私有配置。模板中的路径、模型与镜像摘要都是占位值，不是可直接运行的实验。模型凭据、许可证和 benchmark 私有材料由操作者配置。
+| 示例 | 仿真与评测 | 用途 |
+| --- | --- | --- |
+| [A：AnalogBench RLC](examples/analogbench/README.md) | ngspice，原任务 verifier，无 PDK | 首次准备任务并运行 Harbor |
+| [B：AnalogBench SKY130 OTA](examples/analogbench/README.md) | ngspice、开源 SKY130 模型，原任务 verifier | 接入需要工艺模型的晶体管电路 |
+| [EVAS：vaBench VA07](examples/evas-va07/README.md) | 固定 EVAS 源码，benchmark 自有八例 checker | 重放保存候选，查看开发版后端的评分和不可评原因 |
+
+EVAS 示例是开发版评测路径，其结果不能代替任务声明的正式 Spectre 成绩。每个示例分别说明已验证的运行层级和限制，参考解通过也不表示某个 Agent 已解出该题。
+
+## 接入你的实验
+
+按[开发者接入指南](docs/guides/integration.md)准备任务、公开工具和 verifier，再选择 Agent、模型及部署方式。
+
+已有完整 Harbor 任务时，优先保留原任务环境与 verifier。需要受控仿真访问、动作预算和候选冻结时，再接入 Harness 公开会话。两条路径都由 Harbor 调度，都可以在本机或服务器运行；公开会话是在 Harbor 上增加的电路实验能力。选择标准见[任务执行方式](docs/guides/integration.md#2-选择任务执行方式)。
+
+- **Benchmark** 提供题面、候选接口、评测条件和 checker。可以引用 AnalogBench、接入 vaBench，或编写自己的 Harbor 任务。
+- **仿真器** 按任务需要选择。已有 ngspice、EVAS、Spectre 等具体执行接口；新后端需要适配其输入、输出与错误语义。不同仿真器的分析能力和模型语法并不通用。
+- **Agent 与 Model** 分别配置。已有 Harbor 配置入口支持 Pi、Codex、Claude Code、mini-swe-agent，具体组合取决于模型服务提供的协议。
+- **运行环境** 可以在本机或服务器。用户提供实际工具安装、工艺模型、模型凭据以及商业仿真器所需的许可证。
+
+解题时使用的仿真器与最终 verifier 可以不同。例如用 EVAS 提供公开调试反馈，再由独立 Spectre verifier 评分。正式比较需要固定任务版本、评分器与运行条件。
+
+原生 Harbor 任务使用自身的结果与 Agent 日志。当前 Harness 离线报告和正式 Pi 轨迹导出依赖公开会话的冻结证据，尚未覆盖任意原生任务；具体支持范围见[证据查看方式](docs/guides/integration.md#5-验收并查看证据)。
 
 | 需要 | 入口 |
 | --- | --- |
-| Pi / Codex 等 Agent 与模型组合、Job 编译 | [Harbor](docs/chips/HARBOR.md)、[配置模板](examples/chips/harbor/README.md) |
-| 当前 EVAS 公开会话 | [会话合同](docs/chips/CURRENT_EVAS_PUBLIC_SESSION.md) |
-| 冻结候选、Spectre / 开源 checker、重放 | [独立终评](docs/chips/BENCHMARK_EVALUATION.md) |
-| 直接运行固定 VABench、Analog、ngspice、Spectre、EMX | [执行模块](circuit_harness/execution/README.md)、[示例](examples/chips/README.md) |
-| Harbor 结果与轨迹 | [结果报告](docs/chips/HARBOR_RESULTS.md)、[ATIF 数据](circuit_harness/data/README.md) |
-| 阅读旧实验归档 | [离线 Episode 报告](docs/chips/EPISODE_REPORT.md) |
+| 配置 Agent 与模型 | [Harbor 配置](docs/chips/HARBOR.md) |
+| 将公开工具与私有评分材料分开 | [公开会话](docs/chips/CURRENT_EVAS_PUBLIC_SESSION.md)、[任务绑定](docs/chips/HARBOR_TASKS.md) |
+| 本地、服务器及许可证环境 | [部署步骤](docs/chips/HARBOR_DEPLOYMENT.md)、[独立终评](docs/chips/BENCHMARK_EVALUATION.md) |
+| 查看结果与准备训练数据 | [结果报告](docs/chips/HARBOR_RESULTS.md)、[ATIF 数据](circuit_harness/data/README.md) |
+| 直接调用仿真器或重放候选 | [执行模块](circuit_harness/execution/README.md)、[其他示例](examples/chips/README.md) |
 
-## 代码边界
+## 公共代码与私有配置
 
-- `circuit_harness/execution/` 管理仿真、进程、SSH、公开会话、冻结与归档。
-- `circuit_harness/harbor/` 对接 Harbor，编译配置、控制公开入口、执行私有 verifier、导出结果与 ATIF。
-- `circuit_harness/data/` 准备训练数据并验证 token 和 loss mask。训练器在项目外运行。
-- `circuit_harness/reporting/` 离线读取保存的实验记录。
-- `circuit_harness/cli.py` 提供直接操作者命令，`public_mcp.py` 提供原生 Agent 的公开会话桥。
+仓库保存适配代码、示例准备脚本、安全模板和合成测试。外部任务、PDK、真实服务器配置、许可证、模型密钥与运行产物分别保存在操作者的私有目录。`.gitignore` 覆盖 `private/`、`runs/`、`.env` 和 `*.local.json` 等常见位置；运行时还需要控制 Agent 能读取的文件，Git 忽略规则不能代替隔离。
 
-本版本移除了 Apollo runtime、Robotics、通用 Workflow、Memory 和内置训练器，并将包名改为 `circuit_harness`。旧导入和旧 Agent runner 不再兼容；现有调用方与任务模板的迁移范围见[迁移说明](docs/chips/MIGRATION.md)。固定 VABench r53 和 Analog 的直接会话及评分接口保留，不等于它们已成为可直接启动的 Harbor task。
+框架代码采用 [Apache License 2.0](LICENSE)，来源声明见 [Notice.txt](Notice.txt)。外部 benchmark 内容、仿真器和 PDK 适用各自的许可证。提供商业仿真器适配代码不包含该软件、工艺库或使用许可。来源和发布规则见[发布边界](docs/chips/REPOSITORY_SCOPE.md#publication-boundary)。
 
-## 开发与证据
+## 参与开发
 
-默认分支为 `main`。开发按 [AGENTS.md](AGENTS.md) 和[开发 SOP](docs/chips/DEVELOPMENT_SOP.md)进行，默认交付可 review 的 PR，确认后合并。[测试入口](tests/chips/README.md)说明本地检查；[历史验证记录](docs/chips/VALIDATION.md)只证明当时版本与条件，不能当作新部署的验收。
+Python 包名是 `circuit_harness`，命令行入口是 `circuit-harness`。benchmark 准备与候选重放在 `circuit_harness/benchmarks/`，执行代码在 `circuit_harness/execution/`，Harbor 插件在 `circuit_harness/harbor/`，训练数据准备在 `circuit_harness/data/`。训练器由使用者另行选择。
 
-公开仓库保存通用源码、合成测试和脱敏模板。真实轨迹、模型密钥、机器配置、PDK 和隐藏评分材料留在私有存储，见[发布边界](docs/chips/REPOSITORY_SCOPE.md#publication-boundary)。本项目源自 AlphaApollo，保留 Apache License 2.0 与来源归属，见 [LICENSE](LICENSE) 和 [Notice.txt](Notice.txt)。
+默认分支为 `main`。开发约定见 [AGENTS.md](AGENTS.md) 和[开发 SOP](docs/chips/DEVELOPMENT_SOP.md)，检查入口见[测试说明](tests/chips/README.md)。
