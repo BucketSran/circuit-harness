@@ -41,7 +41,9 @@ requested repeated hardening. Reuse settled scope and evidence from the
 ## Ownership
 
 - `circuit_harness/benchmarks/`: benchmark preparation, replay and operator CLIs.
-- `circuit_harness/execution/`: simulators, sessions, transport, freezing and evidence.
+- `circuit_harness/execution/`: `runtime/` owns processes and jobs, `backends/` simulator execution,
+  `sessions/` public actions, `evaluation/` freezing and verification, and `transport/` local/SSH recovery.
+  Internal imports use these owning paths; root modules preserve existing imports and worker commands.
 - `circuit_harness/harbor/`: Agent/Model configuration and Harbor environment/verifier plugins.
 - `circuit_harness/data/`: ATIF preparation and external-trainer dataset interfaces.
 - `circuit_harness/reporting/`: offline saved-episode reports.

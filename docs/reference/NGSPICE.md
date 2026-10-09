@@ -149,10 +149,10 @@ python tests/chips/probes/ssh_detached_rc.py \
 | --- | --- |
 | 任务参数 JSON | [rc.json](../../examples/chips/ngspice/rc.json) |
 | 任务规格/独立复现状态 | [RC 任务卡](../../examples/chips/benchmarks/rc/TASK.md) |
-| 输入校验、生成网表、执行/恢复 | [ngspice.py](../../circuit_harness/execution/ngspice.py) |
-| 后台提交、状态、取消与完成清单 | [jobs.py](../../circuit_harness/execution/jobs.py) |
-| 独立解析与验收 | [rc_validation.py](../../circuit_harness/execution/rc_validation.py) |
-| 公共命令与离线包 | [chips.py](../../circuit_harness/cli.py)、[bundle.py](../../circuit_harness/execution/bundle.py) |
+| 输入校验、生成网表、执行/恢复 | [ngspice.py](../../circuit_harness/execution/backends/ngspice.py) |
+| 后台提交、状态、取消与完成清单 | [jobs.py](../../circuit_harness/execution/runtime/jobs.py) |
+| 独立解析与验收 | [rc_validation.py](../../circuit_harness/execution/evaluation/rc_validation.py) |
+| 公共命令与离线包 | [chips.py](../../circuit_harness/cli.py)、[bundle.py](../../circuit_harness/execution/runtime/bundle.py) |
 | 回归与可选真实仿真 | [test_chips_ngspice.py](../../tests/chips/test_ngspice.py) |
 
 评分器只服务此公开 Harness 基线，暂与 Chips 执行模块相邻，避免导入通用 grader 的其他领域依赖；

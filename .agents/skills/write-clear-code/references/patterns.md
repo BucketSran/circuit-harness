@@ -7,7 +7,7 @@ sessions, transport and evidence. [Harbor](../../../../circuit_harness/harbor/RE
 owns composition with the external evaluation framework. Execution modules must not
 select models or import the Harbor controller.
 
-[Session transport](../../../../circuit_harness/execution/session_transport.py) preserves
+[Session transport](../../../../circuit_harness/execution/transport/session_transport.py) preserves
 stable action identity and same-action recovery. Unknown state is not permission to retry
 as a new action. Preserve request matching and result integrity.
 
