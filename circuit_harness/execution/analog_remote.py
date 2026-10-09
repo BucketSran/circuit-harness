@@ -1,13 +1,6 @@
-"""Analog public actions over the existing durable local or SSH transport."""
+"""Compatibility import for :mod:`circuit_harness.execution.transport.analog_remote`."""
 
-from .session_transport import LocalSessionTransport, RemoteSessionTransport
+import sys
+from importlib import import_module
 
-
-class RemoteAnalog(RemoteSessionTransport):
-    request_command = "analog-request"
-    response_command = "analog-response"
-
-
-class LocalAnalog(LocalSessionTransport):
-    request_command = "analog-request"
-    response_command = "analog-response"
+sys.modules[__name__] = import_module("circuit_harness.execution.transport.analog_remote")

@@ -11,55 +11,25 @@ import sys
 import threading
 from pathlib import Path
 
-from circuit_harness.execution.analog_design_bench import TASKS as ANALOG_BENCH_TASKS
-from circuit_harness.execution.analog_design_bench import run_case as run_analog_bench
-from circuit_harness.execution.analog_episode import (
+from circuit_harness.execution.backends.emx import EmxConfig, run_emx
+from circuit_harness.execution.backends.ngspice import run_rc, verify_rc
+from circuit_harness.execution.backends.vabench import export_vabench, pin_vabench
+from circuit_harness.execution.evaluation.analog_design_bench import TASKS as ANALOG_BENCH_TASKS
+from circuit_harness.execution.evaluation.analog_design_bench import run_case as run_analog_bench
+from circuit_harness.execution.evaluation.analog_episode import (
     archive_episode as archive_analog_episode,
 )
-from circuit_harness.execution.analog_episode import (
+from circuit_harness.execution.evaluation.analog_episode import (
     verify_episode as verify_analog_episode,
 )
-from circuit_harness.execution.analog_public import TASK_ID, run_public_rlc
-from circuit_harness.execution.analog_session import (
-    action_response as analog_action_response,
-)
-from circuit_harness.execution.analog_session import (
-    close_session as close_analog_session,
-)
-from circuit_harness.execution.analog_session import (
-    create_session as create_analog_session,
-)
-from circuit_harness.execution.analog_session import (
-    enqueue_action as enqueue_analog_action,
-)
-from circuit_harness.execution.analog_session import (
-    finalize_session as finalize_analog_session,
-)
-from circuit_harness.execution.analog_session import (
-    session_action as analog_session_action,
-)
-from circuit_harness.execution.analog_session import (
-    session_info as analog_session_info,
-)
-from circuit_harness.execution.archive import archived_job_status, verify_archive
-from circuit_harness.execution.authoring_session import (
-    action_response as gain_response,
-)
-from circuit_harness.execution.authoring_session import (
-    create_session as create_gain_session,
-)
-from circuit_harness.execution.authoring_session import (
-    request_action as gain_request,
-)
-from circuit_harness.execution.benchmark_remote import stage_transfer
-from circuit_harness.execution.benchmark_replay import (
+from circuit_harness.execution.evaluation.archive import archived_job_status, verify_archive
+from circuit_harness.execution.evaluation.benchmark_replay import (
     replay_candidate,
     summarize_replays,
     verify_replay,
 )
-from circuit_harness.execution.bundle import build_cli
-from circuit_harness.execution.emx import EmxConfig, run_emx
-from circuit_harness.execution.jobs import (
+from circuit_harness.execution.runtime.bundle import build_cli
+from circuit_harness.execution.runtime.jobs import (
     cancel_job,
     cleanup_job,
     execute_job,
@@ -73,10 +43,40 @@ from circuit_harness.execution.jobs import (
     submit_vabench,
     verify_job,
 )
-from circuit_harness.execution.journal import atomic_json, read_events, status
-from circuit_harness.execution.ngspice import run_rc, verify_rc
-from circuit_harness.execution.simulator import SimulationRequest, simulate
-from circuit_harness.execution.vabench import export_vabench, pin_vabench
+from circuit_harness.execution.runtime.journal import atomic_json, read_events, status
+from circuit_harness.execution.runtime.simulator import SimulationRequest, simulate
+from circuit_harness.execution.sessions.analog_public import TASK_ID, run_public_rlc
+from circuit_harness.execution.sessions.analog_session import (
+    action_response as analog_action_response,
+)
+from circuit_harness.execution.sessions.analog_session import (
+    close_session as close_analog_session,
+)
+from circuit_harness.execution.sessions.analog_session import (
+    create_session as create_analog_session,
+)
+from circuit_harness.execution.sessions.analog_session import (
+    enqueue_action as enqueue_analog_action,
+)
+from circuit_harness.execution.sessions.analog_session import (
+    finalize_session as finalize_analog_session,
+)
+from circuit_harness.execution.sessions.analog_session import (
+    session_action as analog_session_action,
+)
+from circuit_harness.execution.sessions.analog_session import (
+    session_info as analog_session_info,
+)
+from circuit_harness.execution.sessions.authoring_session import (
+    action_response as gain_response,
+)
+from circuit_harness.execution.sessions.authoring_session import (
+    create_session as create_gain_session,
+)
+from circuit_harness.execution.sessions.authoring_session import (
+    request_action as gain_request,
+)
+from circuit_harness.execution.transport.benchmark_remote import stage_transfer
 
 
 def main(argv=None) -> int:
@@ -300,7 +300,7 @@ def main(argv=None) -> int:
         "vabench-finalize",
         "vabench-preflight",
     ):
-        from circuit_harness.execution.vabench_session import (
+        from circuit_harness.execution.sessions.vabench_session import (
             action_response,
             create_session,
             enqueue_action,

@@ -11,7 +11,7 @@ import json
 from pathlib import Path
 from urllib.parse import urlsplit
 
-from circuit_harness.execution.analog_design_bench import TASKS, tree_digest
+from circuit_harness.execution.evaluation.analog_design_bench import TASKS, tree_digest
 from circuit_harness.harbor.profiles import compile_job
 
 EXAMPLES = ("rlc-rf-bandpass-100mhz", "sky130-ota-5t-gain40-pm60-noise50uv-pvt")

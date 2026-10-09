@@ -1,12 +1,6 @@
-"""Compatibility imports for VABench action transport."""
+"""Compatibility import for :mod:`circuit_harness.execution.transport.vabench_remote`."""
 
-from .session_transport import LocalSessionTransport, RemoteSessionTransport
+import sys
+from importlib import import_module
 
-
-class RemoteVabench(RemoteSessionTransport):
-    request_command = "vabench-request"
-    response_command = "vabench-response"
-
-
-class LocalVabench(LocalSessionTransport, RemoteVabench):
-    """VABench local transport; remains a RemoteVabench subtype."""
+sys.modules[__name__] = import_module("circuit_harness.execution.transport.vabench_remote")

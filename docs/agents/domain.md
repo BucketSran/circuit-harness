@@ -7,12 +7,12 @@ Use the affected component's contract as the behavior authority:
 - [Integration guide](../guides/integration.md): benchmark adapters, task execution paths and experiment setup.
 - [Execution module guide](../../circuit_harness/execution/README.md): simulator,
   session, transport and evidence interfaces.
-- [Development SOP](../chips/DEVELOPMENT_SOP.md): development, acceptance and delivery rules.
-- [Experiment protocol](../chips/EXPERIMENT_PROTOCOL.md): declared conditions and evidence.
-- [Test entry](../../tests/chips/README.md) and [validation record](../chips/VALIDATION.md):
+- [Development SOP](../development/DEVELOPMENT_SOP.md): development, acceptance and delivery rules.
+- [Experiment protocol](../guides/EXPERIMENT_PROTOCOL.md): declared conditions and evidence.
+- [Test entry](../../tests/chips/README.md) and [validation record](../validation/VALIDATION.md):
   available checks and what actual evidence supports.
-- [Repository scope](../chips/REPOSITORY_SCOPE.md): retained capabilities and publication boundaries.
-- [Platform roadmap](../chips/ROADMAP.md) and [next work](../chips/NEXT_WORK.md): future outcomes and acceptance gaps.
+- [Repository scope](../development/REPOSITORY_SCOPE.md): retained capabilities and publication boundaries.
+- [Platform roadmap](../development/ROADMAP.md) and [next work](../development/NEXT_WORK.md): future outcomes and acceptance gaps.
 
 EVAS semantics and algorithms belong to vaEVAS; task contents and checker rules belong to
 its benchmark component. Read those contracts in the actual referenced checkout for

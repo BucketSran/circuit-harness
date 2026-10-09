@@ -173,7 +173,11 @@ def test_dependency_cached_before_adapter_import_cannot_misidentify_source(
 
     original = Path(__file__).resolve().parents[2]
     isolated = tmp_path / "harness"
-    for name in (*HARNESS_SOURCE, "circuit_harness/execution/simulator.py"):
+    for name in (
+        *HARNESS_SOURCE,
+        "circuit_harness/execution/simulator.py",
+        "circuit_harness/execution/runtime/simulator.py",
+    ):
         target = isolated / name
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(original / name, target)
@@ -238,7 +242,7 @@ def test_loaded_harness_identity_uses_actual_source_module_bytes():
     from circuit_harness.execution import current_evas
     from circuit_harness.execution.journal import file_digest
 
-    root = Path(current_evas.__file__).resolve().parents[2]
+    root = Path(current_evas.__file__).resolve().parents[3]
     assert current_evas._LOADED_HARNESS == {
         name: file_digest(root / name) for name in current_evas.HARNESS_SOURCE
     }

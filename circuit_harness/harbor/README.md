@@ -7,7 +7,7 @@
 并在 Agent 阶段结束时关闭公开动作入口、冻结候选。
 `FrozenCandidateVerifier` 使用独立私有配置评价已冻结候选。
 
-协议支持、部署步骤与证据边界以 [Harbor 文档](../../docs/chips/HARBOR.md) 为准。
+协议支持、部署步骤与证据边界以 [Harbor 文档](../../docs/reference/HARBOR.md) 为准。
 首次实验见 [AnalogBench 快速开始](../../examples/analogbench/README.md)，
 接入自己的任务见[开发者指南](../../docs/guides/integration.md)。
 配置与任务模板见 [examples/chips/harbor](../../examples/chips/harbor/README.md)。

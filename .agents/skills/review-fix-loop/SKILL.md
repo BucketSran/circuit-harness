@@ -7,7 +7,7 @@ description: Repeatedly harden an existing PR with three independent clean revie
 
 This is an explicit special mode. Ordinary implementation, PR preparation or autonomous
 completion uses the normal [review](../review-pr/SKILL.md) and
-[delivery policy](../../../docs/chips/DEVELOPMENT_SOP.md#delivery-and-review).
+[delivery policy](../../../docs/development/DEVELOPMENT_SOP.md#delivery-and-review).
 
 Resolve the requested PR, base/head, workspace, checks and authorized actions. Use shared
 `show-me-your-work` for the decision trail in the project's ignored planning storage.

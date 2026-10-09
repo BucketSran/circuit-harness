@@ -15,7 +15,7 @@ Known component tasks can enter their skill directly. Small fixes and document
 edits do not need a new grill/spec/ticket sequence.
 
 Use the [documentation index](docs/README.md) to locate current contracts and the
-[development SOP](docs/chips/DEVELOPMENT_SOP.md#development-workflow) for delivery.
+[development SOP](docs/development/DEVELOPMENT_SOP.md#development-workflow) for delivery.
 Default delivery is a reviewable PR. User approval authorizes merge and daily
 checkout synchronization. An explicit request to complete and merge authorizes
 that full path. Discussion, review and saved-evidence analysis retain their scope.
@@ -41,7 +41,9 @@ requested repeated hardening. Reuse settled scope and evidence from the
 ## Ownership
 
 - `circuit_harness/benchmarks/`: benchmark preparation, replay and operator CLIs.
-- `circuit_harness/execution/`: simulators, sessions, transport, freezing and evidence.
+- `circuit_harness/execution/`: `runtime/` owns processes and jobs, `backends/` simulator execution,
+  `sessions/` public actions, `evaluation/` freezing and verification, and `transport/` local/SSH recovery.
+  Internal imports use these owning paths; root modules preserve existing imports and worker commands.
 - `circuit_harness/harbor/`: Agent/Model configuration and Harbor environment/verifier plugins.
 - `circuit_harness/data/`: ATIF preparation and external-trainer dataset interfaces.
 - `circuit_harness/reporting/`: offline saved-episode reports.
@@ -68,8 +70,8 @@ restrictions and the original Harbor path without forcing a tool-loop migration.
 
 ## Workspaces and publication
 
-Follow the SOP's [workspace](docs/chips/DEVELOPMENT_SOP.md#workspace-handoff) and
-[cross-repository](docs/chips/DEVELOPMENT_SOP.md#shared-backend-workflow) rules.
+Follow the SOP's [workspace](docs/development/DEVELOPMENT_SOP.md#workspace-handoff) and
+[cross-repository](docs/development/DEVELOPMENT_SOP.md#shared-backend-workflow) rules.
 Verify the checkout, remote and unrelated changes before editing. Target
 `BucketSran/circuit-harness`, PR base `main`; distinguish contributor forks.
 Transfer reviewed source changes from private checkouts without merging private history.
@@ -77,6 +79,6 @@ Transfer reviewed source changes from private checkouts without merging private 
 Drafts and decision logs stay in ignored `.planning/chips/`. Raw prompts, trajectories,
 simulator output and actual host configuration stay in private run storage.
 Commit maintained contracts and safe fixtures under the
-[documentation policy](docs/chips/DEVELOPMENT_SOP.md#documentation-policy).
-Verify contribution checkboxes and the [publication boundary](docs/chips/REPOSITORY_SCOPE.md#publication-boundary).
+[documentation policy](docs/development/DEVELOPMENT_SOP.md#documentation-policy).
+Verify contribution checkboxes and the [publication boundary](docs/development/REPOSITORY_SCOPE.md#publication-boundary).
 Source cleanup does not authorize visibility changes, history rewrites or external data release.

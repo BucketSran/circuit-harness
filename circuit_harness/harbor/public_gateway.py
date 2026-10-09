@@ -20,7 +20,7 @@ from starlette.requests import ClientDisconnect, Request
 from starlette.responses import JSONResponse
 from starlette.routing import Route
 
-from circuit_harness.execution.current_evas_session import session_action, session_info
+from circuit_harness.execution.sessions.current_evas_session import session_action, session_info
 
 
 class _Server(uvicorn.Server):

@@ -2,7 +2,7 @@
 
 ## ATIF trajectories for SFT
 
-The [offline Pi exporter](../../docs/chips/HARBOR.md#offline-pi-trajectory-export)
+The [offline Pi exporter](../../docs/reference/HARBOR.md#offline-pi-trajectory-export)
 creates the initial supported source from completed Harness public-session Trials.
 It requires frozen-candidate evidence; a native Harbor conversation and task reward
 alone are not a supported scored export. Conversation conversion does not verify

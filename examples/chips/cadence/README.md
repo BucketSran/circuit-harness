@@ -1,7 +1,7 @@
 # Cadence / Spectre connection reference
 
 For the current server-local, detached and independently graded PDK-free RC-001
-path, use the [Spectre RC harness guide](../../../docs/chips/SPECTRE_RC.md) and
+path, use the [Spectre RC harness guide](../../../docs/reference/SPECTRE_RC.md) and
 its private-profile [template](spectre-rc.profile.example.json). The labctl
 commands below remain a manual connection reference for other netlists.
 

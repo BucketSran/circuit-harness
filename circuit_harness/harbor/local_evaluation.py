@@ -4,8 +4,8 @@ import asyncio
 import threading
 from pathlib import Path
 
-from circuit_harness.execution.benchmark_replay import replay_candidate
-from circuit_harness.execution.journal import atomic_json
+from circuit_harness.execution.evaluation.benchmark_replay import replay_candidate
+from circuit_harness.execution.runtime.journal import atomic_json
 
 
 async def evaluate_replay(candidate, config, directory):

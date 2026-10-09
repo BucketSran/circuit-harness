@@ -15,14 +15,14 @@
 模型可见材料通过原 exporter 单独导出；最终测试、mutation/checker 和 score sidecar 保持独立。
 原 Testbench 评分含参考 DUT 与五个负向 mutation；沿用原安全检查、信号要求及判定，无自设替代容差。
 
-接口、命令与目录：[VABench 使用说明](../../../../docs/chips/VABENCH.md)。
-执行/固定：[vabench.py](../../../../circuit_harness/execution/vabench.py)；
-原接口桥接：[vabench_worker.py](../../../../circuit_harness/execution/vabench_worker.py)；
+接口、命令与目录：[VABench 使用说明](../../../../docs/reference/VABENCH.md)。
+执行/固定：[vabench.py](../../../../circuit_harness/execution/backends/vabench.py)；
+原接口桥接：[vabench_worker.py](../../../../circuit_harness/execution/backends/vabench_worker.py)；
 验收：[vabench_smoke.py](../../../../tests/chips/probes/vabench_smoke.py)。
 
 状态：本机与实验室服务器的真实 EVAS 六个正负例均符合预期；服务器仿真阶段断开 SSH 后完成、同 ID 不重跑。
-下载完整性验收与版本证据见 [验证记录](../../../../docs/chips/VALIDATION.md)。
+下载完整性验收与版本证据见 [验证记录](../../../../docs/validation/VALIDATION.md)。
 已在单题 `v4-001` 分别完成服务器 Pi＋GLM 与本机 Codex＋GPT 的真实模型、公开仿真和独立终评；
-见[双路径示例](README.md)及[验证记录](../../../../docs/chips/VALIDATION.md)。
+见[双路径示例](README.md)及[验证记录](../../../../docs/validation/VALIDATION.md)。
 未做第二位成员独立复现、全量 release 重认证或 Spectre 等价性验证。
 该行为级切片不能外推晶体管/PDK、版图、EMX 或全部模拟 IC 设计能力。

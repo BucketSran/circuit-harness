@@ -3,8 +3,8 @@
 import json
 from pathlib import Path
 
-from circuit_harness.execution.archive import verify_archive
-from circuit_harness.execution.journal import file_digest
+from circuit_harness.execution.evaluation.archive import verify_archive
+from circuit_harness.execution.runtime.journal import file_digest
 
 
 def read_json(path: Path) -> dict:
@@ -54,7 +54,7 @@ def checked_evaluation(directory: Path, frozen: dict, task: dict) -> tuple[dict,
             ),
         }
     else:
-        from circuit_harness.execution.benchmark_replay import verify_replay
+        from circuit_harness.execution.evaluation.benchmark_replay import verify_replay
 
         receipt = verify_replay(replay.parent)
         final = receipt["result"]

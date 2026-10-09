@@ -10,7 +10,7 @@ B 的历史 task 另需补齐原 checker 期望的上传路径，
 这条原生任务路径不同于 Harness 的私有冻结候选会话。A 使用上游独立 verifier 容器；
 B 使用上游原有 shared verifier，Agent 结束后才上传 tests，并在同一容器中禁网评分。
 它不提供独立私有 verifier、不可变候选提交或防恶意 Agent 篡改的安全级别。
-需要这些隔离时使用 [Harbor 私有会话集成](../../docs/chips/HARBOR.md)，不要把本例当作同等级保证。
+需要这些隔离时使用 [Harbor 私有会话集成](../../docs/reference/HARBOR.md)，不要把本例当作同等级保证。
 
 ## 准备软件与原题
 
@@ -206,4 +206,4 @@ python -m pytest -q tests/test_analog_example.py
 2026-10-09 的单次 Pi + GLM RLC Trial 在1800秒 Agent预算内自然完成，
 原独立 verifier 为15/15。运行使用私有模型元数据适配与预装Pi镜像，且没有CPU硬配额；
 它不表示只用本页公开配置就能复现该服务器部署。版本、轨迹支持范围与限制见
-[验证记录](../../docs/chips/VALIDATION.md#原生-harbor-的-pi--glm-自主-rlc-实验)。
+[验证记录](../../docs/validation/VALIDATION.md#原生-harbor-的-pi--glm-自主-rlc-实验)。
