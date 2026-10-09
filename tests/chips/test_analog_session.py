@@ -238,6 +238,32 @@ def test_interrupted_action_blocks_replay_and_later_mutation(session):
     assert call(session, "next", "read", path="")["error"] == "unresolved_previous_action"
 
 
+def test_runner_interruption_keeps_durable_request_without_replaying(session, monkeypatch):
+    from circuit_harness.execution import analog_session as module
+
+    content = ".subckt rlc_rf_bandpass IN OUT COM\nR1 IN OUT 50\n.ends rlc_rf_bandpass\n"
+    assert call(session, "write", "write", content=content)["ok"]
+    request = {"id": "sim", "tool": "analog_simulate", "arguments": {}}
+
+    def interrupted_runner(*args, **kwargs):
+        action = session / "actions/sim"
+        assert json.loads((action / "request.json").read_text()) == request
+        assert not (action / "response.json").exists()
+        raise RuntimeError("synthetic interruption after durable reservation")
+
+    monkeypatch.setattr(module, "run_public_rlc", interrupted_runner)
+    with pytest.raises(RuntimeError, match="synthetic interruption"):
+        session_action(session, request)
+    assert not (session / "actions/sim/measurement.json").exists()
+    assert call(session, "sim", "simulate") == {
+        "ok": False,
+        "error": "unknown_execution",
+        "retry_safe": False,
+    }
+    assert call(session, "next", "read", path="")["error"] == "unresolved_previous_action"
+    assert (session / "candidate.spi").read_text() == content
+
+
 def test_public_tamper_and_malformed_tool_are_rejected(session):
     with pytest.raises(ValueError, match="invalid tool"):
         session_action(session, {"id": "bad", "tool": [], "arguments": {}})

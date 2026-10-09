@@ -24,6 +24,7 @@ from circuit_harness.execution.evaluation.candidate_bundle import (
 )
 from circuit_harness.execution.runtime.journal import atomic_json, file_digest
 from circuit_harness.execution.sessions import public_observations
+from circuit_harness.execution.sessions.action_store import ActionRecord, ActionStore
 from circuit_harness.execution.sessions.current_evas_public import run_public
 
 TOOLS = {
@@ -315,13 +316,12 @@ def _request(request):
 def session_action(directory: Path, request: dict) -> dict:
     action_id, tool, args = _request(request)
     directory = Path(directory).absolute()
-    with (directory / ".session.lock").open("a") as lock:
-        fcntl.flock(lock, fcntl.LOCK_EX)
+    store = ActionStore(directory)
+    with store.lock() as lock:
         config = json.loads((directory / "session.json").read_text())
-        action = directory / "actions" / action_id
-        if action.exists():
-            if json.loads((action / "request.json").read_text()) != request:
-                raise ValueError("action ID belongs to another request")
+        record = store.lookup(action_id, request)
+        if record is not None:
+            action = record.path
             response = action / "response.json"
             if (
                 not response.exists()
@@ -337,11 +337,7 @@ def session_action(directory: Path, request: dict) -> dict:
                     args,
                     {"ok": True, "result": json.loads((action / "snapshot.json").read_text())},
                 )
-            return (
-                json.loads(response.read_text())
-                if response.exists()
-                else {"ok": False, "error": "unknown_execution", "retry_safe": False}
-            )
+            return record.cached_response()
         if (directory / "frozen.json").exists() or (directory / "episode-end.json").exists():
             return {"ok": False, "error": "submission_frozen"}
         previous = list((directory / "actions").iterdir())
@@ -371,8 +367,8 @@ def session_action(directory: Path, request: dict) -> dict:
             and simulations >= config["max_simulations"]
         ):
             return {"ok": False, "error": "simulation_budget_exhausted"}
-        action.mkdir(mode=0o700)
-        atomic_json(action / "request.json", request)
+        record = store.begin(action_id, request)
+        action = record.path
         try:
             result = _execute(directory, config, action, tool, args)
             response = {"ok": True, "result": result}
@@ -381,8 +377,7 @@ def session_action(directory: Path, request: dict) -> dict:
             if isinstance(error, ValueError):
                 response["detail"] = str(error)
         if tool not in {"evas_simulate", "evas_experiment"} or not response["ok"]:
-            atomic_json(action / "response.json", response)
-            return response
+            return record.complete(response)
     # Snapshot and budget reservation are durable before releasing the edit lock.
     return _finish_simulation(directory, config, action, tool, args, response)
 
@@ -433,8 +428,7 @@ def _finish_simulation(directory, config, action, tool, args, response):
         response = {"ok": True, "result": {**projected, **response["result"]}}
     except (ValueError, OSError) as error:
         response = {"ok": False, "error": type(error).__name__}
-    atomic_json(action / "response.json", response)
-    return response
+    return ActionRecord(action).complete(response)
 
 
 def _freeze(directory, config, reason):

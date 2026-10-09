@@ -22,6 +22,7 @@ from circuit_harness.execution.backends.vabench import (
     verify_pin,
 )
 from circuit_harness.execution.runtime.journal import atomic_json, file_digest
+from circuit_harness.execution.sessions.action_store import ActionStore
 from circuit_harness.execution.sessions.session_budget import budget_rejection, with_budget
 
 TOOLS = {
@@ -132,17 +133,13 @@ def session_action(directory, request):
         raise ValueError("invalid tool or arguments")
     if any(not isinstance(value, str) for value in arguments.values()):
         raise ValueError("arguments must be strings")
-    with (directory / ".session.lock").open("a") as lock:
-        fcntl.flock(lock, fcntl.LOCK_EX)
-        actions = directory / "actions"
+    store = ActionStore(directory)
+    with store.lock():
+        actions = store.actions
         actions.mkdir(mode=0o700, exist_ok=True)
-        action = actions / request["id"]
-        if action.exists():
-            if json.loads((action / "request.json").read_text()) != request:
-                raise ValueError("action ID belongs to another request")
-            if (action / "response.json").exists():
-                return json.loads((action / "response.json").read_text())
-            return {"ok": False, "error": "unknown_execution", "retry_safe": False}
+        record = store.lookup(request["id"], request)
+        if record is not None:
+            return record.cached_response()
         config = json.loads((directory / "session.json").read_text())
         if len(list(actions.iterdir())) >= config["max_actions"]:
             return with_budget({"ok": False, "error": "action_budget_exhausted"}, directory, config)
@@ -153,11 +150,10 @@ def session_action(directory, request):
         rejected = budget_rejection(directory, config, tool)
         if rejected is not None:
             return rejected
-        action.mkdir(mode=0o700)
-        atomic_json(action / "request.json", request)
+        record = store.begin(request["id"], request)
         started = time.monotonic()
         try:
-            result = _execute(directory, config, tool, arguments, action)
+            result = _execute(directory, config, tool, arguments, record.path)
             reply = {"ok": True, "result": result}
         except (ValueError, OSError, subprocess.SubprocessError) as error:
             # Exception text may contain operator paths. Keep the full type only.
@@ -170,9 +166,7 @@ def session_action(directory, request):
             if isinstance(error, InvalidPublicPath):
                 reply["hint"] = "Read task/... or submission/...; use an empty path to list files."
         reply = with_budget(reply, directory, config)
-        atomic_json(action / "measurement.json", {"elapsed_s": time.monotonic() - started})
-        atomic_json(action / "response.json", reply)
-        return reply
+        return record.complete(reply, started=started)
 
 
 def _execute(directory, config, tool, arguments, action):

@@ -60,6 +60,7 @@ def build_cli(destination: Path) -> str:
             "backends/vabench.py",
             "backends/vabench_worker.py",
             "backends/vabench_public_worker.py",
+            "sessions/action_store.py",
             "sessions/analog_session.py",
             "sessions/authoring_session.py",
             "sessions/current_evas_session.py",
