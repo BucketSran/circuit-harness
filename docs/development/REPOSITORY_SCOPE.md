@@ -4,7 +4,7 @@
 
 仓库包含 benchmark 适配、电路执行、公开会话、独立 verifier、Harbor 集成、离线报告与 ATIF 数据接口。Harbor 负责实验调度与 Agent 执行；训练器由使用者提供。固定 VABench r53 协议和兼容 Episode 读取能力继续维护。
 
-清理后的源码仍需本地回归和安装包检查；这些检查不能认证真实模型、EDA 许可证或新任务成绩。历史实测条件见 [VALIDATION](VALIDATION.md)。
+清理后的源码仍需本地回归和安装包检查；这些检查不能认证真实模型、EDA 许可证或新任务成绩。历史实测条件见 [VALIDATION](../validation/VALIDATION.md)。
 
 <a id="publication-boundary"></a>
 

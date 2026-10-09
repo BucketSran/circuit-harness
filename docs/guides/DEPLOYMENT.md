@@ -1,9 +1,9 @@
 # Circuit Harness 部署规范：目录、访问边界与模型网络
 
-本文补充 [平台路线图](ROADMAP.md)。
+本文补充 [平台路线图](../development/ROADMAP.md)。
 适用于个人部署和小组协作；是部署约定及验收要求，不代表这些检查已经在 Harness 中实现。
 实际服务器路径、账号、权限审计和网络证据保存在操作者本地，不写入仓库。
-源码、配置模板与实验数据的对外发布范围见[仓库发布边界](REPOSITORY_SCOPE.md#publication-boundary)。
+源码、配置模板与实验数据的对外发布范围见[仓库发布边界](../development/REPOSITORY_SCOPE.md#publication-boundary)。
 
 ## 1. 文件放在哪里
 
@@ -39,8 +39,8 @@
 初期不默认开启自动清理，也不把未知文件当作本项目 scratch 删除。
 
 同一源码包的 NFS/本地 XFS 对照、真实 EVAS/RC 检查和归档试验见
-[存储验证记录](STORAGE_VALIDATION.md)。后台 RC/VABench 已提供 `--root` / `--archive-root`、
-自动归档、归档单独重试和显式校验后清理，详见 [存储使用说明](STORAGE.md)。
+[存储验证记录](../validation/STORAGE_VALIDATION.md)。后台 RC/VABench 已提供 `--root` / `--archive-root`、
+自动归档、归档单独重试和显式校验后清理，详见 [存储使用说明](../reference/STORAGE.md)。
 表中的环境变量仍是逻辑约定；自动选盘、源码/环境迁移和保留期调度尚未实现。
 Harbor 的实际镜像、容器资源与预检合同见[服务器部署](HARBOR_DEPLOYMENT.md)。
 旧运行配置不自动成为 Harbor JobConfig，各部署分别验收。
@@ -87,7 +87,7 @@ GitHub 仓库权限与服务器文件权限是两个独立边界；源码公开�
 第二种方案仍能把转换、仿真、解析组成服务器内的闭环。Agent 不与仿真进程同机，不代表每轮都要
 下载 GDS、波形和完整日志。当前 EMX 实现仍是 SSH/scp 流程；服务器本地后端、按需产物获取和上述
 统一目录映射需要后续实现，不能仅靠本文件视为已支持。
-新增 [ngspice RC 后端](NGSPICE.md) 已实现独立的服务器本地生成、执行和解析；
+新增 [ngspice RC 后端](../reference/NGSPICE.md) 已实现独立的服务器本地生成、执行和解析；
 不表示现有 EMX 传输、模型网络或通用后台作业服务已完成改造。
 
 连接诊断依次检查：

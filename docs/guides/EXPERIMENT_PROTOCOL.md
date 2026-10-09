@@ -1,7 +1,7 @@
 # 实验条件与比较
 
 Harbor 组织 Agent、Job 和 Trial，任务规定候选接口与判据，Harness 提供电路执行和证据。
-按[接入指南](../guides/integration.md#2-选择任务执行方式)选择原生任务或公开会话。
+按[接入指南](integration.md#2-选择任务执行方式)选择原生任务或公开会话。
 两条路径都能在本机或服务器运行，部署位置与 Agent、模型分别配置。
 
 ## 开跑前固定条件
@@ -26,7 +26,7 @@ Agent 阶段期限与模型请求参数不同。配置中的推理档位不证�
 
 原生 Harbor 任务按自己的规则收取候选并运行原 verifier。
 公开会话的容器 gateway 路径通过 `harness-public` 修改候选和请求仿真，结束后关闭入口、冻结
-实际提交，再由绑定的私有 verifier 评分。具体合同见[独立终评](BENCHMARK_EVALUATION.md)。
+实际提交，再由绑定的私有 verifier 评分。具体合同见[独立终评](../reference/BENCHMARK_EVALUATION.md)。
 
 会话、动作、作业和候选摘要关联证据。断线或超时后先查询原作业；
 未知状态不表示可以重新执行。终评采用该次实际提交，不自动选历史最佳版本。
@@ -46,4 +46,4 @@ Agent 阶段期限与模型请求参数不同。配置中的推理档位不证�
 原生任务先查看 Harbor 结果和日志，公开会话使用[离线报告](HARBOR_RESULTS.md)。
 轨迹只保留 Agent 实际可见的内容。私有 checker 与最终成绩留在关联元数据，
 不混入训练对话。正式导出范围和 reasoning 筛选见[ATIF 数据](../../circuit_harness/data/README.md)。
-验证结果见[验收记录](VALIDATION.md)，尚未覆盖的条件见[后续工作](NEXT_WORK.md)。
+验证结果见[验收记录](../validation/VALIDATION.md)，尚未覆盖的条件见[后续工作](../development/NEXT_WORK.md)。

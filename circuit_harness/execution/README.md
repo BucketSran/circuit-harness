@@ -22,9 +22,9 @@ import, update `bundle.py`'s explicit source list and run the bundle tests.
 Keep public feedback in task sessions and final scoring in the operator-owned
 modules; a successful public simulation is not an independent final score.
 
-The [current EVAS session contract](../../docs/chips/CURRENT_EVAS_PUBLIC_SESSION.md)
+The [current EVAS session contract](../../docs/reference/CURRENT_EVAS_PUBLIC_SESSION.md)
 defines the public task manifest and execution limits. The
-[benchmark evaluation guide](../../docs/chips/BENCHMARK_EVALUATION.md)
+[benchmark evaluation guide](../../docs/reference/BENCHMARK_EVALUATION.md)
 defines frozen inputs, checker results and replay. Harbor owns trial scheduling
-through the [Harbor adapter](../../docs/chips/HARBOR.md); it does not change
+through the [Harbor adapter](../../docs/reference/HARBOR.md); it does not change
 the retained VABench or Analog operator/session protocols.

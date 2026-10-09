@@ -28,7 +28,7 @@
    [安装脚本](../../examples/chips/ngspice/install.sh) 固定本次取得的 SHA-256：
    `894e649651f1838a14095e5a5439e7d3aa63e87ede14d283173fda4fcdef675f`。
    这是下载内容的复现指纹，不是声称已验证发布者签名。
-2. 在本人持久目录建立 `chips-private`，按 [部署规范](DEPLOYMENT.md) 设置 0700、检查父目录和 ACL。
+2. 在本人持久目录建立 `chips-private`，按 [部署规范](../guides/DEPLOYMENT.md) 设置 0700、检查父目录和 ACL。
    不修改系统工具、公共 EDA 或其他人的目录。需 Linux GCC/make/bison/flex、GNU time/timeout。
 3. 编译位置建议使用经过核查的本地临时盘：父目录须不可被他人任意替换条目，例如 `/tmp` 的 1777；
    用 `mktemp -d` 创建本人 0700 目录。持久安装前缀仍在 HOME。脚本不覆盖已有构建/安装。

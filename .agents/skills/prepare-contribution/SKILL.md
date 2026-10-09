@@ -16,7 +16,7 @@ Use the actual base/head and intended diff, including relevant uncommitted/untra
 when preparing local work. Check dependencies and ownership before staging.
 A ticket normally maps to one independently verifiable PR; small specs need no duplicate ticket.
 Review fixes continue in the existing PR. Link a parent spec without closing it unless all
-of its acceptance is complete. See the [PR policy](../../../docs/chips/DEVELOPMENT_SOP.md#delivery-and-review).
+of its acceptance is complete. See the [PR policy](../../../docs/development/DEVELOPMENT_SOP.md#delivery-and-review).
 
 Preserve discussion and review-only scope. For an authorized development delivery, prepare,
 commit, push and create/update its PR under that policy; do not stop at a local draft.
@@ -52,6 +52,6 @@ to the current chat when the host provides that capability.
 Return the PR link, the reviewable revision, key checks and pending acceptance. By default
 leave it open for human review. After confirmation, or under explicit autonomous-merge
 authorization, verify the current head/checks and continue integration and
-[workspace handoff](../../../docs/chips/DEVELOPMENT_SOP.md#workspace-handoff).
+[workspace handoff](../../../docs/development/DEVELOPMENT_SOP.md#workspace-handoff).
 New material changes after human approval require review of the affected change; do not
 use approval of an older result to merge a different result silently.

@@ -137,7 +137,7 @@ Configuration has `backend_config_version=1` and an explicit backend:
   with no host fallback or quota-free retry. Images and kernel must match the
   Podman host architecture and namespace UID mapping. Both container backends
   accept declared Python measurements. Harbor operators use `public_cpu_limit`
-  for this setting and the [private Podman runner](HARBOR_DEPLOYMENT.md#使用-rootless-podman).
+  for this setting and the [private Podman runner](../guides/HARBOR_DEPLOYMENT.md#使用-rootless-podman).
 - `native_codex_sandbox`: requires `image=None`, the actual native `codex` executable
   path and a Python executable via `codex=...`, `python=...`. This uses the outer
   Codex OS sandbox with minimal reads, explicit read-only source/kernel/runtime
