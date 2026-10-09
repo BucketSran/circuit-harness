@@ -33,7 +33,7 @@ async def prepare_session(config, directory: Path, trial_dir: Path):
     # Use a cancellable process, not a background thread that copies after timeout.
     code = (
         "import json,sys; from pathlib import Path; "
-        "from circuit_harness.execution.current_evas_session import create_session; "
+        "from circuit_harness.execution.sessions.current_evas_session import create_session; "
         "p=json.load(sys.stdin); "
         "p.update({k:Path(p[k]) if p[k] is not None else None "
         "for k in ('materials','checkout','kernel','directory')}); "
@@ -76,7 +76,7 @@ async def prepare_session(config, directory: Path, trial_dir: Path):
 
 
 async def freeze_session(directory: Path, reason: str, timeout_s: float) -> dict:
-    from circuit_harness.execution.current_evas_session import close_session
+    from circuit_harness.execution.sessions.current_evas_session import close_session
 
     deadline = asyncio.get_running_loop().time() + timeout_s + 5
     while True:

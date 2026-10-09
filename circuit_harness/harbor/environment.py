@@ -44,9 +44,9 @@ class HarborChipsEnvironment(BaseEnvironment):
             raise FileNotFoundError("harness.json operator configuration is required")
 
     async def start(self, force_build):
-        from circuit_harness.execution.benchmark_remote import RemoteBenchmarkSpectre
-        from circuit_harness.execution.benchmark_spectre import package_identity
-        from circuit_harness.execution.native_sandbox import NativeSandbox
+        from circuit_harness.execution.evaluation.benchmark_spectre import package_identity
+        from circuit_harness.execution.runtime.native_sandbox import NativeSandbox
+        from circuit_harness.execution.transport.benchmark_remote import RemoteBenchmarkSpectre
 
         config = self.settings
         codex = config.executable
@@ -81,7 +81,7 @@ class HarborChipsEnvironment(BaseEnvironment):
         shutil.copyfile(config.auth_file, self.native_home / "auth.json")
         (self.native_home / "auth.json").chmod(0o400)
         await self._create_public_session()
-        from circuit_harness.execution.current_evas_session import session_info
+        from circuit_harness.execution.sessions.current_evas_session import session_info
 
         self.public_tools = tuple(
             schema["function"]["name"] for schema in session_info(self.session_directory)["tools"]

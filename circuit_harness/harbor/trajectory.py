@@ -12,8 +12,8 @@ from pathlib import Path
 from harbor.models.trial.config import TrialConfig
 
 from circuit_harness.data.io import commit_directory
-from circuit_harness.execution.candidate_bundle import regular_file, verify_candidate
-from circuit_harness.execution.journal import file_digest
+from circuit_harness.execution.evaluation.candidate_bundle import regular_file, verify_candidate
+from circuit_harness.execution.runtime.journal import file_digest
 
 from .config import require_harbor_version
 from .evidence import checked_evaluation, read_json

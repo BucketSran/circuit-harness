@@ -232,8 +232,8 @@ def _find_archive(evidence, agent, expected_hash, public):
 
 
 def _vabench_archives(evidence, agent, report, actions, integrity):
-    from circuit_harness.execution.archive import verify_archive
-    from circuit_harness.execution.vabench_session import verify_episode_archive
+    from circuit_harness.execution.evaluation.archive import verify_archive
+    from circuit_harness.execution.sessions.vabench_session import verify_episode_archive
 
     summaries = []
     result = report.get("result", {})

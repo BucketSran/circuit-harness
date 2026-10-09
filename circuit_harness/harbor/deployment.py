@@ -269,7 +269,7 @@ async def _inspect_image(image, timeout_s, backend="docker"):
 async def _probe_public_runtime(public, directory, timeout_s):
     import threading
 
-    from circuit_harness.execution.current_evas_public import run_isolated_container
+    from circuit_harness.execution.sessions.current_evas_public import run_isolated_container
 
     cancel = threading.Event()
     running = asyncio.create_task(

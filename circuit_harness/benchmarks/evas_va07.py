@@ -8,10 +8,10 @@ import sys
 import tarfile
 from pathlib import Path
 
-from circuit_harness.execution.benchmark_replay import replay_candidate, verify_replay
-from circuit_harness.execution.benchmark_spectre import package_identity
-from circuit_harness.execution.candidate_bundle import freeze_candidate
-from circuit_harness.execution.journal import atomic_json, file_digest
+from circuit_harness.execution.evaluation.benchmark_replay import replay_candidate, verify_replay
+from circuit_harness.execution.evaluation.benchmark_spectre import package_identity
+from circuit_harness.execution.evaluation.candidate_bundle import freeze_candidate
+from circuit_harness.execution.runtime.journal import atomic_json, file_digest
 
 SOURCE_URL = "https://github.com/BucketSran/vaEVAS"
 SOURCE_COMMIT = "f8b624f8887f5d55ce726373cff2a856c1487b79"

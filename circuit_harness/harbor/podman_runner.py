@@ -18,7 +18,7 @@ from pathlib import Path
 
 from pydantic import BaseModel, ConfigDict, model_validator
 
-from circuit_harness.execution.journal import atomic_json
+from circuit_harness.execution.runtime.journal import atomic_json
 
 
 class PodmanRuntimeConfig(BaseModel):
