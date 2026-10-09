@@ -18,8 +18,10 @@ commands and worker entry paths. They are compatibility facades. Internal code
 imports the implementation from its owning directory; new development belongs
 there. The operator command entry remains `circuit_harness/cli.py`.
 
-Public sessions persist matched action requests, responses and evidence so that
-recovery uses the same action identity. Task callers own action budgets, remote
+Public sessions use [sessions/action_store.py](sessions/action_store.py) for the
+action lock, request consistency, durable reservation and cached responses. A
+request without a response remains unknown and is never replayed by the store.
+Task callers own action budgets, remote
 snapshot recovery and candidate freezing policies. Keep public feedback in task
 sessions and final scoring in operator verification modules; a successful public
 simulation is not an independent final score.
