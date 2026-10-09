@@ -33,7 +33,7 @@
 - 本地夹具覆盖、真实后端验收和未覆盖条件：
 - 比较新旧版本时固定的任务、模型、工具与预算：
 
-执行接口放在 `circuit_harness/execution/`，Harbor 环境接线放在
+公开会话接口放在 `circuit_harness/execution/sessions/`，仿真器执行放在 `circuit_harness/execution/backends/`，Harbor 环境接线放在
 `circuit_harness/harbor/`，具体 benchmark 准备放在 `circuit_harness/benchmarks/`。
 公开工具通过已有会话或 `circuit_harness/public_mcp.py` 接入，复用原生 Agent
 工具循环。测试归入 `tests/chips/` 或对应模块测试，见[贡献指南](CONTRIBUTING.md)。
