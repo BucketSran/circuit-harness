@@ -6,7 +6,7 @@
 
 ## 版本边界
 
-两道 RLC 题固定于 Analog Design Bench 的[初始公开提交](https://github.com/Arcadia-1/analog-design-bench/tree/fb0ec30463d005d3e463caf4e48ab9a26008e869)，OTA 固定于[当前所审查提交](https://github.com/Arcadia-1/analog-design-bench/tree/c23f124de1e461655d2e02ce6cfae2654ccea0d3)。当前 50 题目录已移除这两道 RLC 题，所以这里是三个**分别固定版本的试验**，不是同一榜单的三题成绩。运行器把三个任务树的 SHA-256 和相应上游基础镜像 digest 固定在 `analog_design_bench.py` 中；内容不符即拒绝执行。上游[许可说明](https://github.com/Arcadia-1/analog-design-bench/blob/main/LICENSE)对软件和 benchmark 内容分别规定 Apache-2.0 和 CC BY-NC 4.0；本仓库不复制原题、参考网表或评分器。
+两道 RLC 题固定于 Analog Design Bench 的[初始公开提交](https://github.com/Arcadia-1/analog-design-bench/tree/fb0ec30463d005d3e463caf4e48ab9a26008e869)，OTA 固定于[当前所审查提交](https://github.com/Arcadia-1/analog-design-bench/tree/c23f124de1e461655d2e02ce6cfae2654ccea0d3)。当前 50 题目录已移除这两道 RLC 题，所以这里是三个**分别固定版本的试验**，不是同一榜单的三题成绩。运行器把三个任务树的 SHA-256 和相应上游基础镜像 digest 固定在 `evaluation/analog_design_bench.py` 中；内容不符即拒绝执行。上游[许可说明](https://github.com/Arcadia-1/analog-design-bench/blob/main/LICENSE)对软件和 benchmark 内容分别规定 Apache-2.0 和 CC BY-NC 4.0；本仓库不复制原题、参考网表或评分器。
 
 准备上游源码时，把两次 `git archive` 展开到操作者私有的同一个 `$CHIPS_SOURCE_ROOT`，形成 `tasks/<task-id>/`；保留原始提交和导出的 tar 校验和。不要把 `solution/`、`tests/` 或归档目录挂载进 Agent 工作区。macOS 二次打 tar 可能额外生成 `._*` 文件并导致哈希不符；应直接转移 `git archive` 的 tar，或以只收录普通文件的脚本重新打包。
 

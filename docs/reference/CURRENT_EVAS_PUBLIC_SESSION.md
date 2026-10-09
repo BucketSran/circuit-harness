@@ -1,6 +1,6 @@
 # Current EVAS public sessions
 
-`circuit_harness.execution.current_evas_session` owns public candidate
+`circuit_harness.execution.sessions.current_evas_session` owns public candidate
 editing, bounded diagnostic execution and final collection. It does not grade
 benchmark tasks. A benchmark owner must explicitly supply a public task mapping;
 there is no inferred va07 mapping or hidden checker mount.
@@ -169,7 +169,7 @@ action replay, budgets, pending simulation exclusion and collection during execu
 Set `CHIPS_TEST_DOCKER_IMAGE` to a local immutable image ID or
 `CHIPS_TEST_NATIVE_CODEX` to the native CLI binary to run those probes. Their engines
 are synthetic fixtures; they establish platform access boundaries, not circuit scores.
-The trusted resource runner `current_evas.py` is not a sandbox and is not a fallback.
+The trusted resource runner `backends/current_evas.py` is not a sandbox and is not a fallback.
 
 The public adapter does not yet establish real va07 benchmark acceptance, a Linux
 build of the current local Mach-O kernel, arbitrary native script isolation, or
