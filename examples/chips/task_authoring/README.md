@@ -39,7 +39,7 @@ python -m circuit_harness.task_authoring verify \
 `inspect` 在待澄清时返回 1；`verify` 在材料变化、确认缺失或失效时返回 1。
 当前通过只表示确认契约有效，不表示物理条件正确或电路达标。
 
-实现：[草案与确认](../../../circuit_harness/execution/task_authoring.py)、
+实现：[草案与确认](../../../circuit_harness/execution/sessions/task_authoring.py)、
 [操作者 CLI](../../../circuit_harness/task_authoring.py)。
 本地检查：`python -m pytest -q tests/chips/test_task_authoring.py`，不调用模型或服务器。
 

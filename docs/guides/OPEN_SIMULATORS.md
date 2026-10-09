@@ -23,7 +23,7 @@ Harness 提供执行与证据接口；仿真器负责求解，benchmark 负责�
 1. 选择真实任务，明确候选格式、单位、模型语法与分析类型。
 2. 固定输入、软件与模型版本，用参考候选确认求解和输出解析。
 3. 补充合法不达标候选、非法输入、超时和依赖缺失的处理。
-4. 在 `circuit_harness/execution/` 接入实际输入输出，复用进程、作业、transport 与归档模块。
+4. 在 `circuit_harness/execution/backends/` 接入实际输入输出，复用 `runtime/` 的进程和作业、`transport/` 的传输与 `evaluation/` 的归档模块。
 5. 若 Agent 需要受控访问，接入对应公开会话；最终评分使用任务声明的独立 checker。
 6. 按[测试入口](../../tests/chips/README.md)验证协议，再按实际部署完成实验验收。
 
