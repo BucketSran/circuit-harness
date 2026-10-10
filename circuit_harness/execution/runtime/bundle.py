@@ -54,6 +54,7 @@ def build_cli(destination: Path) -> str:
             "runtime/bundle.py",
             "backends/ngspice.py",
             "backends/spectre.py",
+            "backends/spectre_isolation.py",
             "backends/emx.py",
             "backends/spectre_testbench.py",
             "backends/current_evas.py",

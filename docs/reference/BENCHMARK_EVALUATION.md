@@ -270,3 +270,70 @@ networked licensing needs a separately implemented and verified access policy. T
 is no host-network or host-process fallback, and no Boolean declaring a deployment
 verified. Supporting this bounded executor does not establish that a particular Spectre
 installation can obtain a license with networking disabled.
+
+## Spectre process namespace
+
+`spectre-isolate` lets a trusted host checker launch the candidate's Spectre process
+in a Linux Bubblewrap namespace. The checker must prepare a separate condition
+directory containing only the candidate, its relative include files and that
+condition's netlist. The process sees that directory and explicitly declared
+simulator runtime paths; the checker, hidden truth and other task packages stay
+outside those mounts. Existing inputs are read-only, while new compiler artifacts,
+logs and waveforms can be written in the condition directory. Candidate source is
+executed as supplied; this interface imposes no Verilog-A language subset.
+
+```sh
+python harness.pyz spectre-isolate --config /private/isolation.json -- \
+  -64 tb.scs +log spectre.log -format psfascii -raw psf +mt=1
+```
+
+The private configuration is an owned regular file with no group/world access.
+Its exact schema is version 1 and requires these fields:
+
+```json
+{
+  "schema_version": 1,
+  "bubblewrap": "/usr/bin/bwrap",
+  "spectre": "/opt/spectre/tools/bin/spectre",
+  "runtime_readonly_paths": ["/opt/spectre", "/usr", "/lib", "/lib64", "/bin"],
+  "network": "disabled",
+  "license_env": []
+}
+```
+
+Runtime grants must include the executable's resolved location, its libraries,
+standard models and shell interpreters. Some systems also need a narrow grant
+for `/etc/alternatives` or DNS configuration. Operators must exclude private
+configuration, home directories, checker packages and secrets from these grants.
+The launcher rejects filesystem-root grants, condition/runtime overlap, source
+symlinks and configuration inside a mounted condition. Missing dependencies fail
+the launch; there is no fallback to an unrestricted process.
+
+`network: "disabled"` creates a network namespace. `"shared_license"` retains the
+host network for a network license server and therefore **does not restrict other
+network egress**. Only explicitly selected simulator/license environment names are
+passed: `CDS_LIC_FILE`, `CDSLMD_LICENSE_FILE`, `LM_LICENSE_FILE`, `CDS_LIC_ONLY`,
+`CDS_LIC_QUEUE`, `CDS_AUTO_64BIT`, `LD_LIBRARY_PATH`, `CDS_INST_DIR`,
+`CDS_SPECTRE_DIR`. Model credentials and the caller's remaining environment are
+removed before Bubblewrap starts. License values remain operator-private.
+
+The launcher replaces itself, preserving the existing job process group for
+timeout and cancellation. `-W` grants no condition directory. Other launches write
+a configuration-hash and input-hash receipt in the condition directory, before
+Spectre starts. This receipt describes launch intent; trusted checkers must still
+verify the process result, input identity and output independently.
+
+To opt in to an existing final host profile, set its `spectre` executable to an
+operator-owned wrapper which invokes this command using a fixed private config
+and pinned bundle. Keep the trusted checker outside the namespace, and retain
+its license preflight and actual installation's discipline paths. Existing
+profiles are unchanged. This process entry does not itself enable the public
+Docker session protocol or authorize mounting a whole task package.
+
+Actual Linux validation with Bubblewrap 0.4.1 and Spectre 21.1.0.509.isr12
+compiled a relative helper module and installed standard disciplines. A transient
+reference and a candidate using `$fopen` against hidden truth and its own source
+both completed with zero errors: 13 samples, 0.5V output for 1V input. Both negative
+file handles were zero; input files and hidden truth were unchanged. The deployment
+used shared license networking. Private raw evidence remains with the operator;
+these probes do not establish arbitrary runtime-grant safety or network isolation.
