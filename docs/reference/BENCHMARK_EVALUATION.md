@@ -64,7 +64,12 @@ triangle report 用 `returncode=0`、`timeout=false` 和 `waveform_sha256` 表�
 | `preflight_script` | 必填的部署预检 shell 脚本绝对路径；普通现存文件 |
 | `run_root`, `archive_root` | 已存在、操作者拥有的私有目录；两者不能重叠 |
 | `timeout_s` | 有限值，`0 < timeout_s <= 1800` |
-| `max_output_bytes` | 整数，1–256 MiB |
+| `max_output_bytes` | 整数，1–512 MiB；沿用原 profile 的值，更大容量须显式声明 |
+
+原有 256 MiB profile 仍按 256 MiB 限制完整输出树。需要更大容量的任务应使用新的版本化
+profile，显式设置 `536870912`，并部署支持该上限的新 worker bundle。提交身份保存该
+profile 的原字节摘要与配置；超出所声明配额仍返回 `output_limit`，分数为 `null`。
+Docker 公开 profile 的 16 MiB 上限及独立 report 的大小检查不变。
 
 提交固定 profile、shell、setup scripts、预检脚本和 Spectre 可执行文件的字节摘要。
 文件预检先检查路径、权限和声明范围；随后有限执行部署提供的 `preflight_script`，通过后才启动 checker。

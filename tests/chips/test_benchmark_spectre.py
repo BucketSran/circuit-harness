@@ -162,6 +162,90 @@ def test_detached_frozen_checker_and_deduplicated_archive(tmp_path):
     }
 
 
+def test_explicit_512_mib_profile_preserves_large_output_and_sealed_identity(tmp_path):
+    from circuit_harness.execution.archive import verify_archive
+    from circuit_harness.execution.jobs import submit_benchmark_spectre, verify_job
+
+    code = "\n".join(
+        [
+            "import os,json,hashlib,pathlib",
+            "out=pathlib.Path(os.environ['VERIFY_OUTPUT']);out.mkdir(parents=True,exist_ok=True)",
+            "with (out/'large.psf').open('wb') as stream: stream.truncate(335544320)",
+            "candidate=pathlib.Path(os.environ['CANDIDATE'])",
+            "report=dict(status='completed',reward=1,cases=[dict(status='graded',passed=True)])",
+            "report['candidate_sha256']=hashlib.sha256(candidate.read_bytes()).hexdigest()",
+            "(out/'report.json').write_text(json.dumps(report))",
+        ]
+    )
+    candidate, package, profile = inputs(
+        tmp_path, checker=shlex.join([sys.executable, "-c", code]) + "\n", timeout=10
+    )
+    configuration = json.loads(profile.read_text())
+    configuration["max_output_bytes"] = 536870912
+    profile.write_text(json.dumps(configuration))
+    submit_benchmark_spectre(candidate, package, profile, "large-output")
+    directory = tmp_path / "jobs/large-output"
+    state = finish(directory)
+    assert state["result"]["execution"] == "ok"
+    assert state["result"]["score"] == 1
+    assert (directory / "run/work/verifier/large.psf").stat().st_size == 335544320
+    assert verify_job(directory)["result"] == state["result"]
+    archived = verify_archive(tmp_path / "archive/large-output")
+    assert archived["completion"]["result"] == state["result"]
+    identity = archived["request"]["identity"]
+    assert identity["profile"]["sha256"] == file_digest(profile)
+    assert identity["profile"]["configuration"]["max_output_bytes"] == 536870912
+    assert identity["package"]["sha256"] == state["result"]["task_package_sha256"]
+    configuration["max_output_bytes"] = 268435456
+    profile.write_text(json.dumps(configuration))
+    with pytest.raises(ValueError, match="different"):
+        submit_benchmark_spectre(candidate, package, profile, "large-output")
+
+
+@pytest.mark.parametrize(
+    "limit,output_bytes",
+    [(268435456, 335544320), (536870912, 536870913)],
+    ids=["existing-256-mib-limit", "explicit-512-mib-limit"],
+)
+def test_profile_output_limit_still_stops_oversized_checker(tmp_path, limit, output_bytes):
+    from circuit_harness.execution.jobs import submit_benchmark_spectre, verify_job
+
+    code = "\n".join(
+        [
+            "import os,pathlib,time",
+            "out=pathlib.Path(os.environ['VERIFY_OUTPUT']);out.mkdir(parents=True,exist_ok=True)",
+            f"with (out/'large.psf').open('wb') as stream: stream.truncate({output_bytes})",
+            "time.sleep(2)",
+        ]
+    )
+    candidate, package, profile = inputs(
+        tmp_path, checker=shlex.join([sys.executable, "-c", code]) + "\n", timeout=10
+    )
+    configuration = json.loads(profile.read_text())
+    configuration["max_output_bytes"] = limit
+    profile.write_text(json.dumps(configuration))
+    submit_benchmark_spectre(candidate, package, profile, "oversized-output")
+    directory = tmp_path / "jobs/oversized-output"
+    state = finish(directory)
+    assert state["result"]["execution"] == "output_limit"
+    assert state["result"]["score"] is None
+    assert state["result"]["process"]["cleanup_confirmed"]
+    assert verify_job(directory)["result"] == state["result"]
+
+
+@pytest.mark.parametrize("limit", [536870913, 0, True, 536870912.0])
+def test_invalid_output_profile_is_rejected_before_job_creation(tmp_path, limit):
+    from circuit_harness.execution.jobs import submit_benchmark_spectre
+
+    candidate, package, profile = inputs(tmp_path)
+    configuration = json.loads(profile.read_text())
+    configuration["max_output_bytes"] = limit
+    profile.write_text(json.dumps(configuration))
+    with pytest.raises(ValueError, match="max_output_bytes"):
+        submit_benchmark_spectre(candidate, package, profile, "invalid-output-profile")
+    assert not (tmp_path / "jobs/invalid-output-profile").exists()
+
+
 @pytest.mark.parametrize(
     "report,checker,timeout,execution,score",
     [

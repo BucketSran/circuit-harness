@@ -276,7 +276,7 @@ def _private_profile(path: Path) -> dict:
         raise ValueError("timeout_s must be finite within (0, 1800]")
     if (
         type(profile["max_output_bytes"]) is not int
-        or not 1 <= profile["max_output_bytes"] <= 256 * 1024 * 1024
+        or not 1 <= profile["max_output_bytes"] <= 512 * 1024 * 1024
     ):
         raise ValueError("invalid max_output_bytes")
     if namespace:
