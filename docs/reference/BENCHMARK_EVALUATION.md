@@ -210,7 +210,7 @@ replay 的 `classification` 为 `match`、`false_accept`、`false_reject`、`inf
 `purpose=public` 要求独立公有任务包，并只投影显式 `feedback_fields`。
 评分、verdict、cases、report、logs、artifacts 等字段不能声明为公开反馈，嵌套私有字段也会拒绝。
 旧的宿主执行路径仅供操作者使用，不能作为 Agent 的公开仿真接口。
-配置 B 的 Agent 接口使用[隔离 Docker 路径](#isolated-public-spectre-jobs)，已有平台实现、本地 Docker 和受控 Harbor Trial 夹具证据；真实 SSH、模型和商业许可证部署仍未验收。
+配置 B 的 Agent 接口使用[隔离 Docker 路径](#isolated-public-spectre-jobs)或[Spectre 进程 namespace](#spectre-process-namespace)。已有本地 Docker 和受控 Harbor Trial 夹具，以及真实 namespace、SSH 和 Spectre 参考探针证据；独立评分的实际模型 Trial 尚未验收。
 最终任务包、report 和 archive 不进入公开工具或 Agent 工作区。
 
 本地子进程夹具验证后台执行、同 ID 去重、unknown 不重跑、超时、malformed report 和归档完整性。
