@@ -111,6 +111,8 @@ stores the response, the next simulation may run if budget remains. The final
 submission action has a reserved budget slot. Defaults are 24 actions, 4 simulations,
 120 seconds per execution and 16 MiB output; maximums are 1000/1000, 300 seconds and
 16 MiB. Candidate/public inputs each have a 16 MiB aggregate bound.
+Trusted public Spectre checker JSON reports also have a 16 MiB size limit.
+Larger reports or invalid JSON return `invalid_result` without a score.
 
 `close_session(directory, reason)` returns a stable receipt with `state`,
 `candidate_directory` and `candidate_sha256` when complete. Repeat close returns

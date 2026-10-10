@@ -60,6 +60,7 @@ _PUBLIC_PROFILE_KEYS = {
 }
 
 _RESERVED_FEEDBACK = {"reward", "score", "verdict", "cases", "report", "artifacts", "logs"}
+_MAX_PUBLIC_REPORT_BYTES = 16 * 1024 * 1024
 
 
 def _relative(name):
@@ -239,7 +240,7 @@ def _private_profile(path: Path) -> dict:
             raise ValueError("invalid Docker timeout")
         if (
             type(profile["max_output_bytes"]) is not int
-            or not 1 <= profile["max_output_bytes"] <= 16 * 1024 * 1024
+            or not 1 <= profile["max_output_bytes"] <= _MAX_PUBLIC_REPORT_BYTES
         ):
             raise ValueError("invalid Docker output limit")
         return profile
@@ -382,7 +383,10 @@ def _read_report(directory: Path, identity: dict):
         or not path.resolve().is_relative_to(directory.resolve())
     ):
         raise ValueError("checker report missing or unsafe")
-    if path.stat().st_size > 4 * 1024 * 1024:
+    max_report_bytes = (
+        _MAX_PUBLIC_REPORT_BYTES if identity["purpose"] == "public" else 4 * 1024 * 1024
+    )
+    if path.stat().st_size > max_report_bytes:
         raise ValueError("checker report exceeds limit")
     report = json.loads(
         path.read_text(), parse_constant=lambda value: (_ for _ in ()).throw(ValueError(value))

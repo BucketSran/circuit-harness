@@ -248,6 +248,70 @@ def test_public_feedback_does_not_include_final_fields(tmp_path):
         benchmark_spectre.public_feedback({"purpose": "final"})
 
 
+def test_public_checker_accepts_large_measurement_report(tmp_path):
+    from circuit_harness.execution.jobs import submit_benchmark_spectre, verify_job
+
+    # A constructed checker writes ADPLL-sized public measurement data locally.
+    code = "\n".join(
+        [
+            "import os,json,hashlib,pathlib",
+            "out=pathlib.Path(os.environ['VERIFY_OUTPUT']);out.mkdir(parents=True,exist_ok=True)",
+            "candidate=pathlib.Path(os.environ['CANDIDATE'])",
+            "report={'status':'completed','measurement':'x'*10726000}",
+            "report['candidate_sha256']=hashlib.sha256(candidate.read_bytes()).hexdigest()",
+            "(out/'report.json').write_text(json.dumps(report))",
+        ]
+    )
+    args = inputs(tmp_path, purpose="public", checker=shlex.join([sys.executable, "-c", code]))
+    profile = json.loads(args[2].read_text())
+    profile["max_output_bytes"] = 16 * 1024 * 1024
+    args[2].write_text(json.dumps(profile))
+    submit_benchmark_spectre(*args, "large-public", purpose="public")
+    directory = tmp_path / "jobs/large-public"
+    result = finish(directory)["result"]
+    assert result["execution"] == "ok"
+    assert result["score"] is None
+    assert benchmark_spectre.public_feedback(result)["feedback"]["measurement"] == "x" * 10726000
+    assert verify_job(directory)["result"] == result
+
+
+@pytest.mark.parametrize(
+    "payload,reason",
+    [
+        ("json.dumps(report | {'measurement':'x'*16777216})", "exceeds limit"),
+        ("'{broken'", "Expecting property name"),
+        ("json.dumps(report | {'measurement':float('nan')})", "NaN"),
+        ("'[]'", "candidate identity differs"),
+    ],
+)
+def test_public_checker_rejects_oversized_or_invalid_report(tmp_path, payload, reason):
+    from circuit_harness.execution.jobs import submit_benchmark_spectre, verify_job
+
+    code = "\n".join(
+        [
+            "import os,json,hashlib,pathlib",
+            "out=pathlib.Path(os.environ['VERIFY_OUTPUT']);out.mkdir(parents=True,exist_ok=True)",
+            "candidate=pathlib.Path(os.environ['CANDIDATE'])",
+            "report={'status':'completed','measurement':42}",
+            "report['candidate_sha256']=hashlib.sha256(candidate.read_bytes()).hexdigest()",
+            f"(out/'report.json').write_text({payload})",
+        ]
+    )
+    args = inputs(tmp_path, purpose="public", checker=shlex.join([sys.executable, "-c", code]))
+    # Allow the fixture to write an oversized report so result validation, rather
+    # than the process output quota, rejects it.
+    profile = json.loads(args[2].read_text())
+    profile["max_output_bytes"] = 32 * 1024 * 1024
+    args[2].write_text(json.dumps(profile))
+    submit_benchmark_spectre(*args, "invalid-public", purpose="public")
+    directory = tmp_path / "jobs/invalid-public"
+    result = finish(directory)["result"]
+    assert result["execution"] == "invalid_result"
+    assert reason in result["reason"]
+    assert result["score"] is None
+    assert verify_job(directory)["result"] == result
+
+
 def test_archive_tamper_is_rejected(tmp_path):
     from circuit_harness.execution.archive import verify_archive
     from circuit_harness.execution.jobs import submit_benchmark_spectre
