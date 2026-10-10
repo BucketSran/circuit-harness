@@ -229,7 +229,7 @@ retain their prior default behavior. The Agent adapter cannot register final eva
 as a public tool. `stage-benchmark --purpose public` validates the public package;
 the default purpose remains final.
 
-A private public profile has exactly these fields:
+A private Docker public profile has exactly these fields:
 
 ```json
 {
@@ -327,8 +327,26 @@ To opt in to an existing final host profile, set its `spectre` executable to an
 operator-owned wrapper which invokes this command using a fixed private config
 and pinned bundle. Keep the trusted checker outside the namespace, and retain
 its license preflight and actual installation's discipline paths. Existing
-profiles are unchanged. This process entry does not itself enable the public
-Docker session protocol or authorize mounting a whole task package.
+profiles are unchanged. The process entry does not authorize mounting a whole task
+package.
+
+For public sessions, use a host profile with its normal `shell`, `setup_scripts`,
+`spectre`, `preflight_script`, storage roots and resource bounds, plus exactly
+`backend: "spectre_namespace"` and `isolation_config: "/private/isolation.json"`.
+The profile's Spectre path must match the isolation configuration. The evaluator
+generates its own launcher from that validated configuration for both preflight
+and verification; the public path accepts no ordinary unisolated host profile.
+The profile identity includes the isolation configuration, Bubblewrap executable
+and Python interpreter. Namespace public jobs use the same durable job and archive
+checks as Docker public jobs. The two backends have different network policies;
+the Docker restrictions above do not imply network isolation for `shared_license`.
+
+The public task checker remains trusted host code. It must assemble each child
+condition from public assets and frozen candidate inputs only. The optional
+[`evas_testbench` declaration](CURRENT_EVAS_PUBLIC_SESSION.md#configuration-b-task-declared-remote-public-spectre)
+passes temporary netlist and VA text to that checker without changing the formal
+submission inventory. The checker must validate temporary support paths against
+its own immutable inputs before launching the isolated child.
 
 Actual Linux validation with Bubblewrap 0.4.1 and Spectre 21.1.0.509.isr12
 compiled a relative helper module and installed standard disciplines. A transient

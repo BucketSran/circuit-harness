@@ -415,9 +415,12 @@ The public package must be separate from `final_task_package`. These operator re
 stay outside the native Agent grants and public tool responses.
 
 The server must use the [isolated public profile](BENCHMARK_EVALUATION.md#isolated-public-spectre-jobs).
-It requires all runtime/dependency and actual licensing checks to pass in a container
-with networking disabled. Network license servers and arbitrary PDK/analysis mappings
-are unsupported. There is no verified commercial deployment yet. Controlled Trial
+It requires all runtime/dependency and actual licensing checks to pass. The `docker`
+profile runs with networking disabled. The `spectre_namespace` profile uses the
+operator's validated process namespace and may retain host networking for licensing;
+that mode does not restrict network egress. Actual namespace reference probes have
+run fixed and temporary netlists through SSH and licensed Spectre. Arbitrary PDK or
+analysis mappings still require task-owned support. Controlled Trial
 fixtures cover one Agent process editing, receiving public feedback, editing again,
 freezing and handing the exact final bytes to a separate verifier. Real Docker fixtures
 cover input access, cancellation and output limits. Neither fixture establishes a real

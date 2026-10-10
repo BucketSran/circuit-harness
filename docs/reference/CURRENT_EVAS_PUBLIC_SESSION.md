@@ -236,8 +236,23 @@ must match the session. Public Python experiments are unsupported on this path.
 `archive_root` and `upload_root`, with the same private transport contract as final
 jobs. The frozen public package and candidate are transferred separately from the
 final package. The Agent receives no profile, SSH identity, artifact path, raw logs,
-final report or reward. Remote public requests require the server's Docker profile;
-a host operator profile is rejected even if the request claims isolation.
+final report or reward. Remote public requests require the server's `docker` or
+`spectre_namespace` profile. An ordinary host operator profile is rejected even if
+the request claims isolation. Namespace profiles keep the trusted checker on the
+host and isolate each Spectre child; their `shared_license` mode retains host
+networking and does not restrict network egress.
+
+A task may declare `testbench: {"version": "spectre-netlist-v1", "payload_file":
+".public-testbench.json"}` to expose `evas_testbench`. Its `spec` argument is a JSON
+string with `netlist` text and a `support_files` object mapping separate relative
+`.va` paths to complete source text. At most 16 support files are accepted, within
+the existing candidate byte limit. They cannot replace formal candidate files.
+The task-owned public checker must explicitly consume this payload and reject
+collisions with its immutable public inputs. This action freezes a diagnostic
+copy, shares the ordinary action/simulation budget and recovery protocol, and
+does not add its payload or support files to final submission. Tasks without the
+declaration expose only their existing tools. This declaration is available only
+for `remote_spectre`; it does not enable public Python experiments.
 
 Each simulation reserves its existing session action and quota before network
 execution and persists a randomly unique public job ID before submission. A broken
@@ -261,5 +276,7 @@ and the server's finite execution limit are independent operations.
 The server boundary and its deployment limits are described in
 [BENCHMARK_EVALUATION](BENCHMARK_EVALUATION.md#isolated-public-spectre-jobs).
 Local protocol, real Docker and controlled Harbor Trial tests prove their respective
-boundaries; they do not establish a real native Agent, SSH server, Spectre license or
-independently graded configuration B trial.
+boundaries. Actual namespace public probes also ran a fixed netlist and a temporary
+netlist with an added VA observation module through SSH and Spectre 21.1.0.509.isr12.
+Each completed with zero child errors and 1409 waveform rows. These reference probes
+do not establish an independently graded model Trial.
