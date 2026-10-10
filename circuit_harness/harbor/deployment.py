@@ -176,7 +176,10 @@ def _validate_resources(private, roots):
         "feedback_fields",
         "manifest",
     }
-    if not required <= declaration.keys() or declaration.keys() - required - {"experiments"}:
+    if not required <= declaration.keys() or declaration.keys() - required - {
+        "experiments",
+        "testbench",
+    }:
         raise ValueError("unknown or missing public task declaration fields")
     if any(
         not isinstance(declaration[key], str) or not declaration[key]

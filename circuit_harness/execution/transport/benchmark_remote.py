@@ -181,8 +181,11 @@ class RemoteBenchmarkSpectre(RemoteSessionTransport):
             or request.get("archive_directory") != str(remote)
         ):
             raise ValueError("retrieved job differs from configured remote identity")
-        if self.purpose == "public" and configuration.get("backend") != "docker":
-            raise ValueError("public job did not use isolated Docker profile")
+        if self.purpose == "public" and configuration.get("backend") not in {
+            "docker",
+            "spectre_namespace",
+        }:
+            raise ValueError("public job did not use an isolated profile")
         if identity.get("purpose") != self.purpose:
             raise ValueError("retrieved job is not independent final evaluation")
         return receipt["completion"]["result"]
