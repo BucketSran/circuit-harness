@@ -1,11 +1,14 @@
 """One lifecycle adapter around Harbor agents, independent of model/provider."""
 
 import asyncio
+from pathlib import Path
 
 from harbor.agents.base import BaseAgent
 from harbor.agents.factory import AgentFactory
 from harbor.agents.installed.base import NonZeroAgentExitCodeError
+from harbor.agents.oracle import OracleAgent
 from harbor.models.trial.config import AgentConfig
+from harbor.models.trial.paths import TrialPaths
 
 from .config import require_harbor_version
 from .docker_environment import CircuitDockerEnvironment
@@ -28,7 +31,18 @@ class CircuitAgent(BaseAgent):
         agent_class = AgentFactory.get_agent_class_from_config(config)
         if issubclass(agent_class, CircuitAgent):
             raise ValueError("CircuitAgent cannot wrap itself")
-        self.delegate = agent_class(*args, **kwargs, **(agent_kwargs or {}))
+        delegate_kwargs = dict(agent_kwargs or {})
+        self.oracle_task_dir = None
+        if issubclass(agent_class, OracleAgent):
+            if "trial_paths" in delegate_kwargs:
+                raise ValueError("Oracle trial paths come from Harbor's agent logs")
+            task_dir = delegate_kwargs.get("task_dir")
+            if task_dir is None:
+                raise ValueError("CircuitAgent oracle requires agent_kwargs.task_dir")
+            self.oracle_task_dir = Path(task_dir).resolve()
+            delegate_kwargs["task_dir"] = self.oracle_task_dir
+            delegate_kwargs["trial_paths"] = TrialPaths(trial_dir=self.logs_dir.parent)
+        self.delegate = agent_class(*args, **kwargs, **delegate_kwargs)
 
     @staticmethod
     def name():
@@ -56,6 +70,11 @@ class CircuitAgent(BaseAgent):
     async def setup(self, environment):
         if not isinstance(environment, CircuitDockerEnvironment):
             raise TypeError("CircuitAgent requires the public circuit environment")
+        if self.oracle_task_dir is not None:
+            if self.oracle_task_dir != Path(environment.environment_dir).parent.resolve():
+                raise ValueError("Oracle task_dir differs from the current Harbor task")
+            if self.logs_dir.parent.resolve() != environment.trial_paths.trial_dir.resolve():
+                raise ValueError("Oracle logs differ from the current Harbor trial")
         self.delegate.context_id = self.context_id
         self.delegate.session_id = self.session_id
         await self.delegate.setup(environment)
@@ -66,6 +85,12 @@ class CircuitAgent(BaseAgent):
             await self.delegate.run(
                 instruction=instruction, environment=environment, context=context
             )
+            if self.oracle_task_dir is not None:
+                exit_code = self.logs_dir / "exit-code.txt"
+                if exit_code.exists() and exit_code.read_text().strip() != "0":
+                    raise RuntimeError(
+                        "Harbor oracle reference solution failed; retained without grading"
+                    )
             reason = "completed"
         except NonZeroAgentExitCodeError as error:
             # Harbor normally grades these exits. A failed CLI/API is not a

@@ -162,6 +162,19 @@ Agent 正常返回、超时、异常或取消时，适配器关闭 gateway 的�
 等待已接受动作结束，再冻结最后一份完整候选，然后 Harbor 才继续阶段收尾与终评。
 终评只读取已冻结的候选。未收妥的公开动作保留恢复证据，不能宣称冻结成功。
 
+参考解入口也可将 `kwargs.agent_name` 设为 `oracle`，继续委托 Harbor 的 stock Oracle。
+此时 `kwargs.agent_kwargs.task_dir` 必须是当前任务目录，`agent_timeout_sec` 可指定
+原生 solve 执行期限。Harbor 只给顶层 Oracle 注入任务和 Trial 路径；包装器因此从
+Harbor 实际提供的 agent 日志目录导出当前 `TrialPaths`，不接受另行指定 `trial_paths`。
+setup 再核对任务目录和环境的当前 Trial，失配则不执行参考脚本。
+普通模型 Agent 的参数及委托方式不变。
+
+stock Oracle 按原路径上传 solution 并执行 solve，适配器不增加工具循环。
+如果 stock Oracle 留下非零 `exit-code.txt`，适配器按参考执行错误冻结候选并保持未评分，
+不把脚本失败当成正常参考完成。参考 solve 如需向公开会话提交结果，任务必须提供明确的
+提交桥接；这不表示原任务的 test.sh 在容器内执行，终评仍由 `FrozenCandidateVerifier`
+独立读取冻结候选。
+
 Harbor 限制 Agent 和 verifier 的独立阶段期限。公开仿真预算由会话管理。
 CLI 基础设施失败、终评执行失败、损坏证据和身份不匹配保持无分数；
 只有完成的独立 checker 分数与匹配候选身份才能产生 reward。
