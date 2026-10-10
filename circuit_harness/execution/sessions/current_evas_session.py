@@ -116,9 +116,12 @@ def create_session(
     if any(not isinstance(task[key], str) or not task[key] for key in ("task_id", "task_version")):
         raise ValueError("invalid task identity")
     fields = task["feedback_fields"]
+    supported_feedback = {"diagnostics", "observations"}
+    if backend in {"docker", "podman", "native_codex_sandbox"}:
+        supported_feedback.add("diagnostic")
     if (
         not isinstance(fields, list)
-        or any(field not in {"diagnostics", "observations"} for field in fields)
+        or any(field not in supported_feedback for field in fields)
         or len(fields) != len(set(fields))
     ):
         raise ValueError("declare only supported public feedback fields")

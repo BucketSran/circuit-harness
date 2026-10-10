@@ -313,3 +313,45 @@ def test_podman_quota_failure_is_not_silently_retried(tmp_path, monkeypatch, cpu
     assert result["execution"] == ("infrastructure_error" if cpu_limit else "ok")
     assert result["cleanup_confirmed"]
     assert json.loads((tmp_path / "result/backend.json").read_text())["cpu_limit"] == cpu_limit
+
+
+@pytest.mark.skipif(
+    not os.environ.get("CHIPS_TEST_NATIVE_CODEX"), reason="requires native Codex sandbox executable"
+)
+def test_versioned_diagnostic_through_isolated_session_is_opt_in_and_replayable(tmp_path):
+    import sys
+    from pathlib import Path
+
+    payload = dict(
+        diagnostic_version=1,
+        kind="compile_error",
+        code="unsupported_timer_dependency",
+        category="unsupported",
+        stage="lowering",
+        capability="TIMER",
+        message="/private/secret" + "x" * 5000,
+        raw_payload={"secret": "private"},
+    )
+    main = "import sys\nsys.stderr.write(" + repr(json.dumps(payload)) + ")\nraise SystemExit(2)\n"
+    directory = make_session(
+        tmp_path,
+        main=main,
+        image=None,
+        backend="native_codex_sandbox",
+        codex=Path(os.environ["CHIPS_TEST_NATIVE_CODEX"]),
+        python=sys.executable,
+        feedback_fields=["diagnostic"],
+    )
+    call(directory, "write", "evas_write", path="dut.va", content="candidate")
+    first = call(directory, "simulate", "evas_simulate")
+    assert first == call(directory, "simulate", "evas_simulate")
+    result = first["result"]
+    assert result["execution"] == "backend_error", first
+    assert result["diagnostic"]["category"] == "unsupported"
+    assert result["task_correctness"] == "not_evaluated"
+    assert "diagnostics" not in result
+    assert "private" not in json.dumps(result)
+    assert (
+        json.loads((directory / "actions/simulate/execution/evas.stderr.log").read_text())
+        == payload
+    )
