@@ -32,7 +32,8 @@ The `task` declaration requires exactly these fields:
 
 Paths must be unique canonical relative paths without symlinks. Manifest models
 must exactly match candidate files. Feedback fields must be explicitly declared;
-only `diagnostics` and `observations` are supported, including an empty selection.
+only `diagnostics`, `diagnostic` and `observations` are supported, including an empty selection.
+`diagnostic` is an opt-in machine field for failed fixed EVAS simulations; existing tasks keep their feedback selection.
 Public material bytes, source inventory and kernel identity are frozen at creation.
 
 `session_info(directory)` returns tool instructions, a summary of the fixed manifest, declared
@@ -161,6 +162,22 @@ candidate, infrastructure failure, timeout, output limit, backend failure, inval
 result and unconfirmed cleanup. Inspect private action receipts for detailed evidence;
 do not expose their paths or logs wholesale to the Agent.
 
+### Versioned EVAS failure metadata
+
+For a failed fixed EVAS simulation, `diagnostic` contains `diagnostic_version`, `code`,
+`category`, `stage` and `capability`. It is read from the complete private stderr before
+text truncation. Only well-formed v1 metadata is projected; missing, malformed, oversized
+or future-version payloads have `category="unknown"`. A valid integer version is retained.
+The original log and its artifact hash remain private. No category is inferred from a
+message or kind prefix. Metadata is not a circuit correctness verdict.
+
+Messages, locations, raw nested payloads and arbitrary extra keys are excluded from this
+new public field. The existing `diagnostics` string keeps its current truncation/redaction
+contract. Python measurement experiments and remote Spectre do not emit EVAS metadata.
+`execution`, task grading and replay classification are unchanged. A missing machine
+field never implies success. Parsing is limited to 1 MiB; larger raw logs remain subject
+to the existing output limit and are not discarded from accounting.
+
 ## Evidence and limits
 
 `tests/chips/test_current_evas_session.py` covers complete writes, exact bundles,
@@ -169,6 +186,17 @@ action replay, budgets, pending simulation exclusion and collection during execu
 Set `CHIPS_TEST_DOCKER_IMAGE` to a local immutable image ID or
 `CHIPS_TEST_NATIVE_CODEX` to the native CLI binary to run those probes. Their engines
 are synthetic fixtures; they establish platform access boundaries, not circuit scores.
+`test_current_evas_real.py` additionally executes a selected real EVAS checkout through
+both the trusted runner and an OS-isolated public session. Set `CHIPS_TEST_EVAS_CHECKOUT`
+and `CHIPS_TEST_NATIVE_CODEX` to run the five fixed compile/runtime/success controls.
+They verify metadata, retained failures and action replay, not benchmark replay or scores.
+For the current integration acceptance, EVAS main `ab0df35b` / IR18 and kernel
+`0de37e97dca3e52b871a8895872a39994bd012b51c9d5d5086f8bc26ead6667b`
+completed all five controls on macOS. The four failures stayed `backend_error`, with
+three `unsupported` and one `numerical` reason; the success control had no failure metadata.
+Full raw runs remain private. Docker benchmark replay and its full receipt aggregation
+are still a separate acceptance obligation under vaEVAS #64.
+
 The trusted resource runner `backends/current_evas.py` is not a sandbox and is not a fallback.
 
 The public adapter does not yet establish real va07 benchmark acceptance, a Linux

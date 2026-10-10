@@ -13,7 +13,7 @@ import time
 import uuid
 from pathlib import Path
 
-from circuit_harness.execution.backends.current_evas import _CLI, _validate_result
+from circuit_harness.execution.backends.current_evas import _CLI, _validate_result, read_diagnostic
 from circuit_harness.execution.evaluation.candidate_bundle import regular_file, verify_candidate
 from circuit_harness.execution.runtime.journal import Journal, atomic_json, file_digest
 from circuit_harness.execution.runtime.native_sandbox import NativeSandbox
@@ -485,5 +485,7 @@ def run_public(
         "diagnostics": diagnostics,
         "observations": data if execution == "ok" else None,
     }
+    if experiment is None and execution == "backend_error":
+        result["diagnostic"] = read_diagnostic(output / "evas.stderr.log")
     atomic_json(output / "result.json", result)
     return result

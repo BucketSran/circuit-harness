@@ -275,3 +275,84 @@ def test_zipimport_harness_identity_uses_actual_packaged_module_bytes(tmp_path):
     with ZipFile(bundle) as archive:
         expected = {name: hashlib.sha256(archive.read(name)).hexdigest() for name in HARNESS_SOURCE}
     assert json.loads(process.stdout) == expected
+
+
+def test_versioned_error_survives_untruncated_with_safe_metadata(evas_request):
+    payload = dict(
+        diagnostic_version=1,
+        kind="compile_error",
+        code="unsupported_timer_dependency",
+        category="unsupported",
+        stage="lowering",
+        capability="TIMER",
+        message="private/" + "x" * 5000,
+        location={"source": "/private/model.va", "line": 3},
+        raw_payload={"secret": 1},
+    )
+    (evas_request["checkout"] / "evas/src/evas/__main__.py").write_text(
+        "import sys\nsys.stderr.write(" + repr(json.dumps(payload)) + ")\nraise SystemExit(2)\n"
+    )
+    result = run_evas(**evas_request)
+    assert result["execution"] == "backend_error"
+    assert result["verdict"] == "not_evaluated"
+    assert result["diagnostic"] == dict(
+        diagnostic_version=1,
+        code="unsupported_timer_dependency",
+        category="unsupported",
+        stage="lowering",
+        capability="TIMER",
+    )
+    raw = evas_request["output"] / "execution/evas.stderr.log"
+    assert json.loads(raw.read_text()) == payload
+    assert result["artifacts"]["execution/evas.stderr.log"]["sha256"]
+
+
+@pytest.mark.parametrize(
+    "payload, version",
+    [
+        ("plain diagnostic", None),
+        ("{}", None),
+        ('{"diagnostic_version":2,"category":"unsupported","kind":"unsupported_timer"}', 2),
+        ('{"diagnostic_version":true}', None),
+        ('{"diagnostic_version":1,"diagnostic_version":2}', None),
+        (
+            json.dumps(
+                dict(
+                    diagnostic_version=1,
+                    kind="compile_error",
+                    code="code",
+                    stage="/private/path",
+                    category="unsupported",
+                    message="hidden",
+                )
+            ),
+            1,
+        ),
+        (
+            json.dumps(
+                dict(
+                    diagnostic_version=1,
+                    kind="compile_error",
+                    code="code",
+                    stage="compile",
+                    category=["unsupported"],
+                    message="hidden",
+                )
+            ),
+            1,
+        ),
+        pytest.param("x" * (1024 * 1024 + 1), None, id="oversized"),
+    ],
+)
+def test_unknown_diagnostic_does_not_change_failed_execution(evas_request, payload, version):
+    evas_request["max_output_bytes"] = 4 * 1024 * 1024
+    (evas_request["checkout"] / "evas/src/evas/__main__.py").write_text(
+        "import sys\nsys.stderr.write(" + repr(payload) + ")\nraise SystemExit(2)\n"
+    )
+    result = run_evas(**evas_request)
+    assert result["execution"] == "backend_error"
+    assert result["verdict"] == "not_evaluated"
+    assert result["diagnostic"] == dict(
+        diagnostic_version=version, code=None, category="unknown", stage=None, capability=None
+    )
+    assert (evas_request["output"] / "execution/evas.stderr.log").read_text() == payload
