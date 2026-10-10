@@ -66,6 +66,30 @@ def test_stock_agents_share_environment(tmp_path, agent, wrapped):
     assert trial.agent_environment.capabilities.mounted
 
 
+def oracle_config(tmp_path):
+    config = task_config(tmp_path, "oracle")
+    (tmp_path / "task/solution").mkdir()
+    (tmp_path / "task/solution/solve.sh").write_text("#!/bin/sh\nexit 0\n")
+    config.agent.name = None
+    config.agent.model_name = None
+    config.agent.import_path = "circuit_harness.harbor.installed_agent:CircuitAgent"
+    config.agent.kwargs = {
+        "agent_name": "oracle",
+        "agent_kwargs": {"task_dir": str(tmp_path / "task"), "agent_timeout_sec": 2},
+    }
+    return config
+
+
+def test_real_trial_constructs_stock_oracle_with_current_trial_context(tmp_path):
+    from harbor.agents.oracle import OracleAgent
+
+    trial = asyncio.run(Trial.create(oracle_config(tmp_path)))
+    assert isinstance(trial.agent.delegate, OracleAgent)
+    assert trial.agent.to_agent_info().name == "oracle"
+    assert trial.agent.delegate._trial_paths == trial.paths
+    assert trial.agent.delegate._task.task_dir == trial.task.task_dir
+
+
 @pytest.mark.skipif(
     not os.environ.get("CHIPS_TEST_DOCKER_IMAGE"), reason="needs local Docker image"
 )
@@ -239,6 +263,128 @@ def test_real_trial_delegates_identity_usage_and_freezes_at_phase_end(tmp_path, 
         assert result.agent_info.name == "lifecycle-fixture"
 
     asyncio.run(run())
+
+
+class OracleLocalEnvironment(CircuitDockerEnvironment):
+    """Run stock Oracle's uploaded script in a local filesystem, without Docker."""
+
+    async def start(self, force_build):
+        self.workspace = self.trial_paths.trial_dir / "local-oracle"
+        self.workspace.mkdir()
+        self.events = []
+
+    async def upload_dir(self, source_dir, target_dir):
+        import shutil
+
+        assert target_dir == "/solution"
+        shutil.copytree(source_dir, self.workspace / "solution")
+
+    async def exec(self, command, **kwargs):
+        from harbor.environments.base import ExecResult
+
+        command = command.replace("/solution/", str(self.workspace / "solution") + "/")
+        command = command.replace("/logs/agent/", str(self.trial_paths.agent_dir) + "/")
+        process = await asyncio.create_subprocess_shell(
+            command,
+            env={**os.environ, "REF_OUTPUT": str(self.workspace / "dut.va")},
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+        )
+        stdout, stderr = await process.communicate()
+        return ExecResult(
+            return_code=process.returncode, stdout=stdout.decode(), stderr=stderr.decode()
+        )
+
+    async def freeze(self, reason):
+        import hashlib
+
+        candidate = self.workspace / "dut.va"
+        self.events.append(("freeze", reason))
+        self.frozen = {
+            "candidate_directory": str(self.workspace),
+            "candidate_sha256": hashlib.sha256(candidate.read_bytes()).hexdigest(),
+        }
+        return self.frozen
+
+    async def stop(self, delete=True):
+        pass
+
+
+class OracleLocalVerifier(FrozenCandidateVerifier):
+    async def evaluate(self, environment, candidate):
+        assert (
+            Path(candidate["candidate_directory"]) / "dut.va"
+        ).read_bytes() == b"reference-bytes\n"
+        environment.events.append(("verify", candidate["candidate_sha256"]))
+        return {
+            "state": "completed",
+            "score": 1,
+            "execution": "ok",
+            "verdict": "pass",
+            "candidate_sha256": candidate["candidate_sha256"],
+            "task_id": "fixture",
+            "task_version": "1",
+            "purpose": "final",
+        }
+
+
+def test_real_trial_executes_stock_oracle_solve_then_freezes_and_verifies(tmp_path):
+    config = oracle_config(tmp_path)
+    script = b'#!/bin/sh\nprintf "reference-bytes\\n" > "$REF_OUTPUT"\n'
+    (tmp_path / "task/solution/solve.sh").write_bytes(script)
+    config.environment.import_path = __name__ + ":OracleLocalEnvironment"
+    config.verifier.import_path = __name__ + ":OracleLocalVerifier"
+
+    async def run():
+        trial = await Trial.create(config)
+        result = await trial.run()
+        assert result.exception_info is None
+        assert result.verifier_result.rewards == {"reward": 1}
+        assert result.agent_info.name == "oracle"
+        assert (trial.agent_environment.workspace / "solution/solve.sh").read_bytes() == script
+        assert trial.agent_environment.events[0] == ("freeze", "completed")
+        assert trial.agent_environment.events[1][0] == "verify"
+        assert (trial.paths.agent_dir / "oracle.txt").is_file()
+
+    asyncio.run(run())
+
+
+def test_real_trial_keeps_nonzero_oracle_solution_unscored(tmp_path):
+    config = oracle_config(tmp_path)
+    (tmp_path / "task/solution/solve.sh").write_text(
+        '#!/bin/sh\nprintf "reference-bytes\\n" > "$REF_OUTPUT"\nexit 7\n'
+    )
+    config.environment.import_path = __name__ + ":OracleLocalEnvironment"
+    config.verifier.import_path = __name__ + ":OracleLocalVerifier"
+
+    async def run():
+        trial = await Trial.create(config)
+        result = await trial.run()
+        assert result.verifier_result is None
+        assert result.exception_info.exception_type == "RuntimeError"
+        assert (trial.paths.agent_dir / "exit-code.txt").read_text() == "7"
+        assert trial.agent_environment.events == [("freeze", "agent_error")]
+
+    asyncio.run(run())
+
+
+def test_oracle_does_not_accept_operator_supplied_trial_paths(tmp_path):
+    config = oracle_config(tmp_path)
+    config.agent.kwargs["agent_kwargs"]["trial_paths"] = "another-trial"
+    with pytest.raises(ValueError, match="come from Harbor"):
+        asyncio.run(Trial.create(config))
+
+
+def test_oracle_rejects_other_task_context_before_running_source_solve(tmp_path):
+    config = oracle_config(tmp_path)
+    other = tmp_path / "other-task"
+    import shutil
+
+    shutil.copytree(tmp_path / "task", other)
+    config.agent.kwargs["agent_kwargs"]["task_dir"] = str(other)
+    trial = asyncio.run(Trial.create(config))
+    with pytest.raises(ValueError, match="current Harbor task"):
+        asyncio.run(trial.agent.setup(trial.agent_environment))
 
 
 @pytest.mark.parametrize("where", ["task", "trials/nop"])
