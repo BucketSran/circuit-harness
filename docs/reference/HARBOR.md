@@ -276,7 +276,7 @@ Docker-only; a native public backend with `task.experiments` is rejected before 
 | Condition | Implementation | Acceptance |
 | --- | --- | --- |
 | A: local native Codex → local public EVAS MCP → SSH final Spectre | Harbor plugins, explicit Docker or native sandbox public EVAS session, public-only broker, OS sandbox, frozen final transport | Bounded local lifecycle and sandbox checks; real model/SSH/Spectre acceptance pending |
-| B: local native Codex → server public Spectre and final Spectre | Shared public session, stable public job recovery, mandatory server Docker boundary, independent final verifier | Local Docker and controlled Harbor Trial protocol checks; real Agent/SSH/commercial deployment acceptance pending |
+| B: local native Codex → server public Spectre and final Spectre | Shared public session, stable public job recovery, server Docker or Spectre process namespace, independent final verifier | Local Docker and controlled Harbor Trial checks; actual namespace SSH/Spectre reference probes; graded model Trial pending |
 
 There is no switch accepting an arbitrary `isolation_verified` Boolean. Unknown configuration
 fields, missing auth/runtime declarations and overlapping private grants fail closed. Do not
@@ -415,9 +415,12 @@ The public package must be separate from `final_task_package`. These operator re
 stay outside the native Agent grants and public tool responses.
 
 The server must use the [isolated public profile](BENCHMARK_EVALUATION.md#isolated-public-spectre-jobs).
-It requires all runtime/dependency and actual licensing checks to pass in a container
-with networking disabled. Network license servers and arbitrary PDK/analysis mappings
-are unsupported. There is no verified commercial deployment yet. Controlled Trial
+It requires all runtime/dependency and actual licensing checks to pass. The `docker`
+profile runs with networking disabled. The `spectre_namespace` profile uses the
+operator's validated process namespace and may retain host networking for licensing;
+that mode does not restrict network egress. Actual namespace reference probes have
+run fixed and temporary netlists through SSH and licensed Spectre. Arbitrary PDK or
+analysis mappings still require task-owned support. Controlled Trial
 fixtures cover one Agent process editing, receiving public feedback, editing again,
 freezing and handing the exact final bytes to a separate verifier. Real Docker fixtures
 cover input access, cancellation and output limits. Neither fixture establishes a real

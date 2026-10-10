@@ -31,6 +31,7 @@ TOOLS = {
     "evas_read": {"path": {"type": "string"}},
     "evas_write": {"path": {"type": "string"}, "content": {"type": "string"}},
     "evas_simulate": {},
+    "evas_testbench": {"spec": {"type": "string"}},
     "evas_submit": {},
     "evas_experiment": {"analysis": {"type": "string"}, "script": {"type": "string"}},
 }
@@ -47,7 +48,7 @@ END_REASONS = {
 }
 
 
-def tool_schemas(*, experiments=False, observations=False):
+def tool_schemas(*, experiments=False, observations=False, testbench=False):
     return [
         {
             "type": "function",
@@ -58,6 +59,11 @@ def tool_schemas(*, experiments=False, observations=False):
                     "evas_read": "Read a public file or candidate; empty path lists files.",
                     "evas_write": "Replace complete bytes of one declared candidate file.",
                     "evas_simulate": "Run the fixed public manifest on frozen input; no score.",
+                    "evas_testbench": (
+                        "Run a temporary Spectre netlist and support VA files; spec is a JSON "
+                        "string with netlist and support_files. "
+                        "No score or change to final submission."
+                    ),
                     "evas_experiment": "Run a declared Python measurement in Docker; no score.",
                     "evas_submit": "Freeze the last complete candidate and end editing; no score.",
                 }[tool],
@@ -75,7 +81,7 @@ def tool_schemas(*, experiments=False, observations=False):
             **TOOLS,
             **(public_observations.READ_TOOLS if observations else {}),
         }.items()
-        if experiments or tool != "evas_experiment"
+        if (experiments or tool != "evas_experiment") and (testbench or tool != "evas_testbench")
     ]
 
 
@@ -104,7 +110,7 @@ def create_session(
     validate_cpu_limit(cpu_limit)
     if backend not in {"docker", "podman"} and cpu_limit != 1:
         raise ValueError("cpu_limit applies only to container backends")
-    if not isinstance(task, dict) or set(task) - {"experiments"} != {
+    if not isinstance(task, dict) or set(task) - {"experiments", "testbench"} != {
         "task_id",
         "task_version",
         "public_files",
@@ -127,6 +133,14 @@ def create_session(
         declared_files(task["candidate_files"]),
     )
     declared_files(public_names + candidate_names)
+    if "testbench" in task:
+        if (
+            backend != "remote_spectre"
+            or task["testbench"]
+            != {"version": "spectre-netlist-v1", "payload_file": ".public-testbench.json"}
+            or ".public-testbench.json" in [*public_names, *candidate_names]
+        ):
+            raise ValueError("invalid remote Spectre testbench declaration")
     experiments = task.get("experiments")
     if "experiments" in task:
         if (
@@ -259,7 +273,7 @@ def session_info(directory: Path) -> dict:
     previous = list((directory / "actions").iterdir())
     simulations = sum(
         json.loads((item / "request.json").read_text())["tool"]
-        in {"evas_simulate", "evas_experiment"}
+        in {"evas_simulate", "evas_experiment", "evas_testbench"}
         for item in previous
     )
     return {
@@ -272,6 +286,7 @@ def session_info(directory: Path) -> dict:
         "candidate_workspace": str(directory / "submission"),
         "tools": tool_schemas(
             experiments=bool(config["task"].get("experiments")),
+            testbench=bool(config["task"].get("testbench")),
             observations=config.get("observation_view_version") == 1,
         ),
         "experiments": config["task"].get("experiments"),
@@ -346,10 +361,10 @@ def session_action(directory: Path, request: dict) -> dict:
             for item in previous
         ):
             return {"ok": False, "error": "unresolved_previous_action", "retry_safe": False}
-        if tool in {"evas_simulate", "evas_experiment"} and any(
+        if tool in {"evas_simulate", "evas_experiment", "evas_testbench"} and any(
             not (item / "response.json").exists()
             and json.loads((item / "request.json").read_text())["tool"]
-            in {"evas_simulate", "evas_experiment"}
+            in {"evas_simulate", "evas_experiment", "evas_testbench"}
             for item in previous
         ):
             return {"ok": False, "error": "unresolved_previous_simulation", "retry_safe": False}
@@ -359,11 +374,11 @@ def session_action(directory: Path, request: dict) -> dict:
             return {"ok": False, "error": "action_budget_exhausted"}
         simulations = sum(
             json.loads((item / "request.json").read_text())["tool"]
-            in {"evas_simulate", "evas_experiment"}
+            in {"evas_simulate", "evas_experiment", "evas_testbench"}
             for item in previous
         )
         if (
-            tool in {"evas_simulate", "evas_experiment"}
+            tool in {"evas_simulate", "evas_experiment", "evas_testbench"}
             and simulations >= config["max_simulations"]
         ):
             return {"ok": False, "error": "simulation_budget_exhausted"}
@@ -376,7 +391,7 @@ def session_action(directory: Path, request: dict) -> dict:
             response = {"ok": False, "error": type(error).__name__}
             if isinstance(error, ValueError):
                 response["detail"] = str(error)
-        if tool not in {"evas_simulate", "evas_experiment"} or not response["ok"]:
+        if tool not in {"evas_simulate", "evas_experiment", "evas_testbench"} or not response["ok"]:
             return record.complete(response)
     # Snapshot and budget reservation are durable before releasing the edit lock.
     return _finish_simulation(directory, config, action, tool, args, response)
@@ -526,11 +541,40 @@ def _execute(directory, config, action, tool, args):
         or not args["script"].endswith(".py")
     ):
         raise ValueError("unsupported or undeclared public experiment")
+    source = directory / "submission"
+    files = task["candidate_files"]
+    if tool == "evas_testbench":
+        if config["backend"] != "remote_spectre" or not task.get("testbench"):
+            raise ValueError("temporary Spectre testbenches are not declared")
+        spec = json.loads(args["spec"])
+        if (
+            not isinstance(spec, dict)
+            or set(spec) != {"netlist", "support_files"}
+            or not isinstance(spec["netlist"], str)
+            or not spec["netlist"]
+            or not isinstance(spec["support_files"], dict)
+            or len(spec["support_files"]) > 16
+            or any(not isinstance(v, str) for v in spec["support_files"].values())
+            or len(args["spec"].encode()) > MAX_CANDIDATE_BYTES
+        ):
+            raise ValueError("invalid or oversized testbench specification")
+        names = declared_files(list(spec["support_files"])) if spec["support_files"] else []
+        if any(not name.endswith(".va") or name in files for name in names):
+            raise ValueError("support models require separate declared VA paths")
+        source = action / "diagnostic-source"
+        source.mkdir(mode=0o700)
+        for name in files:
+            target = source / name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(regular_file(directory / "submission", name), target)
+        payload = task["testbench"]["payload_file"]
+        atomic_json(source / payload, spec)
+        files = [*files, payload]
     snapshot = action / "candidate"
     frozen = freeze_candidate(
-        directory / "submission",
+        source,
         snapshot,
-        task["candidate_files"],
+        files,
         task_id=task["task_id"],
         task_version=task["task_version"],
         reason="simulation",

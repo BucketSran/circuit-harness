@@ -210,7 +210,7 @@ replay 的 `classification` 为 `match`、`false_accept`、`false_reject`、`inf
 `purpose=public` 要求独立公有任务包，并只投影显式 `feedback_fields`。
 评分、verdict、cases、report、logs、artifacts 等字段不能声明为公开反馈，嵌套私有字段也会拒绝。
 旧的宿主执行路径仅供操作者使用，不能作为 Agent 的公开仿真接口。
-配置 B 的 Agent 接口使用[隔离 Docker 路径](#isolated-public-spectre-jobs)，已有平台实现、本地 Docker 和受控 Harbor Trial 夹具证据；真实 SSH、模型和商业许可证部署仍未验收。
+配置 B 的 Agent 接口使用[隔离 Docker 路径](#isolated-public-spectre-jobs)或[Spectre 进程 namespace](#spectre-process-namespace)。已有本地 Docker 和受控 Harbor Trial 夹具，以及真实 namespace、SSH 和 Spectre 参考探针证据；独立评分的实际模型 Trial 尚未验收。
 最终任务包、report 和 archive 不进入公开工具或 Agent 工作区。
 
 本地子进程夹具验证后台执行、同 ID 去重、unknown 不重跑、超时、malformed report 和归档完整性。
@@ -229,7 +229,7 @@ retain their prior default behavior. The Agent adapter cannot register final eva
 as a public tool. `stage-benchmark --purpose public` validates the public package;
 the default purpose remains final.
 
-A private public profile has exactly these fields:
+A private Docker public profile has exactly these fields:
 
 ```json
 {
@@ -270,3 +270,88 @@ networked licensing needs a separately implemented and verified access policy. T
 is no host-network or host-process fallback, and no Boolean declaring a deployment
 verified. Supporting this bounded executor does not establish that a particular Spectre
 installation can obtain a license with networking disabled.
+
+## Spectre process namespace
+
+`spectre-isolate` lets a trusted host checker launch the candidate's Spectre process
+in a Linux Bubblewrap namespace. The checker must prepare a separate condition
+directory containing only the candidate, its relative include files and that
+condition's netlist. The process sees that directory and explicitly declared
+simulator runtime paths; the checker, hidden truth and other task packages stay
+outside those mounts. Existing inputs are read-only, while new compiler artifacts,
+logs and waveforms can be written in the condition directory. Candidate source is
+executed as supplied; this interface imposes no Verilog-A language subset.
+
+```sh
+python harness.pyz spectre-isolate --config /private/isolation.json -- \
+  -64 tb.scs +log spectre.log -format psfascii -raw psf +mt=1
+```
+
+The private configuration is an owned regular file with no group/world access.
+Its exact schema is version 1 and requires these fields:
+
+```json
+{
+  "schema_version": 1,
+  "bubblewrap": "/usr/bin/bwrap",
+  "spectre": "/opt/spectre/tools/bin/spectre",
+  "runtime_readonly_paths": ["/opt/spectre", "/usr", "/lib", "/lib64", "/bin"],
+  "network": "disabled",
+  "license_env": []
+}
+```
+
+Runtime grants must include the executable's resolved location, its libraries,
+standard models and shell interpreters. Some systems also need a narrow grant
+for `/etc/alternatives` or DNS configuration. Operators must exclude private
+configuration, home directories, checker packages and secrets from these grants.
+The launcher rejects filesystem-root grants, condition/runtime overlap, source
+symlinks and configuration inside a mounted condition. Missing dependencies fail
+the launch; there is no fallback to an unrestricted process.
+
+`network: "disabled"` creates a network namespace. `"shared_license"` retains the
+host network for a network license server and therefore **does not restrict other
+network egress**. Only explicitly selected simulator/license environment names are
+passed: `CDS_LIC_FILE`, `CDSLMD_LICENSE_FILE`, `LM_LICENSE_FILE`, `CDS_LIC_ONLY`,
+`CDS_LIC_QUEUE`, `CDS_AUTO_64BIT`, `LD_LIBRARY_PATH`, `CDS_INST_DIR`,
+`CDS_SPECTRE_DIR`. Model credentials and the caller's remaining environment are
+removed before Bubblewrap starts. License values remain operator-private.
+
+The launcher replaces itself, preserving the existing job process group for
+timeout and cancellation. `-W` grants no condition directory. Other launches write
+a configuration-hash and input-hash receipt in the condition directory, before
+Spectre starts. This receipt describes launch intent; trusted checkers must still
+verify the process result, input identity and output independently.
+
+To opt in to an existing final host profile, set its `spectre` executable to an
+operator-owned wrapper which invokes this command using a fixed private config
+and pinned bundle. Keep the trusted checker outside the namespace, and retain
+its license preflight and actual installation's discipline paths. Existing
+profiles are unchanged. The process entry does not authorize mounting a whole task
+package.
+
+For public sessions, use a host profile with its normal `shell`, `setup_scripts`,
+`spectre`, `preflight_script`, storage roots and resource bounds, plus exactly
+`backend: "spectre_namespace"` and `isolation_config: "/private/isolation.json"`.
+The profile's Spectre path must match the isolation configuration. The evaluator
+generates its own launcher from that validated configuration for both preflight
+and verification; the public path accepts no ordinary unisolated host profile.
+The profile identity includes the isolation configuration, Bubblewrap executable
+and Python interpreter. Namespace public jobs use the same durable job and archive
+checks as Docker public jobs. The two backends have different network policies;
+the Docker restrictions above do not imply network isolation for `shared_license`.
+
+The public task checker remains trusted host code. It must assemble each child
+condition from public assets and frozen candidate inputs only. The optional
+[`evas_testbench` declaration](CURRENT_EVAS_PUBLIC_SESSION.md#configuration-b-task-declared-remote-public-spectre)
+passes temporary netlist and VA text to that checker without changing the formal
+submission inventory. The checker must validate temporary support paths against
+its own immutable inputs before launching the isolated child.
+
+Actual Linux validation with Bubblewrap 0.4.1 and Spectre 21.1.0.509.isr12
+compiled a relative helper module and installed standard disciplines. A transient
+reference and a candidate using `$fopen` against hidden truth and its own source
+both completed with zero errors: 13 samples, 0.5V output for 1V input. Both negative
+file handles were zero; input files and hidden truth were unchanged. The deployment
+used shared license networking. Private raw evidence remains with the operator;
+these probes do not establish arbitrary runtime-grant safety or network isolation.

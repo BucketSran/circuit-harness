@@ -13,6 +13,7 @@ import os
 import re
 import shlex
 import shutil
+import sys
 import threading
 import time
 from pathlib import Path
@@ -242,11 +243,9 @@ def _private_profile(path: Path) -> dict:
         ):
             raise ValueError("invalid Docker output limit")
         return profile
-    if (
-        not isinstance(profile, dict)
-        or set(profile) != _PROFILE_KEYS
-        or profile["schema_version"] != 1
-    ):
+    namespace = isinstance(profile, dict) and profile.get("backend") == "spectre_namespace"
+    required = _PROFILE_KEYS | {"backend", "isolation_config"} if namespace else _PROFILE_KEYS
+    if not isinstance(profile, dict) or set(profile) != required or profile["schema_version"] != 1:
         raise ValueError("unsupported benchmark Spectre profile fields")
     if profile["shell"] not in {"/bin/sh", "/bin/csh"}:
         raise ValueError("shell must be /bin/sh or /bin/csh")
@@ -279,11 +278,23 @@ def _private_profile(path: Path) -> dict:
         or not 1 <= profile["max_output_bytes"] <= 256 * 1024 * 1024
     ):
         raise ValueError("invalid max_output_bytes")
+    if namespace:
+        from circuit_harness.execution.backends.spectre_isolation import _configuration
+
+        isolation, _ = _configuration(profile["isolation_config"])
+        if isolation["spectre"] != profile["spectre"]:
+            raise ValueError("namespace profile must declare the same Spectre binary")
     return profile
 
 
 def _profile_identity(path: Path) -> dict:
     profile = _private_profile(path)
+    isolation_tools = []
+    if profile.get("backend") == "spectre_namespace":
+        from circuit_harness.execution.backends.spectre_isolation import _configuration
+
+        isolation, _ = _configuration(profile["isolation_config"])
+        isolation_tools = [profile["isolation_config"], isolation["bubblewrap"], sys.executable]
     return {
         "path": str(Path(path).absolute()),
         "sha256": file_digest(path),
@@ -298,6 +309,7 @@ def _profile_identity(path: Path) -> dict:
                     profile["spectre"],
                     profile["preflight_script"],
                     *profile["setup_scripts"],
+                    *isolation_tools,
                 ]
             )
         },
@@ -323,9 +335,12 @@ def benchmark_identity(
         raise ValueError("declared checker candidate file is missing")
     profile = _profile_identity(profile_path)
     if isolated_public and (
-        purpose != "public" or profile["configuration"].get("backend") != "docker"
+        purpose != "public"
+        or profile["configuration"].get("backend") not in {"docker", "spectre_namespace"}
     ):
-        raise ValueError("Agent public execution requires isolated Docker profile")
+        raise ValueError(
+            "Agent public execution requires an isolated Docker or Spectre namespace profile"
+        )
     if purpose == "final" and profile["configuration"].get("backend") == "docker":
         raise ValueError("Docker public profile cannot run final evaluation")
     return {
@@ -527,6 +542,23 @@ def run_benchmark(identity: dict, directory: Path, cancel=None) -> dict:
     if config.get("backend") == "docker":
         return _run_public_container(identity, directory, deadline, cancel)
     atomic_json(directory / "identity.json", identity)
+    spectre = config["spectre"]
+    if config.get("backend") == "spectre_namespace":
+        # This trusted launcher, rather than arbitrary operator wrapper text,
+        # selects the validated namespace for every candidate Spectre child.
+        launcher = directory / "spectre-namespace-launcher"
+        package_root = str(Path(__file__).resolve().parents[3])
+        code = (
+            "import sys;sys.path.insert(0," + repr(package_root) + ");"
+            "from circuit_harness.execution.backends.spectre_isolation "
+            "import exec_isolated_spectre;"
+            "exec_isolated_spectre(" + repr(config["isolation_config"]) + ",sys.argv[1:])"
+        )
+        launcher.write_text(
+            "#!/bin/sh\nexec " + shlex.join([sys.executable, "-c", code]) + ' "$@"\n'
+        )
+        launcher.chmod(0o700)
+        spectre = str(launcher)
     work = directory / "work"
     shutil.copytree(directory.parent / "task-package", work)
     shutil.copytree(directory.parent / "candidate/files", work / "candidate")
@@ -540,7 +572,7 @@ def run_benchmark(identity: dict, directory: Path, cancel=None) -> dict:
             config,
             directory,
             [
-                f"SPECTRE={config['spectre']}",
+                f"SPECTRE={spectre}",
                 f"TASK_PACKAGE={directory.parent / 'task-package'}",
                 f"PREFLIGHT_OUTPUT={directory / 'preflight/report.json'}",
                 "/bin/sh",
@@ -564,7 +596,7 @@ def run_benchmark(identity: dict, directory: Path, cancel=None) -> dict:
             config,
             directory,
             [
-                f"SPECTRE={config['spectre']}",
+                f"SPECTRE={spectre}",
                 f"CANDIDATE={candidate}",
                 f"VERIFY_OUTPUT={output}",
                 "/bin/sh",

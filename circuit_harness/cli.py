@@ -102,6 +102,11 @@ def main(argv=None) -> int:
     final.add_argument("--root", type=Path, required=True)
     final.add_argument("--job-id", required=True)
     final.add_argument("--archive-root", type=Path)
+    isolate = commands.add_parser(
+        "spectre-isolate", help="run only Spectre in an explicit filesystem namespace"
+    )
+    isolate.add_argument("--config", type=Path, required=True)
+    isolate.add_argument("simulator_args", nargs=argparse.REMAINDER)
     bundle = commands.add_parser("bundle", help="build an offline standard-library CLI zipapp")
     bundle.add_argument("--output", type=Path, required=True)
     analog = commands.add_parser("analog-bench", help="run a pinned Analog Design Bench verifier")
@@ -335,6 +340,14 @@ def main(argv=None) -> int:
                     atomic_json(spool / "response.json", reply)
         print(json.dumps(reply))
         return 0 if reply.get("ok", True) else 1
+    if args.command == "spectre-isolate":
+        from circuit_harness.execution.backends.spectre_isolation import exec_isolated_spectre
+
+        arguments = args.simulator_args
+        if arguments[:1] == ["--"]:
+            arguments = arguments[1:]
+        exec_isolated_spectre(args.config, arguments)
+        return 0
     if args.command == "bundle":
         print(json.dumps({"path": str(args.output), "sha256": build_cli(args.output)}))
         return 0
