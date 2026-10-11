@@ -197,6 +197,28 @@ three `unsupported` and one `numerical` reason; the success control had no failu
 Full raw runs remain private. Docker benchmark replay and its full receipt aggregation
 are still a separate acceptance obligation under vaEVAS #64.
 
+`test_current_evas_docker_replay_real.py` accepts `CHIPS_TEST_EVAS_CHECKOUT`,
+`CHIPS_TEST_EVAS_LINUX_KERNEL` and `CHIPS_TEST_DOCKER_IMAGE` for the real Docker
+transport controls. The selected checkout also needs its built native debug kernel
+for the trusted runner. Use an immutable local image ID containing Python 3 and a
+Linux kernel built from the same frozen source bytes. The test runs the four EVAS
+failures, a successful arithmetic control and a real missing-kernel or missing-local-image
+infrastructure failure through the runner, public session and sealed benchmark replay.
+The event DAE must pass static lint before failing during transient execution.
+
+These are diagnostic transport controls, not benchmark circuit scores. The probe
+package preserves complete EVAS stderr inside the sealed replay inventory; after
+`verify_replay`, the existing metadata reader consumes those original bytes. Failed
+simulations remain unscored `unclassified_failure` records classified `unevaluable`.
+The success control is `not_compared`, and the infrastructure control is `infra`.
+`summarize_replays` counts all six records and candidates. Public feedback retains
+only the declared machine projection; original messages, locations and sample identity
+remain in the private logs. The run identity records source inventory, image, native
+and Linux kernel hashes, IR and diagnostic versions, acceptance file hash and sealed
+replay receipt hashes. Missing, malformed and future payloads remain covered by the
+constructed negative controls in `test_current_evas.py`, rather than pretending that
+a current EVAS engine emits a future protocol.
+
 The trusted resource runner `backends/current_evas.py` is not a sandbox and is not a fallback.
 
 The public adapter does not yet establish real va07 benchmark acceptance, a Linux
