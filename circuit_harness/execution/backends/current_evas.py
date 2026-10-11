@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import math
+import re
 import shutil
 import subprocess
 import threading
@@ -123,6 +124,61 @@ def _read_json(path: Path):
         raise ValueError(f"nonfinite JSON constant: {value}")
 
     return json.loads(path.read_text(), object_pairs_hook=pairs, parse_constant=constant)
+
+
+def read_diagnostic(path: Path) -> dict:
+    """Project v1 metadata only; complete stderr remains a private artifact.
+
+    Missing, malformed and future payloads stay unknown. Never infer a category
+    from a kind prefix or message. This evidence cannot change execution/grading.
+    """
+    result = dict(
+        diagnostic_version=None, code=None, category="unknown", stage=None, capability=None
+    )
+    try:
+        # Bound parsing separately from retained log size. Large failures still
+        # count and retain their original bytes, even when metadata is unknown.
+        if path.stat().st_size > 1024 * 1024:
+            return result
+        payload = _read_json(path)
+        if not isinstance(payload, dict):
+            return result
+        version = payload.get("diagnostic_version")
+        if type(version) is int and 0 <= version <= 2**31 - 1:
+            result["diagnostic_version"] = version
+        if type(version) is not int or version != 1:
+            return result
+        categories = {
+            "unknown",
+            "invalid_input",
+            "unsupported",
+            "version",
+            "numerical",
+            "resource",
+            "infrastructure",
+            "internal",
+            "protocol",
+        }
+
+        def token(value):
+            return isinstance(value, str) and re.fullmatch(r"[A-Za-z0-9_.-]{1,96}", value)
+
+        if (
+            not token(payload.get("kind"))
+            or not token(payload.get("code"))
+            or not token(payload.get("stage"))
+            or not isinstance(payload.get("message"), str)
+            or not isinstance(payload.get("category"), str)
+            or payload["category"] not in categories
+            or not (payload.get("capability") is None or token(payload["capability"]))
+        ):
+            return result
+        result.update(
+            {key: payload.get(key) for key in ("code", "category", "stage", "capability")}
+        )
+    except (OSError, ValueError, TypeError, OverflowError, RecursionError):
+        pass
+    return result
 
 
 def _validate_manifest(config: dict) -> None:
@@ -294,6 +350,8 @@ def run_evas(
     }
     if result["execution"] == "ok" and process["returncode"] != 0:
         result["execution"] = "backend_error"
+    if result["execution"] == "backend_error":
+        result["diagnostic"] = read_diagnostic(execution_dir / "evas.stderr.log")
     if kernel_error:
         result["reason"] = kernel_error
     if result["execution"] == "ok":

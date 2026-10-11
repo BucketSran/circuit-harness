@@ -9,6 +9,33 @@ from test_current_evas_session import call, make_session
 from circuit_harness.execution import current_evas_session as session
 
 
+def test_remote_session_rejects_evas_diagnostic_projection(tmp_path):
+    package = task_package(tmp_path, purpose="public")
+    manifest = json.loads((package / "manifest.json").read_text())
+    manifest.update(task_id="synthetic", feedback_fields=["diagnostic"])
+    (package / "manifest.json").write_text(json.dumps(manifest))
+    remote = dict(
+        host="fixture",
+        python="/bin/python",
+        bundle="/bundle.pyz",
+        profile="/public.json",
+        run_root="/public/jobs",
+        archive_root="/public/archive",
+        upload_root="/public/upload",
+    )
+    with pytest.raises(ValueError, match="supported public feedback fields"):
+        make_session(
+            tmp_path,
+            backend="remote_spectre",
+            image=None,
+            feedback_fields=["diagnostic"],
+            public_task_package=package,
+            public_remote=remote,
+            manifest={"condition_id": "fixture-condition-v1"},
+        )
+    assert not (tmp_path / "session").exists()
+
+
 def test_remote_session_reuses_public_budget_and_freezes(tmp_path, monkeypatch):
     package = task_package(tmp_path, purpose="public")
     manifest = json.loads((package / "manifest.json").read_text())

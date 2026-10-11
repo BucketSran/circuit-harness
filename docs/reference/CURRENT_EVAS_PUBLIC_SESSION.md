@@ -32,7 +32,8 @@ The `task` declaration requires exactly these fields:
 
 Paths must be unique canonical relative paths without symlinks. Manifest models
 must exactly match candidate files. Feedback fields must be explicitly declared;
-only `diagnostics` and `observations` are supported, including an empty selection.
+only `diagnostics`, `diagnostic` and `observations` are supported, including an empty selection.
+`diagnostic` is an opt-in machine field for failed fixed EVAS simulations; existing tasks keep their feedback selection.
 Public material bytes, source inventory and kernel identity are frozen at creation.
 
 `session_info(directory)` returns tool instructions, a summary of the fixed manifest, declared
@@ -163,6 +164,22 @@ candidate, infrastructure failure, timeout, output limit, backend failure, inval
 result and unconfirmed cleanup. Inspect private action receipts for detailed evidence;
 do not expose their paths or logs wholesale to the Agent.
 
+### Versioned EVAS failure metadata
+
+For a failed fixed EVAS simulation, `diagnostic` contains `diagnostic_version`, `code`,
+`category`, `stage` and `capability`. It is read from the complete private stderr before
+text truncation. Only well-formed v1 metadata is projected; missing, malformed, oversized
+or future-version payloads have `category="unknown"`. A valid integer version is retained.
+The original log and its artifact hash remain private. No category is inferred from a
+message or kind prefix. Metadata is not a circuit correctness verdict.
+
+Messages, locations, raw nested payloads and arbitrary extra keys are excluded from this
+new public field. The existing `diagnostics` string keeps its current truncation/redaction
+contract. Python measurement experiments and remote Spectre do not emit EVAS metadata.
+`execution`, task grading and replay classification are unchanged. A missing machine
+field never implies success. Parsing is limited to 1 MiB; larger raw logs remain subject
+to the existing output limit and are not discarded from accounting.
+
 ## Evidence and limits
 
 `tests/chips/test_current_evas_session.py` covers complete writes, exact bundles,
@@ -171,11 +188,81 @@ action replay, budgets, pending simulation exclusion and collection during execu
 Set `CHIPS_TEST_DOCKER_IMAGE` to a local immutable image ID or
 `CHIPS_TEST_NATIVE_CODEX` to the native CLI binary to run those probes. Their engines
 are synthetic fixtures; they establish platform access boundaries, not circuit scores.
+`test_current_evas_real.py` additionally executes a selected real EVAS checkout through
+both the trusted runner and an OS-isolated public session. Set `CHIPS_TEST_EVAS_CHECKOUT`
+and `CHIPS_TEST_NATIVE_CODEX` to run the five fixed compile/runtime/success controls.
+They verify metadata, retained failures and action replay, not benchmark replay or scores.
+The earlier macOS-only acceptance selected EVAS `ab0df35b` / IR18 and kernel
+`0de37e97dca3e52b871a8895872a39994bd012b51c9d5d5086f8bc26ead6667b`.
+It completed five controls, but did not establish a Linux build or Docker benchmark replay.
+
+On 2026-10-11, Harness `bdcdde2` and clean EVAS source
+`989e7f53ad825e7393167feef67e0df1e2039a1f` completed the six Docker transport
+controls below with IR18 and diagnostic v1. Both native and Linux kernels were
+built from the same frozen source inventory. The four EVAS failures retained
+`backend_error` in the runner and public session, with three `unsupported` reasons
+and one `numerical` reason. Replay kept all four failures unscored and `unevaluable`.
+The successful control was `not_compared`; the actual missing-kernel or missing-local-image
+control was `infrastructure_error` and counted as `infra`. All six sealed replay
+receipts verified, and the aggregate retained six records and six candidates.
+These complete the fixed external consumer controls under vaEVAS #64. They
+establish no circuit correctness score, full diagnostic-exit coverage or Spectre alignment.
+
+A separate Linux OS probe used the same selected kernel and a two-sample static
+request with `EVAS_STATIC_THREADS=2`. Docker's inspected `pids-limit=1` caused
+actual exit 2 with `worker_start` and OS error 11. The same request under
+`pids-limit=8` completed with y=2 and y=4. The frozen EVAS Python adapter retained
+the raw payload and projected v1, `kernel.worker_start`, kernel and infrastructure.
+Both containers used no network, a read-only root, 512 MiB memory and one CPU,
+with confirmed cleanup. This probe verifies the OS thread-start failure and Python
+adaptation, separately from the six replay records. It did not pass through a
+public session or benchmark replay and does not replace their infrastructure control.
+Worker panic and VCO advice are producer-owned EVAS tests, outside this consumer
+replay denominator.
+
+The selected immutable local image is
+`sha256:3e7c9ffd3018d384a089688b8eece2d95b4d0b4b056fc733513b375b13ba0d44`.
+Kernel SHA-256 values are:
+
+| Build | SHA-256 |
+| --- | --- |
+| Native debug | `b1bb58a2bb4d59f060eda0d8e788ef5a4f5e9c52e38c74a4349214f2ee30d86f` |
+| Linux release | `86c6d470a39075f7648b431e5d315ae29cb2d54871687d048ea06bb70382ee8e` |
+
+The 107-file build inventory has SHA-256
+`2a4e80076e1428ed8c4eafb1870d346be626364e120a15d1b6acdd84607ad2a8`,
+computed from the sorted file inventory as compact JSON. Complete raw runs, build
+logs, receipts and failed preparation attempts remain private; they are not a
+public dataset. The maintained test below supplies the rerunnable acceptance path.
+
+`test_current_evas_docker_replay_real.py` accepts `CHIPS_TEST_EVAS_CHECKOUT`,
+`CHIPS_TEST_EVAS_LINUX_KERNEL` and `CHIPS_TEST_DOCKER_IMAGE` for the real Docker
+transport controls. The selected checkout also needs its built native debug kernel
+for the trusted runner. Use an immutable local image ID containing Python 3 and a
+Linux kernel built from the same frozen source bytes. The test runs the four EVAS
+failures, a successful arithmetic control and a real missing-kernel or missing-local-image
+infrastructure failure through the runner, public session and sealed benchmark replay.
+The event DAE must pass static lint before failing during transient execution.
+
+These are diagnostic transport controls, not benchmark circuit scores. The probe
+package preserves complete EVAS stderr inside the sealed replay inventory; after
+`verify_replay`, the existing metadata reader consumes those original bytes. Failed
+simulations remain unscored `unclassified_failure` records classified `unevaluable`.
+The success control is `not_compared`, and the infrastructure control is `infra`.
+`summarize_replays` counts all six records and candidates. Public feedback retains
+only the declared machine projection; original messages, locations and sample identity
+remain in the private logs. The run identity records source inventory, image, native
+and Linux kernel hashes, IR and diagnostic versions, acceptance file hash and sealed
+replay receipt hashes. Missing, malformed and future payloads remain covered by the
+constructed negative controls in `test_current_evas.py`, rather than pretending that
+a current EVAS engine emits a future protocol.
+
 The trusted resource runner `backends/current_evas.py` is not a sandbox and is not a fallback.
 
-The public adapter does not yet establish real va07 benchmark acceptance, a Linux
-build of the current local Mach-O kernel, arbitrary native script isolation, or
-native memory/PID enforcement. These require separate owned acceptance evidence.
+The public adapter does not yet establish real va07 benchmark circuit acceptance,
+arbitrary native script isolation or native memory/PID enforcement. These require
+separate owned acceptance evidence. The earlier Linux-build and Docker-replay gaps
+are closed only for the fixed diagnostic transport controls described above.
 
 ## Opt-in public Python measurements
 
