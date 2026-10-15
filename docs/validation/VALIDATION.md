@@ -13,6 +13,30 @@
 该交付还完成新旧入口兼容检查、仓库外 wheel 安装、schema 资源与标准库 zipapp
 检查。具体代码边界由测试定义；这些结果不证明真实模型或商业许可证可用。
 
+## 原生 Harbor 交付检查
+
+2026-10-15，本轮实现基于 `bee5695`，使用 Python 3.12.13、Harbor 0.23.0，
+以合成文件工程核对[原生 artifacts 交付](../reference/BENCHMARK_EVALUATION.md#原生-harbor-artifacts-的交付检查)。
+没有修改具体 benchmark 题包，也没有运行模型或仿真器。
+
+| 实际检查 | 结果与范围 |
+| --- | --- |
+| 文件与进程协议 | [32 项通过](../../tests/chips/test_artifact_delivery.py)：最终字节、显式多文件、目录增删改名及空目录、固定材料恢复、文件执行权限、快照篡改、checker 身份和失败拒绝 |
+| 独立 Docker 环境 | [4 项通过](../../tests/chips/test_artifact_delivery_docker.py)：单文件、多文件、开放目录得到 reward 1；只改坏辅助模块得到正常 reward 0；评分器运行原始 `test.sh` |
+| 受影响兼容回归 | 158 passed、16 skipped，包含上述 32 项协议检查；跳过项是其他测试的可选 Docker 镜像条件，不包含本轮单独执行的 4 项容器检查 |
+| 静态与打包 | Ruff lint/format、schema 导出、compileall、wheel 构建及仓库外 wheel 安装 smoke 通过 |
+
+容器使用 Docker 29.5.2、禁网配置和固定 Python 镜像
+`sha256:593bd06efe90efa80dc4eee3948be7c0fde4134606dd40d8dd8dbcade98e669c`。
+两侧为独立容器，求解侧不能读取 `/tests/`、`/solution/` 或终评 reward；
+开放目录内被改写的固定材料从可信基线恢复，原有删除不会被目录合并悄悄补回。
+
+故障检查拒绝缺失交付、传输失败、错误评分材料、旧 reward、缺失或非有限 reward，
+以及 checker 写出 reward 后异常退出。独立审查发现的执行权限丢失和 checker 覆盖问题，
+均已复现、修复并复查。完成分数与交付、任务和评分材料摘要关联。
+这些结果证明该显式接入路径的文件交付和执行流程；尚不证明真实电路题的判据质量，
+也不表示任意原生 Harbor Job 已自动接入这一检查。
+
 ## AnalogBench 原题与操作者控制
 
 示例及来源固定方式见 [AnalogBench](../../examples/analogbench/README.md)。

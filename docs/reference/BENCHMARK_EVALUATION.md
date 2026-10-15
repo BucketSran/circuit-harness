@@ -4,6 +4,74 @@
 Harness 管理执行与证据；vaEVAS benchmark 声明任务、checker、判据、任务集合和后端映射。
 这些入口不属于 Agent 的公开工具。
 
+## 原生 Harbor artifacts 的交付检查
+
+新建的单文件、多文件和开放目录工程可以选择
+[`ArtifactDelivery`](../../circuit_harness/harbor/artifact_delivery.py) 校验原生 Harbor 交付流程。
+它复用 Harbor 0.23.0 的 `ArtifactConfig`、`ArtifactHandler` 和原始 `Verifier`，
+不改现有公开会话的候选协议，也不自动替换任意 Job 或 Trial 的环境、Agent 或 verifier。
+本轮验收使用合成文件工程，不代表真实电路题、商业仿真器或模型已经通过。
+
+操作者从实际任务配置读取 `artifacts`，提供可信 starter、任务身份和待运行的 verifier task。
+starter 是完整的 `/app/` 工程基线。声明路径默认可修改，其余基线文件保持固定；
+开放目录内还有固定文件或子目录时，在 `fixed_paths` 中按 `/app/` 绝对路径明确保护。
+收集前必须结束求解及其写入进程；独立环境的创建、阶段期限、取消和清理由调用者或 Harbor 生命周期负责。
+当前接口不承担第二套 Agent 调度。
+
+```python
+from circuit_harness.harbor.artifact_delivery import ArtifactDelivery
+from harbor.verifier.verifier import Verifier
+
+# task、agent_env 和 verifier_env 由调用者按原生 Harbor 合同创建。
+delivery = ArtifactDelivery(
+    task.paths.environment_dir / "starter",
+    task.config.artifacts,
+    task_id=task.config.metadata["name"],
+    task_version="reviewed-task-revision",
+    fixed_paths=["/app/modules/fixed.inc"],  # 仅在题目确有此固定材料时提供
+    verifier_task=task,
+)
+frozen = await delivery.collect(agent_env, private_run / "submission")
+result = await delivery.grade(
+    Verifier(task=task, trial_paths=verifier_paths, environment=verifier_env),
+    frozen,
+)
+```
+
+收集和恢复的检查分别如下：
+
+| 环节 | 自动核对 |
+| --- | --- |
+| 原生收集 | 每个声明必须有唯一且类型正确的 `ok` 记录；失败或缺失不能退回使用 starter |
+| 冻结 | 保存当前文件字节、文件权限、目录结构与空目录；摘要绑定任务、范围和交付内容；冻结后不再读取 Agent 工作文件 |
+| 可信基线 | 固定文件不进入可修改交付快照；保留作者基线副本和身份，保护开放目录内的固定材料 |
+| 恢复 | 原生目录清空与上传保留删除、重命名和新文件；补回固定材料，并读回完整 `/app/` 工程核对实际放置结果 |
+| 独立终评 | 拒绝使用原求解环境；冻结前绑定题面、task.toml 与 tests；执行前读回实际 `/tests/` 核对内容，再运行原始 `/tests/test.sh` |
+| 完成判定 | 拒绝旧评分目录、错误 verifier、入口异常退出、缺失或非有限 reward、输入被评分器改写等情况；正常完成的 0 分仍是有效结果 |
+
+`verify(frozen)` 可只读重新校验快照，`restore(verifier_env, frozen)` 可独立恢复和核对工程。
+目录可以为空，必需入口是否存在由题目规格与 checker 判断。
+新的辅助文件按目录范围自动收集，不要求 Git 登记。暂存、复制后的候选仍要独立核验摘要。
+评分器可以生成波形、缓存等新输出，原有输入字节、文件权限与目录必须保留；输出不回写成提交内容。
+实际 checker 的文件字节与目录必须与绑定材料一致；不能用预加载或 step 覆盖换成另一套评分器。
+Harbor 执行前给 `test.sh` 增加执行权限的正常操作不影响 checker 内容核对。
+
+当前适配明确支持 Linux、`/app/`、主服务和无 exclude 的文件或目录声明。
+可使用 Harbor 的 host `destination` 重定位；它不改变 verifier 中的源路径。
+跨服务与排除模式会在收集前拒绝，固定材料使用 `fixed_paths`，避免把排除配置误当成成功提交。
+`grade` 使用标准 `tests/test.sh` 入口，要求完整执行且退出码为 0；电路不合格用正常完成的 reward 0 表达。
+这项可选路径的完成条件不改变下方已有公开会话/Spectre report 对明确非零 checker 判定的处理。
+输入树沿用现有 16 MiB 配额，文件与目录总数上限为 1000；大波形应作为输出处理。
+
+`delivery.json` 是该路径的私有收据，保存范围、可信基线、文件摘要、空目录、源环境和 verifier 身份。
+`candidate_sha256` 标识任务版本与交付内容，`plan_sha256` 另绑定基线和评分材料；两者不混用。
+完成验收后在 Harbor verifier 目录生成 `delivery-result.json`，关联本次 reward 与两项身份。
+这些是新增原生路径的记录，不冒充下方旧 `candidate_bundle` 或远端作业的既有 schema。
+收集或终评异常不会发布成功收据；可能留下诊断文件或原生 reward，应保留但不能当作本路径的完成分数。
+调用者须把运行材料放在 Agent 不可读的私有目录。
+
+自动检查入口与可重复命令见[测试导航](../../tests/chips/README.md#原生交付检查)。
+
 ## 输入与任务包
 
 [`candidate_bundle`](../../circuit_harness/execution/evaluation/candidate_bundle.py) 提供：

@@ -17,6 +17,8 @@
 | 测试 | 实际覆盖 | 外部依赖与证据边界 |
 | --- | --- | --- |
 | `test_candidate_bundle.py` | 候选字节冻结、摘要与收取校验 | 本地文件，不运行评分器 |
+| `test_artifact_delivery.py` | 原生 artifacts 的单文件、多文件、目录快照、固定工程恢复、原始 verifier 和故障拒绝 | 真实文件与子进程，Harbor 原生传输逻辑；环境提供者为本地夹具，不证明隔离 |
+| `test_artifact_delivery_docker.py` | 三种交付及错误辅助模块对照，独立 Docker 收集、恢复、原始 test.sh 与结果绑定 | 需要显式本地镜像；真实容器，不运行模型或仿真器 |
 | `test_current_evas*.py` | 当前源码身份、公开会话、动作去重、预算、失败及冻结 | 构造任务；部分检查使用本地 Docker 或 Codex 沙箱，不调用模型 |
 | `test_public_observations.py` | 摘要、波形窗口、完整公开 JSON 分页、版本兼容、完整性和读取预算 | 构造 Docker CLI；实际文件、子进程和离线包，不运行仿真器或模型 |
 | `test_native_sandbox.py` | 原生进程的公开写入、私有路径及网络拒绝 | 需要本地 Codex CLI；不发送模型请求 |
@@ -40,6 +42,20 @@
 测试不自动拉取镜像。Docker 的测试目录必须在 daemon 可挂载的文件系统内。
 macOS 的虚拟机后端可能不共享默认临时目录，此时把 pytest `--basetemp`
 指向 worktree 中一个新的、已被忽略的 `.planning/chips/` 子目录。
+
+## 原生交付检查
+
+先执行不需要容器的合成协议检查，再用已经安装的、带 Python 和 sh 的不可变镜像执行独立容器检查：
+
+```bash
+python -m pytest -q tests/chips/test_artifact_delivery.py
+CHIPS_TEST_ARTIFACT_IMAGE=sha256:<installed-image-id> python -m pytest -q tests/chips/test_artifact_delivery_docker.py
+```
+
+测试不会拉取镜像或请求模型。macOS 可将 `--basetemp` 指向新的 ignored 本地目录，
+避免 Docker VM 无法共享系统临时目录。CI 单独准备固定 Python 镜像，再显式运行容器检查并保存 JUnit。
+协议夹具只证明文件、进程和接口行为；Docker 检查另外验证独立容器与隐藏材料的隔离。
+具体适配合同和限制见[原生 artifacts 交付](../../docs/reference/BENCHMARK_EVALUATION.md#原生-harbor-artifacts-的交付检查)。
 
 ## 本地检查
 
