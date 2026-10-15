@@ -19,6 +19,12 @@ jobs:
       - run: python -m pip install -e '.[dev,chips,harbor]'
       - run: ruff check circuit_harness tests && ruff format --check circuit_harness tests
       - run: python -m pytest -q --junitxml=runs/chips/validation/ci/junit.xml
+      - name: Native Harbor artifact delivery in separate containers
+        run: |
+          image=python@sha256:593bd06efe90efa80dc4eee3948be7c0fde4134606dd40d8dd8dbcade98e669c
+          docker pull "$image"
+          export CHIPS_TEST_ARTIFACT_IMAGE="$(docker image inspect --format '{{.Id}}' "$image")"
+          python -m pytest -q tests/chips/test_artifact_delivery_docker.py --junitxml=runs/chips/validation/ci/artifact-delivery.xml
       - run: python -m circuit_harness._schema_export
       - run: python -m compileall -q circuit_harness tests
       - run: python -m pip wheel --no-deps . --wheel-dir dist
@@ -27,7 +33,7 @@ jobs:
         if: always()
         with:
           name: chips-local-tests
-          path: runs/chips/validation/ci/junit.xml
+          path: runs/chips/validation/ci/*.xml
           if-no-files-found: warn
           retention-days: 14
   trajectory-data:

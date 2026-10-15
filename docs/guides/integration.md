@@ -50,6 +50,10 @@ Harbor 启动 Agent + Model
 
 用 `circuit_harness.harbor.profiles` 为原生 Job 编译 Agent 与 Model 配置。此时文件收取、测试注入和评分隔离遵循 Harbor 与该任务的实现，不会自动接入 Harness 的动作预算、冻结收据和私有终评接口。
 
+新工程需要核对收集完整性、目录删除、固定材料恢复和原始 checker 时，可以显式接入
+[原生 artifacts 交付检查](../reference/BENCHMARK_EVALUATION.md#原生-harbor-artifacts-的交付检查)。
+它使用原生传输与 verifier，独立保存交付证据；当前不自动接入任意 Job，也不使用公开会话候选作为第二份提交。
+
 任务仓库中的 `solution/` 用于操作者的 oracle 验收，不能放进 Agent 镜像或公开材料。发布示例准备代码与来源引用，下载后的完整任务保存在忽略目录。参考解和错误候选分别验收后，再开展真实 Agent 实验。
 
 ### 需要公开会话与独立终评
